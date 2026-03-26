@@ -4,6 +4,7 @@ import Exercises from './components/Exercises.jsx';
 import Reference from './components/Reference.jsx';
 import History from './components/History.jsx';
 import Tree from './components/Tree.jsx';
+import AskCLI from './components/AskCLI.jsx';
 import { useTerminal } from './hooks/useTerminal.js';
 
 const tabs = [
@@ -12,6 +13,7 @@ const tabs = [
   { id: 'reference', label: '📖 Référence' },
   { id: 'history', label: '✓ Historique' },
   { id: 'tree', label: '🌲 Arborescence' },
+  { id: 'ask', label: '💬 Question' },
 ];
 
 export default function App() {
@@ -25,7 +27,6 @@ export default function App() {
     feedback,
     feedbackType,
     hint,
-    isRunning,
     executeCommand,
     validateExercise,
     resetTerminal,
@@ -92,6 +93,9 @@ export default function App() {
         )}
         {activeTab === 'tree' && (
           <Tree />
+        )}
+        {activeTab === 'ask' && (
+          <AskCLI />
         )}
       </div>
 
