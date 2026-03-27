@@ -104,25 +104,8 @@ export default function AskCLI() {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {messages.length === 0 && (
-          <div className="text-gray-500 text-xs space-y-2">
-            <p>Posez n'importe quelle question :</p>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {[
-                'Comment supprimer un dossier avec tout son contenu ?',
-                'Quelle est la différence entre git merge et git rebase ?',
-                'Comment fonctionne le protocole HTTP ?',
-                'Explique ce qu\'est une API REST',
-                'Comment sécuriser un serveur Linux ?',
-              ].map(ex => (
-                <button
-                  key={ex}
-                  onClick={() => { setQuestion(ex); }}
-                  className="px-2 py-1 text-xs bg-gray-800/60 text-gray-300 rounded border border-gray-700 hover:border-cyan-700 hover:text-cyan-300"
-                >
-                  {ex}
-                </button>
-              ))}
-            </div>
+          <div className="text-gray-500 text-xs">
+            Posez n'importe quelle question…
           </div>
         )}
         {messages.map((m, i) => (
