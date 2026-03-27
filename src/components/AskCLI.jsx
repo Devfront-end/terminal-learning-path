@@ -3,14 +3,8 @@ import Anthropic from '@anthropic-ai/sdk';
 
 const STORAGE_KEY = 'tlp_anthropic_key';
 
-const SYSTEM_PROMPT = `Tu es un expert en commandes CLI (Linux, macOS, Windows, Git, Docker, npm, etc.).
-Réponds en français, de façon concise et pédagogique.
-Pour chaque réponse :
-- Donne la commande exacte dans un bloc de code
-- Explique ce qu'elle fait
-- Donne un exemple concret si utile
-- Signale les options importantes ou les variantes
-Tu peux répondre à des questions sur n'importe quel outil en ligne de commande.`;
+const SYSTEM_PROMPT = `Tu es un assistant expert et pédagogue. Réponds en français, de façon claire et concise.
+Quand la question porte sur une commande ou du code, utilise des blocs de code avec des exemples concrets.`;
 
 export default function AskCLI() {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem(STORAGE_KEY) || '');
@@ -111,14 +105,14 @@ export default function AskCLI() {
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {messages.length === 0 && (
           <div className="text-gray-500 text-xs space-y-2">
-            <p>Posez n'importe quelle question sur les commandes CLI :</p>
+            <p>Posez n'importe quelle question :</p>
             <div className="flex flex-wrap gap-2 mt-2">
               {[
                 'Comment supprimer un dossier avec tout son contenu ?',
-                'Comment voir les ports ouverts sur ma machine ?',
-                'Comment annuler le dernier commit git ?',
-                'Comment tuer un processus par nom ?',
-                'Comment compresser un dossier en .tar.gz ?',
+                'Quelle est la différence entre git merge et git rebase ?',
+                'Comment fonctionne le protocole HTTP ?',
+                'Explique ce qu\'est une API REST',
+                'Comment sécuriser un serveur Linux ?',
               ].map(ex => (
                 <button
                   key={ex}
@@ -159,7 +153,7 @@ export default function AskCLI() {
           value={question}
           onChange={e => setQuestion(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); } }}
-          placeholder="Posez une question sur n'importe quelle CLI… (Entrée pour envoyer)"
+          placeholder="Posez n'importe quelle question… (Entrée pour envoyer)"
           rows={2}
           className="flex-1 bg-gray-900/60 border border-gray-700 rounded px-3 py-2 text-green-300 font-mono text-xs outline-none focus:border-cyan-600 placeholder-gray-600 resize-none"
         />
