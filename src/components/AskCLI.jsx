@@ -16,7 +16,7 @@ function loadSaved() {
 }
 
 export default function AskCLI() {
-  const [apiKey, setApiKey]   = useState(() => localStorage.getItem(STORAGE_KEY) || '');
+  const [apiKey, setApiKey]     = useState(() => localStorage.getItem(STORAGE_KEY) || '');
   const [keyInput, setKeyInput] = useState('');
   const [question, setQuestion] = useState('');
   const [messages, setMessages] = useState([]);
@@ -26,14 +26,21 @@ export default function AskCLI() {
     try { return JSON.parse(localStorage.getItem('tlp_usage')) || { requests: 0, tokensIn: 0, tokensOut: 0 }; }
     catch { return { requests: 0, tokensIn: 0, tokensOut: 0 }; }
   });
-  const [saved, setSaved]       = useState(loadSaved);
-  const [showSaved, setShowSaved] = useState(false);
-  const [savedIdx, setSavedIdx]   = useState(new Set());
+  const [saved, setSaved]           = useState(loadSaved);
+  const [showSaved, setShowSaved]   = useState(false);
+  const [savedIdx, setSavedIdx]     = useState(new Set());
+  const [editingIdx, setEditingIdx] = useState(null);
+  const [editText, setEditText]     = useState('');
   const bottomRef = useRef(null);
+  const editRef   = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  useEffect(() => {
+    if (editingIdx !== null) editRef.current?.focus();
+  }, [editingIdx]);
 
   const saveKey = () => {
     const k = keyInput.trim();
@@ -44,6 +51,25 @@ export default function AskCLI() {
 
   const removeKey = () => { localStorage.removeItem(STORAGE_KEY); setApiKey(''); };
 
+  const callAPI = async (msgs) => {
+    const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
+    const response = await client.messages.create({
+      model: 'claude-haiku-4-5', max_tokens: 1024,
+      system: SYSTEM_PROMPT, messages: msgs,
+    });
+    const answer = response.content.find(b => b.type === 'text')?.text || '';
+    setUsage(prev => {
+      const next = {
+        requests: prev.requests + 1,
+        tokensIn: prev.tokensIn + (response.usage?.input_tokens || 0),
+        tokensOut: prev.tokensOut + (response.usage?.output_tokens || 0),
+      };
+      localStorage.setItem('tlp_usage', JSON.stringify(next));
+      return next;
+    });
+    return answer;
+  };
+
   const ask = async () => {
     const q = question.trim();
     if (!q || loading) return;
@@ -52,22 +78,8 @@ export default function AskCLI() {
     setMessages(newMessages);
     setLoading(true);
     try {
-      const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
-      const response = await client.messages.create({
-        model: 'claude-haiku-4-5', max_tokens: 1024,
-        system: SYSTEM_PROMPT, messages: newMessages,
-      });
-      const answer = response.content.find(b => b.type === 'text')?.text || '';
+      const answer = await callAPI(newMessages);
       setMessages(prev => [...prev, { role: 'assistant', content: answer }]);
-      setUsage(prev => {
-        const next = {
-          requests: prev.requests + 1,
-          tokensIn: prev.tokensIn + (response.usage?.input_tokens || 0),
-          tokensOut: prev.tokensOut + (response.usage?.output_tokens || 0),
-        };
-        localStorage.setItem('tlp_usage', JSON.stringify(next));
-        return next;
-      });
     } catch (e) {
       setError(e.message || 'Erreur API');
     } finally {
@@ -75,11 +87,52 @@ export default function AskCLI() {
     }
   };
 
-  // Sauvegarde la question + réponse associée au message i (assistant)
+  // Supprimer une paire question/réponse (index de la question)
+  const deletePair = (i) => {
+    setMessages(prev => {
+      const next = [...prev];
+      // supprimer la réponse si elle suit
+      if (next[i + 1]?.role === 'assistant') next.splice(i, 2);
+      else next.splice(i, 1);
+      return next;
+    });
+    setSavedIdx(prev => {
+      const next = new Set(prev);
+      next.delete(i + 1);
+      return next;
+    });
+  };
+
+  // Démarrer l'édition d'un message utilisateur
+  const startEdit = (i) => {
+    setEditingIdx(i);
+    setEditText(messages[i].content);
+  };
+
+  // Confirmer l'édition : remplace le message et regénère la réponse
+  const confirmEdit = async () => {
+    const q = editText.trim();
+    if (!q || loading) return;
+    setEditingIdx(null);
+    setError('');
+    // Tronquer l'historique jusqu'à ce message (inclus) et relancer
+    const truncated = [...messages.slice(0, editingIdx), { role: 'user', content: q }];
+    setMessages(truncated);
+    setLoading(true);
+    try {
+      const answer = await callAPI(truncated);
+      setMessages([...truncated, { role: 'assistant', content: answer }]);
+    } catch (e) {
+      setError(e.message || 'Erreur API');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const saveQA = (i) => {
-    const question = messages[i - 1]?.content || '';
-    const answer   = messages[i]?.content || '';
-    const entry = { id: Date.now(), date: new Date().toLocaleDateString('fr-FR'), question, answer };
+    const q = messages[i - 1]?.content || '';
+    const a = messages[i]?.content || '';
+    const entry = { id: Date.now(), date: new Date().toLocaleDateString('fr-FR'), question: q, answer: a };
     const next = [entry, ...saved];
     setSaved(next);
     localStorage.setItem(SAVED_KEY, JSON.stringify(next));
@@ -165,15 +218,40 @@ export default function AskCLI() {
         {messages.length === 0 && <div className="text-gray-500 text-xs">Posez n'importe quelle question…</div>}
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className="relative group">
-              <div className={`max-w-2xl text-xs rounded-lg px-4 py-3 whitespace-pre-wrap font-mono ${
-                m.role === 'user'
-                  ? 'bg-cyan-900/30 text-cyan-200 border border-cyan-800/40'
-                  : 'bg-gray-900/60 text-gray-200 border border-gray-700/40'
-              }`}>
-                {m.content}
+            {m.role === 'user' ? (
+              <div className="relative group max-w-2xl">
+                {editingIdx === i ? (
+                  <div className="space-y-2">
+                    <textarea
+                      ref={editRef}
+                      value={editText}
+                      onChange={e => setEditText(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); confirmEdit(); } if (e.key === 'Escape') setEditingIdx(null); }}
+                      rows={3}
+                      className="w-full bg-cyan-950/40 border border-cyan-600 rounded px-3 py-2 text-cyan-200 font-mono text-xs outline-none resize-none"
+                    />
+                    <div className="flex gap-2 justify-end">
+                      <button onClick={() => setEditingIdx(null)} className="px-3 py-1 text-xs bg-gray-800 border border-gray-700 text-gray-300 rounded hover:bg-gray-700">Annuler</button>
+                      <button onClick={confirmEdit} disabled={loading} className="px-3 py-1 text-xs bg-cyan-900/60 border border-cyan-700 text-cyan-300 rounded hover:bg-cyan-900 disabled:opacity-40">Envoyer</button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="bg-cyan-900/30 text-cyan-200 border border-cyan-800/40 text-xs rounded-lg px-4 py-3 whitespace-pre-wrap font-mono">
+                      {m.content}
+                    </div>
+                    <div className="absolute -bottom-5 right-0 hidden group-hover:flex gap-2">
+                      <button onClick={() => startEdit(i)} className="text-gray-500 hover:text-cyan-400 text-xs">✏️ Modifier</button>
+                      <button onClick={() => deletePair(i)} className="text-gray-500 hover:text-red-400 text-xs">🗑️ Supprimer</button>
+                    </div>
+                  </>
+                )}
               </div>
-              {m.role === 'assistant' && (
+            ) : (
+              <div className="relative group max-w-2xl">
+                <div className="bg-gray-900/60 text-gray-200 border border-gray-700/40 text-xs rounded-lg px-4 py-3 whitespace-pre-wrap font-mono">
+                  {m.content}
+                </div>
                 <button
                   onClick={() => saveQA(i)}
                   disabled={savedIdx.has(i)}
@@ -181,8 +259,8 @@ export default function AskCLI() {
                 >
                   {savedIdx.has(i) ? '✓' : '📌'}
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         ))}
         {loading && (
