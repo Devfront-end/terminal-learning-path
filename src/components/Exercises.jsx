@@ -10,11 +10,14 @@ const categoryColors = {
   'git-remote': { text: 'text-yellow-400', border: 'border-yellow-900/40' },
 };
 
+const categories = [...new Set(Object.values(exercises).map(e => e.category))];
+
 export default function Exercises({ onValidate }) {
   const [exerciseMode, setExerciseMode] = useState(null);
   const [exCommand, setExCommand] = useState('');
   const [feedback, setFeedback] = useState('');
   const [feedbackType, setFeedbackType] = useState('');
+  const [activeCat, setActiveCat] = useState(categories[0]);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -74,8 +77,6 @@ export default function Exercises({ onValidate }) {
       if (!grouped[ex.category]) grouped[ex.category] = [];
       grouped[ex.category].push([key, ex]);
     });
-    const categories = Object.keys(grouped);
-    const [activeCat, setActiveCat] = useState(categories[0]);
     const color = categoryColors[activeCat] || { text: 'text-cyan-400', border: 'border-cyan-900/40' };
     const items = grouped[activeCat] || [];
 
