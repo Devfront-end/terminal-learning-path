@@ -48,7 +48,7 @@ export default function App() {
           <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></div>
           <h1 className="text-xl font-bold text-cyan-400">TERMINAL LEARNING PATH</h1>
         </div>
-        <p className="text-xs text-gray-400">Commandes Linux</p>
+        <p className="text-xs text-gray-400">CLI Linux et Git</p>
       </div>
 
       {/* Tabs */}
