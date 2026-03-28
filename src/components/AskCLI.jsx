@@ -17,7 +17,10 @@ export default function AskCLI() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [usage, setUsage] = useState({ requests: 0, tokensIn: 0, tokensOut: 0 });
+  const [usage, setUsage] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('tlp_usage')) || { requests: 0, tokensIn: 0, tokensOut: 0 }; }
+    catch { return { requests: 0, tokensIn: 0, tokensOut: 0 }; }
+  });
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -60,11 +63,15 @@ export default function AskCLI() {
       });
       const answer = response.content.find(b => b.type === 'text')?.text || '';
       setMessages(prev => [...prev, { role: 'assistant', content: answer }]);
-      setUsage(prev => ({
-        requests: prev.requests + 1,
-        tokensIn: prev.tokensIn + (response.usage?.input_tokens || 0),
-        tokensOut: prev.tokensOut + (response.usage?.output_tokens || 0),
-      }));
+      setUsage(prev => {
+        const next = {
+          requests: prev.requests + 1,
+          tokensIn: prev.tokensIn + (response.usage?.input_tokens || 0),
+          tokensOut: prev.tokensOut + (response.usage?.output_tokens || 0),
+        };
+        localStorage.setItem('tlp_usage', JSON.stringify(next));
+        return next;
+      });
     } catch (e) {
       setError(e.message || 'Erreur API');
     } finally {
@@ -121,6 +128,10 @@ export default function AskCLI() {
         <span className="text-gray-500">Tokens out <span className="text-green-300">{usage.tokensOut.toLocaleString()}</span></span>
         <span className="text-gray-500">Total <span className="text-yellow-300">{totalTokens.toLocaleString()}</span></span>
         <span className="text-gray-500">Coût <span className="text-orange-300">${cost.toFixed(5)}</span></span>
+        <button
+          onClick={() => { const z = { requests: 0, tokensIn: 0, tokensOut: 0 }; setUsage(z); localStorage.setItem('tlp_usage', JSON.stringify(z)); }}
+          className="ml-auto text-gray-700 hover:text-gray-400"
+        >reset</button>
       </div>
 
       {/* Messages */}
