@@ -69,41 +69,53 @@ export default function Exercises({ onValidate }) {
   };
 
   if (!exerciseMode) {
-    // Group by category
     const grouped = {};
     Object.entries(exercises).forEach(([key, ex]) => {
       if (!grouped[ex.category]) grouped[ex.category] = [];
       grouped[ex.category].push([key, ex]);
     });
+    const categories = Object.keys(grouped);
+    const [activeCat, setActiveCat] = useState(categories[0]);
+    const color = categoryColors[activeCat] || { text: 'text-cyan-400', border: 'border-cyan-900/40' };
+    const items = grouped[activeCat] || [];
 
     return (
-      <div className="flex-1 overflow-y-auto p-6 space-y-8">
-        {Object.entries(grouped).map(([cat, items]) => {
-          const color = categoryColors[cat] || { text: 'text-cyan-400', border: 'border-cyan-900/40' };
-          return (
-            <div key={cat}>
-              <h2 className={`text-sm font-bold mb-4 pb-2 border-b ${color.text} ${color.border}`}>
+      <div className="flex-1 overflow-hidden flex flex-col">
+        {/* Onglets catégories */}
+        <div className="flex border-b border-gray-800/60 bg-gray-950/40 px-4 overflow-x-auto shrink-0">
+          {categories.map(cat => {
+            const c = categoryColors[cat] || { text: 'text-cyan-400', border: 'border-cyan-900/40' };
+            const active = cat === activeCat;
+            return (
+              <button
+                key={cat}
+                onClick={() => setActiveCat(cat)}
+                className={`px-4 py-3 text-xs font-semibold border-b-2 whitespace-nowrap transition-all ${active ? `${c.text} border-current` : 'text-gray-500 border-transparent hover:text-gray-300'}`}
+              >
                 {categoryLabels[cat] || cat}
-              </h2>
-              <div className="space-y-3">
-                {items.map(([key, ex]) => (
-                  <div key={key} className="bg-gray-900/40 border border-gray-800/40 rounded p-4 flex items-start justify-between gap-4 hover:border-cyan-600/30 transition-all">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-cyan-300 font-semibold text-xs mb-1">{ex.title}</h3>
-                      <p className="text-gray-400 text-xs truncate">{ex.challenge}</p>
-                    </div>
-                    <button
-                      onClick={() => handleStartExercise(key)}
-                      className="shrink-0 px-3 py-1.5 bg-cyan-600/20 border border-cyan-600/40 text-cyan-300 rounded text-xs font-semibold hover:bg-cyan-600/30 cursor-pointer"
-                    >
-                      Commencer
-                    </button>
-                  </div>
-                ))}
+                <span className="ml-2 text-gray-600">({grouped[cat].length})</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Liste des exercices de la catégorie active */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-3">
+          {items.map(([key, ex]) => (
+            <div key={key} className="bg-gray-900/40 border border-gray-800/40 rounded p-4 flex items-start justify-between gap-4 hover:border-cyan-600/30 transition-all">
+              <div className="flex-1 min-w-0">
+                <h3 className={`font-semibold text-xs mb-1 ${color.text}`}>{ex.title}</h3>
+                <p className="text-gray-400 text-xs">{ex.challenge}</p>
               </div>
+              <button
+                onClick={() => handleStartExercise(key)}
+                className="shrink-0 px-3 py-1.5 bg-cyan-600/20 border border-cyan-600/40 text-cyan-300 rounded text-xs font-semibold hover:bg-cyan-600/30 cursor-pointer"
+              >
+                Commencer
+              </button>
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
     );
   }
