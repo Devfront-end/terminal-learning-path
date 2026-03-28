@@ -5,12 +5,16 @@ import Reference from './components/Reference.jsx';
 import History from './components/History.jsx';
 import Tree from './components/Tree.jsx';
 import AskCLI from './components/AskCLI.jsx';
+import Snippets from './components/Snippets.jsx';
+import CodeEditor from './components/CodeEditor.jsx';
 import { useTerminal } from './hooks/useTerminal.js';
 
 const tabs = [
   { id: 'terminal', label: '⚡ Terminal' },
   { id: 'exercises', label: '📚 Exercices' },
   { id: 'reference', label: '📖 Référence' },
+  { id: 'snippets', label: '🗂️ Snippets' },
+  { id: 'editor', label: '✏️ Éditeur' },
   { id: 'history', label: '✓ Historique' },
   { id: 'tree', label: '🌲 Arborescence' },
   { id: 'ask', label: '💬 Question' },
@@ -90,6 +94,12 @@ export default function App() {
         )}
         {activeTab === 'history' && (
           <History history={history} />
+        )}
+        {activeTab === 'snippets' && (
+          <Snippets />
+        )}
+        {activeTab === 'editor' && (
+          <CodeEditor />
         )}
         {activeTab === 'tree' && (
           <Tree />

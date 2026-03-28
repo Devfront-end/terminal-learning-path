@@ -1,0 +1,63 @@
+// ── Array functions ───────────────────────────────────────
+export const phpArrayRows = [
+  { cmd: 'count($arr)', desc: 'Nombre d\'éléments', example: 'count([1,2,3])', result: '3', note: '' },
+  { cmd: 'array_push($arr, val)', desc: 'Ajoute à la fin', example: 'array_push($arr, 4)', result: 'nouvelle longueur', note: 'Ou $arr[] = val' },
+  { cmd: 'array_pop($arr)', desc: 'Retire et retourne le dernier', example: 'array_pop($arr)', result: 'dernier élément', note: 'Mutant' },
+  { cmd: 'array_shift($arr)', desc: 'Retire le premier élément', example: 'array_shift($arr)', result: 'premier élément', note: 'Mutant' },
+  { cmd: 'array_unshift($arr, v)', desc: 'Ajoute au début', example: 'array_unshift($arr, 0)', result: 'nouvelle longueur', note: '' },
+  { cmd: 'array_merge($a, $b)', desc: 'Fusionne des tableaux', example: 'array_merge($a, $b)', result: 'nouveau tableau', note: '' },
+  { cmd: 'array_map(fn, $arr)', desc: 'Applique fn à chaque élément', example: 'array_map(fn($x) => $x*2, $arr)', result: 'nouveau tableau', note: '' },
+  { cmd: 'array_filter($arr, fn)', desc: 'Filtre selon fn', example: 'array_filter($arr, fn($x) => $x>2)', result: 'tableau filtré', note: '' },
+  { cmd: 'array_reduce($arr, fn, init)', desc: 'Réduit à une valeur', example: 'array_reduce($arr, fn($c,$x) => $c+$x, 0)', result: 'valeur', note: '' },
+  { cmd: 'in_array(val, $arr)', desc: 'True si valeur présente', example: 'in_array(2, [1,2,3])', result: 'true', note: '' },
+  { cmd: 'array_key_exists(k, $arr)', desc: 'True si clé présente', example: 'array_key_exists(\'id\', $arr)', result: 'true/false', note: '' },
+  { cmd: 'array_keys($arr)', desc: 'Retourne les clés', example: 'array_keys([\'a\'=>1,\'b\'=>2])', result: '[\'a\',\'b\']', note: '' },
+  { cmd: 'array_values($arr)', desc: 'Retourne les valeurs réindexées', example: 'array_values($filtered)', result: '[1,2,3]', note: '' },
+  { cmd: 'array_slice($arr, s, n)', desc: 'Extrait une portion', example: 'array_slice($arr, 1, 2)', result: 'sous-tableau', note: '' },
+  { cmd: 'array_splice($arr, s, n)', desc: 'Retire des éléments', example: 'array_splice($arr, 1, 1)', result: 'éléments retirés', note: 'Mutant' },
+  { cmd: 'sort($arr)', desc: 'Trie par valeur (croissant)', example: 'sort($arr)', result: '-', note: 'Mutant' },
+  { cmd: 'usort($arr, fn)', desc: 'Trie avec comparateur personnalisé', example: 'usort($arr, fn($a,$b) => $a-$b)', result: '-', note: 'Mutant' },
+  { cmd: 'array_unique($arr)', desc: 'Supprime les doublons', example: 'array_unique([1,2,2,3])', result: '[1,2,3]', note: '' },
+  { cmd: 'implode(sep, $arr)', desc: 'Tableau → chaîne', example: 'implode(\',\', [\'a\',\'b\'])', result: '\'a,b\'', note: '' },
+  { cmd: 'explode(sep, str)', desc: 'Chaîne → tableau', example: 'explode(\',\', \'a,b,c\')', result: '[\'a\',\'b\',\'c\']', note: '' },
+];
+
+// ── String functions ──────────────────────────────────────
+export const phpStringRows = [
+  { cmd: 'strlen($str)', desc: 'Longueur de la chaîne', example: 'strlen(\'hello\')', result: '5', note: '' },
+  { cmd: 'strtolower($str)', desc: 'Convertit en minuscules', example: 'strtolower(\'HELLO\')', result: '\'hello\'', note: '' },
+  { cmd: 'strtoupper($str)', desc: 'Convertit en majuscules', example: 'strtoupper(\'hello\')', result: '\'HELLO\'', note: '' },
+  { cmd: 'trim($str)', desc: 'Supprime espaces en début/fin', example: 'trim(\' hi \')', result: '\'hi\'', note: '' },
+  { cmd: 'str_replace(a, b, $str)', desc: 'Remplace toutes les occurrences', example: 'str_replace(\'a\',\'b\',\'aaa\')', result: '\'bbb\'', note: '' },
+  { cmd: 'strpos($str, sub)', desc: 'Position première occurrence', example: 'strpos(\'hello\',\'l\')', result: '2', note: 'false si absent' },
+  { cmd: 'substr($str, s, n)', desc: 'Extrait une portion', example: 'substr(\'hello\', 1, 3)', result: '\'ell\'', note: '' },
+  { cmd: 'str_contains($str, sub)', desc: 'True si contient la sous-chaîne', example: 'str_contains(\'hello\',\'ell\')', result: 'true', note: 'PHP 8+' },
+  { cmd: 'str_starts_with($str, s)', desc: 'True si commence par s', example: 'str_starts_with(\'hello\',\'he\')', result: 'true', note: 'PHP 8+' },
+  { cmd: 'str_ends_with($str, s)', desc: 'True si finit par s', example: 'str_ends_with(\'hello\',\'lo\')', result: 'true', note: 'PHP 8+' },
+  { cmd: 'sprintf(fmt, ...args)', desc: 'Formate une chaîne', example: 'sprintf(\'%s a %d ans\', \'Jules\', 25)', result: '\'Jules a 25 ans\'', note: '' },
+  { cmd: 'number_format(n, d)', desc: 'Formate un nombre', example: 'number_format(1234.5, 2)', result: '\'1,234.50\'', note: '' },
+  { cmd: 'nl2br($str)', desc: 'Convertit \\n en <br>', example: 'nl2br("ligne1\\nligne2")', result: 'HTML', note: '' },
+  { cmd: 'htmlspecialchars($str)', desc: 'Échappe les caractères HTML', example: 'htmlspecialchars(\'<b>\')', result: '\'&lt;b&gt;\'', note: 'Sécurité XSS' },
+  { cmd: 'json_encode($val)', desc: 'PHP → JSON', example: 'json_encode([\'a\'=>1])', result: '\'{"a":1}\'', note: '' },
+  { cmd: 'json_decode($str, true)', desc: 'JSON → tableau PHP', example: 'json_decode($json, true)', result: 'tableau associatif', note: '' },
+];
+
+// ── Fonctions utilitaires ─────────────────────────────────
+export const phpUtilRows = [
+  { cmd: 'isset($var)', desc: 'True si variable définie et non null', example: 'isset($_GET[\'id\'])', result: 'true/false', note: '' },
+  { cmd: 'empty($var)', desc: 'True si vide/false/null/0/""', example: 'empty($input)', result: 'true/false', note: '' },
+  { cmd: 'var_dump($val)', desc: 'Affiche type + valeur (debug)', example: 'var_dump($arr)', result: 'array(2) {...}', note: '' },
+  { cmd: 'print_r($val)', desc: 'Affiche lisiblement', example: 'print_r($arr)', result: 'Array ( [0]=>1 )', note: '' },
+  { cmd: 'intval($str)', desc: 'Convertit en entier', example: 'intval(\'42px\')', result: '42', note: '' },
+  { cmd: 'floatval($str)', desc: 'Convertit en float', example: 'floatval(\'3.14px\')', result: '3.14', note: '' },
+  { cmd: 'date(fmt, timestamp)', desc: 'Formate une date', example: 'date(\'Y-m-d\')', result: '\'2026-03-28\'', note: '' },
+  { cmd: 'time()', desc: 'Timestamp Unix actuel', example: 'time()', result: '1743120000', note: '' },
+  { cmd: 'rand(min, max)', desc: 'Nombre aléatoire', example: 'rand(1, 10)', result: '1..10', note: '' },
+  { cmd: 'round($n, d)', desc: 'Arrondit à d décimales', example: 'round(3.456, 2)', result: '3.46', note: '' },
+  { cmd: 'abs($n)', desc: 'Valeur absolue', example: 'abs(-5)', result: '5', note: '' },
+  { cmd: 'max(...vals)', desc: 'Valeur maximale', example: 'max(1, 5, 3)', result: '5', note: '' },
+  { cmd: 'min(...vals)', desc: 'Valeur minimale', example: 'min(1, 5, 3)', result: '1', note: '' },
+  { cmd: 'header(str)', desc: 'Envoie un en-tête HTTP', example: 'header(\'Location: /login\')', result: 'redirection', note: 'Avant tout output' },
+  { cmd: 'session_start()', desc: 'Démarre la session', example: 'session_start()', result: '-', note: 'En début de fichier' },
+  { cmd: '$_SESSION[\'key\']', desc: 'Lit/écrit une variable de session', example: '$_SESSION[\'user\'] = $id', result: '-', note: '' },
+];

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { cdRows, findRows, grepRows, findUsageRows, grepUsageRows, gitRows, gitWorkflowRows, fileRows, sysRows, permRows } from '../data/reference.js';
+import { jsArrayRows, jsStringRows, jsObjectRows, jsAsyncRows } from '../data/reference-js.js';
+import { phpArrayRows, phpStringRows, phpUtilRows } from '../data/reference-php.js';
 
 function SyntaxTable({ rows, hasNote }) {
   return (
@@ -71,6 +73,8 @@ const TABS = [
   { id: 'grep', label: 'grep',        color: 'text-purple-400' },
   { id: 'git',  label: 'git',         color: 'text-green-400' },
   { id: 'sys',  label: 'Système',     color: 'text-cyan-400' },
+  { id: 'js',   label: 'JavaScript',  color: 'text-yellow-400' },
+  { id: 'php',  label: 'PHP',         color: 'text-indigo-400' },
 ];
 
 export default function Reference() {
@@ -162,6 +166,44 @@ export default function Reference() {
                   </tbody>
                 </table>
               </div>
+            </div>
+          </>
+        )}
+
+        {active === 'js' && (
+          <>
+            <div>
+              <h2 className="text-yellow-400 font-semibold text-sm mb-3">JavaScript — Méthodes Array</h2>
+              <SyntaxTable rows={jsArrayRows} hasNote={true} />
+            </div>
+            <div>
+              <h2 className="text-yellow-400 font-semibold text-sm mb-3">JavaScript — Méthodes String</h2>
+              <SyntaxTable rows={jsStringRows} hasNote={true} />
+            </div>
+            <div>
+              <h2 className="text-yellow-400 font-semibold text-sm mb-3">JavaScript — Object</h2>
+              <SyntaxTable rows={jsObjectRows} hasNote={true} />
+            </div>
+            <div>
+              <h2 className="text-yellow-400 font-semibold text-sm mb-3">JavaScript — Async / Promise / fetch</h2>
+              <SyntaxTable rows={jsAsyncRows} hasNote={true} />
+            </div>
+          </>
+        )}
+
+        {active === 'php' && (
+          <>
+            <div>
+              <h2 className="text-indigo-400 font-semibold text-sm mb-3">PHP — Fonctions Array</h2>
+              <SyntaxTable rows={phpArrayRows} hasNote={true} />
+            </div>
+            <div>
+              <h2 className="text-indigo-400 font-semibold text-sm mb-3">PHP — Fonctions String</h2>
+              <SyntaxTable rows={phpStringRows} hasNote={true} />
+            </div>
+            <div>
+              <h2 className="text-indigo-400 font-semibold text-sm mb-3">PHP — Utilitaires & Session</h2>
+              <SyntaxTable rows={phpUtilRows} hasNote={true} />
             </div>
           </>
         )}

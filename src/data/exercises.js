@@ -424,4 +424,152 @@ export const exercises = {
     successMessage: '✓ Rebase au lieu de merge !',
     explanation: "git pull --rebase rejoue vos commits locaux par-dessus les commits distants au lieu de créer un commit de merge. L'historique reste linéaire et plus lisible. Recommandé quand vous travaillez en équipe pour éviter les \"Merge branch main into main\" parasites."
   },
+
+  // ── JavaScript ───────────────────────────────────────────
+  js_map: {
+    category: 'js', title: 'Array.map() — transformer un tableau',
+    challenge: 'Utilisez .map() pour doubler chaque nombre du tableau [1, 2, 3]',
+    hint: '[1, 2, 3].map(x => x * 2)',
+    expectedPatterns: ['.map(', '=>'],
+    successMessage: '✓ .map() retourne un nouveau tableau !',
+    explanation: ".map() applique une fonction à chaque élément et retourne un NOUVEAU tableau de même longueur. L'original n'est pas modifié. C'est l'une des méthodes les plus utilisées en JavaScript moderne."
+  },
+  js_filter: {
+    category: 'js', title: 'Array.filter() — filtrer un tableau',
+    challenge: 'Filtrez le tableau [1, 2, 3, 4, 5] pour ne garder que les nombres supérieurs à 2',
+    hint: '[1, 2, 3, 4, 5].filter(x => x > 2)',
+    expectedPatterns: ['.filter(', '=>'],
+    successMessage: '✓ .filter() garde les éléments qui satisfont la condition !',
+    explanation: ".filter() retourne un nouveau tableau contenant seulement les éléments pour lesquels la fonction retourne true. Si aucun élément ne correspond, retourne un tableau vide []."
+  },
+  js_reduce: {
+    category: 'js', title: 'Array.reduce() — réduire un tableau',
+    challenge: 'Utilisez .reduce() pour sommer tous les éléments de [1, 2, 3, 4]',
+    hint: '[1, 2, 3, 4].reduce((acc, x) => acc + x, 0)',
+    expectedPatterns: ['.reduce(', 'acc', '=>'],
+    successMessage: '✓ .reduce() accumule une valeur à partir du tableau !',
+    explanation: ".reduce() prend une fonction (accumulateur, valeur) et une valeur initiale. Idéal pour sommer, construire un objet, ou aplatir des données. Plus puissant que .map() ou .filter()."
+  },
+  js_find: {
+    category: 'js', title: 'Array.find() — trouver un élément',
+    challenge: 'Trouvez le premier nombre supérieur à 3 dans [1, 2, 3, 4, 5]',
+    hint: '[1, 2, 3, 4, 5].find(x => x > 3)',
+    expectedPatterns: ['.find(', '=>'],
+    successMessage: '✓ .find() retourne le premier élément trouvé !',
+    explanation: ".find() retourne le PREMIER élément qui satisfait la condition, ou undefined si aucun. Différent de .filter() qui retourne tous les éléments correspondants. Utilisez .findIndex() pour obtenir l'index."
+  },
+  js_arrow: {
+    category: 'js', title: 'Fonction fléchée — arrow function',
+    challenge: 'Écrivez une fonction fléchée nommée "double" qui prend x et retourne x * 2',
+    hint: 'const double = x => x * 2',
+    expectedPatterns: ['const', '=>', '* 2'],
+    successMessage: '✓ Syntaxe concise des fonctions fléchées !',
+    explanation: "Les fonctions fléchées (=>) sont une syntaxe raccourcie. Si le corps est une expression, le return est implicite. (x, y) => x + y pour plusieurs paramètres. Elles ne lient pas leur propre 'this', ce qui les rend idéales pour les callbacks."
+  },
+  js_spread: {
+    category: 'js', title: 'Spread operator — fusionner des tableaux',
+    challenge: 'Fusionnez les tableaux [1, 2] et [3, 4] en un seul avec le spread operator',
+    hint: '[...[1, 2], ...[3, 4]]',
+    expectedPatterns: ['...'],
+    successMessage: '✓ Le spread (...) copie et fusionne sans muter !',
+    explanation: "L'opérateur spread (...) étale les éléments d'un itérable. Pour les objets : {...obj1, ...obj2} fusionne les propriétés. C'est la façon moderne de copier sans muter l'original."
+  },
+  js_destructuring: {
+    category: 'js', title: 'Destructuring — extraire des valeurs',
+    challenge: 'Extrayez les propriétés "nom" et "age" de l\'objet { nom: "Jules", age: 25 }',
+    hint: 'const { nom, age } = { nom: "Jules", age: 25 }',
+    expectedPatterns: ['const', '{', 'nom', 'age', '}', '='],
+    successMessage: '✓ Le destructuring simplifie l\'accès aux propriétés !',
+    explanation: "Le destructuring extrait des valeurs d'objets ou tableaux en variables. Pour un tableau : const [a, b] = [1, 2]. On peut aussi renommer : const { nom: name } = obj, ou donner une valeur par défaut : const { age = 0 } = obj."
+  },
+  js_async_await: {
+    category: 'js', title: 'async/await — appel asynchrone',
+    challenge: 'Écrivez une fonction async "getData" qui utilise await pour appeler fetch(url)',
+    hint: 'async function getData(url) { const res = await fetch(url); return res.json(); }',
+    expectedPatterns: ['async', 'await', 'fetch'],
+    successMessage: '✓ async/await rend le code asynchrone lisible !',
+    explanation: "async/await est du sucre syntaxique sur les Promises. Une fonction async retourne toujours une Promise. await attend la résolution avant de continuer. Utilisez try/catch pour gérer les erreurs."
+  },
+  js_template_literal: {
+    category: 'js', title: 'Template literals — interpolation de chaîne',
+    challenge: 'Créez la chaîne "Bonjour Jules, vous avez 25 ans" avec des template literals',
+    hint: 'const msg = `Bonjour ${nom}, vous avez ${age} ans`',
+    expectedPatterns: ['`', '${'],
+    successMessage: '✓ Les backticks permettent d\'interpoler des variables !',
+    explanation: "Les template literals (backticks `) permettent d'insérer des expressions avec ${expr}. Ils supportent aussi le multi-ligne sans \\n. Bien plus lisible que la concaténation avec +."
+  },
+  js_optional_chaining: {
+    category: 'js', title: 'Optional chaining — accès sécurisé',
+    challenge: 'Accédez à user?.address?.city sans erreur si user ou address est null',
+    hint: 'const city = user?.address?.city',
+    expectedPatterns: ['?.'],
+    successMessage: '✓ ?. évite les "Cannot read properties of null" !',
+    explanation: "L'optional chaining (?.) retourne undefined si la valeur à gauche est null ou undefined, au lieu de lever une erreur. Très utile pour les données d'API potentiellement incomplètes. Combine bien avec ?? pour une valeur par défaut : user?.name ?? 'Anonyme'."
+  },
+
+  // ── PHP ──────────────────────────────────────────────────
+  php_array_map: {
+    category: 'php', title: 'array_map() — transformer un tableau',
+    challenge: 'Utilisez array_map() pour doubler chaque nombre de [1, 2, 3]',
+    hint: 'array_map(fn($x) => $x * 2, [1, 2, 3])',
+    expectedPatterns: ['array_map(', '=>', '* 2'],
+    successMessage: '✓ array_map() retourne un nouveau tableau !',
+    explanation: "array_map() applique une fonction à chaque élément. Contrairement à JS, la fonction vient EN PREMIER, le tableau EN SECOND. Avec PHP 7.4+, utilisez les fonctions fléchées fn($x) => $x * 2."
+  },
+  php_array_filter: {
+    category: 'php', title: 'array_filter() — filtrer un tableau',
+    challenge: 'Filtrez [1, 2, 3, 4, 5] pour ne garder que les nombres supérieurs à 2',
+    hint: 'array_filter([1, 2, 3, 4, 5], fn($x) => $x > 2)',
+    expectedPatterns: ['array_filter(', '=>', '> 2'],
+    successMessage: '✓ array_filter() garde les éléments vrais !',
+    explanation: "array_filter() retourne un tableau avec les éléments pour lesquels la fonction retourne true. Attention : les clés sont préservées (pas réindexées). Utilisez array_values() après si vous avez besoin d'index consécutifs."
+  },
+  php_implode: {
+    category: 'php', title: 'implode() — tableau en chaîne',
+    challenge: 'Convertissez ["a", "b", "c"] en chaîne "a,b,c" avec implode()',
+    hint: 'implode(",", ["a", "b", "c"])',
+    expectedPatterns: ['implode(', ','],
+    successMessage: '✓ implode() joint les éléments avec un séparateur !',
+    explanation: "implode() (alias join()) concatène les éléments d'un tableau avec un séparateur. L'inverse est explode() qui divise une chaîne en tableau. Très utilisé pour construire des requêtes SQL ou des CSV."
+  },
+  php_str_contains: {
+    category: 'php', title: 'str_contains() — chercher dans une chaîne',
+    challenge: 'Vérifiez si la chaîne "bonjour monde" contient "monde" (PHP 8+)',
+    hint: 'str_contains("bonjour monde", "monde")',
+    expectedPatterns: ['str_contains(', 'monde'],
+    successMessage: '✓ str_contains() est plus lisible que strpos() !',
+    explanation: "str_contains() retourne true/false selon que la sous-chaîne est présente. Disponible depuis PHP 8.0. Avant PHP 8, utilisez strpos($str, $sub) !== false. Voir aussi str_starts_with() et str_ends_with()."
+  },
+  php_json: {
+    category: 'php', title: 'json_encode() / json_decode() — conversion JSON',
+    challenge: 'Convertissez le tableau ["nom" => "Jules", "age" => 25] en JSON',
+    hint: 'json_encode(["nom" => "Jules", "age" => 25])',
+    expectedPatterns: ['json_encode(', '=>'],
+    successMessage: '✓ json_encode() convertit PHP en JSON !',
+    explanation: "json_encode() convertit une valeur PHP en chaîne JSON. json_decode($json, true) fait l'inverse en retournant un tableau associatif (le 2ème argument true est important). Essentiel pour les API REST en PHP."
+  },
+  php_isset: {
+    category: 'php', title: 'isset() — vérifier une variable',
+    challenge: 'Vérifiez si $_GET["id"] existe et n\'est pas null avant de l\'utiliser',
+    hint: 'if (isset($_GET["id"])) { $id = $_GET["id"]; }',
+    expectedPatterns: ['isset(', '$_GET'],
+    successMessage: '✓ isset() évite les erreurs "Undefined index" !',
+    explanation: "isset() retourne true si la variable est définie ET n'est pas null. Indispensable pour accéder à $_GET, $_POST, $_SESSION sans déclencher d'avertissement. empty() va plus loin : true si vide, 0, '', null, [], false."
+  },
+  php_session: {
+    category: 'php', title: '$_SESSION — variables de session',
+    challenge: 'Démarrez la session et stockez l\'id utilisateur 42 dans $_SESSION["user_id"]',
+    hint: 'session_start(); $_SESSION["user_id"] = 42;',
+    expectedPatterns: ['session_start()', '$_SESSION'],
+    successMessage: '✓ Les sessions persistent entre les requêtes !',
+    explanation: "session_start() doit être appelé avant tout output HTML. $_SESSION est un tableau superglobal qui persiste entre les pages pour un même visiteur. Pour déconnecter : session_destroy(). Les données sont stockées côté serveur."
+  },
+  php_sprintf: {
+    category: 'php', title: 'sprintf() — formater une chaîne',
+    challenge: 'Formatez "Jules a 25 ans" avec sprintf() en utilisant des variables',
+    hint: 'sprintf("%s a %d ans", "Jules", 25)',
+    expectedPatterns: ['sprintf(', '%s', '%d'],
+    successMessage: '✓ sprintf() formate proprement les chaînes !',
+    explanation: "sprintf() retourne une chaîne formatée. %s = chaîne, %d = entier, %f = flottant, %.2f = 2 décimales. Plus sûr que la concaténation pour construire des messages complexes. printf() fait la même chose mais affiche directement."
+  },
 };
