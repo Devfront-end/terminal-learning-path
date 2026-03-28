@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { exercises } from '../data/exercises.js';
 
-const categoryLabels = { cd: 'Navigation — cd & pwd', find: 'Recherche — find', grep: 'Recherche texte — grep', git: 'Contrôle de version — git' };
+const categoryLabels = { cd: 'Navigation — cd & pwd', find: 'Recherche — find', grep: 'Recherche texte — grep', git: 'Contrôle de version — git', 'git-remote': 'Dépôts distants — git remote' };
 const categoryColors = {
   cd: { text: 'text-blue-400', border: 'border-blue-900/40' },
   find: { text: 'text-orange-400', border: 'border-orange-900/40' },
   grep: { text: 'text-purple-400', border: 'border-purple-900/40' },
   git: { text: 'text-green-400', border: 'border-green-900/40' },
+  'git-remote': { text: 'text-yellow-400', border: 'border-yellow-900/40' },
 };
 
 export default function Exercises({ onValidate }) {

@@ -358,4 +358,70 @@ export const exercises = {
     successMessage: '✓ Commit annulé proprement !',
     explanation: "git revert crée un NOUVEAU commit qui annule les changements d'un commit précédent. C'est la méthode sûre pour annuler en gardant l'historique intact — indispensable sur une branche partagée. Différent de git reset qui réécrit l'historique (dangereux en équipe)."
   },
+
+  // ── git remote ───────────────────────────────────────────
+  git_remote_v: {
+    category: 'git-remote', title: 'git remote -v — voir les dépôts distants',
+    challenge: 'Affichez la liste de tous les dépôts distants configurés avec leurs URLs',
+    hint: 'git remote -v',
+    expectedPatterns: ['git', 'remote', '-v'],
+    successMessage: '✓ Dépôts distants listés !',
+    explanation: "git remote -v liste tous les remotes avec leurs URLs (fetch et push). Par défaut, un clone crée un remote nommé \"origin\". Vous pouvez avoir plusieurs remotes : upstream (le projet original), origin (votre fork), etc."
+  },
+  git_remote_add: {
+    category: 'git-remote', title: 'git remote add — ajouter un dépôt distant',
+    challenge: 'Ajoutez un dépôt distant nommé "origin" pointant vers https://github.com/user/projet.git',
+    hint: 'git remote add origin https://github.com/user/projet.git',
+    expectedPatterns: ['git', 'remote', 'add', 'origin'],
+    successMessage: '✓ Remote ajouté !',
+    explanation: "git remote add crée un raccourci (alias) vers un dépôt distant. \"origin\" est la convention pour le dépôt principal. Après git init + git remote add, vous pouvez faire git push origin main pour envoyer vos commits."
+  },
+  git_fetch: {
+    category: 'git-remote', title: 'git fetch — récupérer sans merger',
+    challenge: 'Téléchargez les nouveaux commits d\'origin sans les intégrer dans votre branche locale',
+    hint: 'git fetch origin',
+    expectedPatterns: ['git', 'fetch'],
+    successMessage: '✓ Commits téléchargés (sans merge) !',
+    explanation: "git fetch télécharge les nouveaux commits du distant SANS modifier votre branche locale. Contrairement à git pull, vous pouvez inspecter les changements avant de les intégrer : git diff main origin/main. C'est la commande la plus sûre pour voir ce qui a changé."
+  },
+  git_push_u: {
+    category: 'git-remote', title: 'git push -u — pousser et configurer l\'upstream',
+    challenge: 'Poussez la branche "feature/login" vers origin ET configurez le tracking automatique',
+    hint: 'git push -u origin feature/login',
+    expectedPatterns: ['git', 'push', '-u', 'origin'],
+    successMessage: '✓ Branche poussée et tracking configuré !',
+    explanation: "-u (ou --set-upstream) configure la branche distante comme référence par défaut. Après ça, git push et git pull sans arguments fonctionneront automatiquement sur cette branche. À faire une seule fois par branche lors du premier push."
+  },
+  git_remote_remove: {
+    category: 'git-remote', title: 'git remote remove — supprimer un remote',
+    challenge: 'Supprimez le dépôt distant nommé "old-origin"',
+    hint: 'git remote remove old-origin',
+    expectedPatterns: ['git', 'remote', 'remove'],
+    successMessage: '✓ Remote supprimé !',
+    explanation: "git remote remove (ou git remote rm) supprime la référence au dépôt distant — il ne supprime pas le dépôt lui-même, seulement le lien local. Utile quand vous déplacez votre repo vers un autre service (GitHub → GitLab par ex)."
+  },
+  git_remote_rename: {
+    category: 'git-remote', title: 'git remote rename — renommer un remote',
+    challenge: 'Renommez le remote "origin" en "github"',
+    hint: 'git remote rename origin github',
+    expectedPatterns: ['git', 'remote', 'rename', 'origin'],
+    successMessage: '✓ Remote renommé !',
+    explanation: "git remote rename change l'alias local d'un dépôt distant. Pratique quand on travaille avec plusieurs remotes (GitHub + GitLab) pour avoir des noms plus explicites que \"origin\"."
+  },
+  git_remote_set_url: {
+    category: 'git-remote', title: 'git remote set-url — changer l\'URL',
+    challenge: 'Changez l\'URL du remote "origin" vers https://github.com/new-user/projet.git',
+    hint: 'git remote set-url origin https://github.com/new-user/projet.git',
+    expectedPatterns: ['git', 'remote', 'set-url', 'origin'],
+    successMessage: '✓ URL mise à jour !',
+    explanation: "git remote set-url modifie l'URL d'un remote existant sans le supprimer/recréer. Utile lors d'un transfert de repo, d'un renommage de compte, ou pour passer de HTTPS à SSH (git remote set-url origin git@github.com:user/projet.git)."
+  },
+  git_pull_rebase: {
+    category: 'git-remote', title: 'git pull --rebase — synchroniser sans commit de merge',
+    challenge: 'Récupérez les derniers commits d\'origin/main en rebasant votre travail par-dessus',
+    hint: 'git pull --rebase origin main',
+    expectedPatterns: ['git', 'pull', '--rebase'],
+    successMessage: '✓ Rebase au lieu de merge !',
+    explanation: "git pull --rebase rejoue vos commits locaux par-dessus les commits distants au lieu de créer un commit de merge. L'historique reste linéaire et plus lisible. Recommandé quand vous travaillez en équipe pour éviter les \"Merge branch main into main\" parasites."
+  },
 };
