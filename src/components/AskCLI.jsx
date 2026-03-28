@@ -236,15 +236,13 @@ export default function AskCLI() {
                     </div>
                   </div>
                 ) : (
-                  <>
-                    <div className="bg-cyan-900/30 text-cyan-200 border border-cyan-800/40 text-xs rounded-lg px-4 py-3 whitespace-pre-wrap font-mono">
-                      {m.content}
-                    </div>
-                    <div className="absolute -bottom-5 right-0 hidden group-hover:flex gap-2">
+                  <div className="bg-cyan-900/30 text-cyan-200 border border-cyan-800/40 text-xs rounded-lg px-4 py-3 whitespace-pre-wrap font-mono">
+                    {m.content}
+                    <div className="hidden group-hover:flex gap-3 mt-2 pt-2 border-t border-cyan-800/30">
                       <button onClick={() => startEdit(i)} className="text-gray-500 hover:text-cyan-400 text-xs">✏️ Modifier</button>
                       <button onClick={() => deletePair(i)} className="text-gray-500 hover:text-red-400 text-xs">🗑️ Supprimer</button>
                     </div>
-                  </>
+                  </div>
                 )}
               </div>
             ) : (
