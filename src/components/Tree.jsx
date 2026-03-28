@@ -62,12 +62,37 @@ const DEFAULT_TREE = `my_project/
 
 // ── Composant ─────────────────────────────────────────────────────────────────
 
+async function dirToTree(handle, prefix = '', depth = 0, maxDepth = 6) {
+  if (depth > maxDepth) return prefix + '    …\n';
+  const entries = [];
+  for await (const [name, child] of handle.entries()) entries.push([name, child]);
+  entries.sort(([a, ac], [b, bc]) => {
+    if (ac.kind !== bc.kind) return ac.kind === 'directory' ? -1 : 1;
+    return a.localeCompare(b);
+  });
+  let result = '';
+  for (let i = 0; i < entries.length; i++) {
+    const [name, child] = entries[i];
+    const last = i === entries.length - 1;
+    const conn = last ? '└── ' : '├── ';
+    const next = prefix + (last ? '    ' : '│   ');
+    if (child.kind === 'directory') {
+      result += prefix + conn + name + '/\n';
+      result += await dirToTree(child, next, depth + 1, maxDepth);
+    } else {
+      result += prefix + conn + name + '\n';
+    }
+  }
+  return result;
+}
+
 export default function Tree() {
   const [raw, setRaw] = useState(DEFAULT_TREE);
   const [input, setInput] = useState(DEFAULT_TREE);
   const [selected, setSelected] = useState(null);
   const [copied, setCopied] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const nodes = useMemo(() => parseTree(raw), [raw]);
 
@@ -80,16 +105,43 @@ export default function Tree() {
     });
   };
 
+  const openDir = async () => {
+    if (!window.showDirectoryPicker) {
+      alert('Votre navigateur ne supporte pas cette fonctionnalité (Chrome/Edge requis).');
+      return;
+    }
+    try {
+      setLoading(true);
+      const handle = await window.showDirectoryPicker();
+      const tree = handle.name + '/\n' + await dirToTree(handle);
+      setRaw(tree);
+      setInput(tree);
+      setSelected(null);
+      setEditing(false);
+    } catch (e) {
+      if (e.name !== 'AbortError') console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
       {/* Toolbar */}
       <div className="px-6 py-3 border-b border-cyan-900/20 bg-gray-950/30 flex items-center gap-3">
-        <span className="text-xs text-gray-500">Colle ton arborescence :</span>
+        <button
+          onClick={openDir}
+          disabled={loading}
+          className="px-3 py-1 bg-cyan-900/40 border border-cyan-700/40 text-cyan-300 rounded text-xs hover:bg-cyan-900/60 cursor-pointer disabled:opacity-40"
+        >
+          {loading ? '…' : '📂 Ouvrir un dossier'}
+        </button>
+        <span className="text-gray-700 text-xs">ou</span>
         <button
           onClick={() => setEditing(e => !e)}
           className="px-3 py-1 bg-gray-800/60 border border-gray-700/40 text-gray-300 rounded text-xs hover:bg-gray-700/60 cursor-pointer"
         >
-          {editing ? 'Annuler' : '✏️ Modifier'}
+          {editing ? 'Annuler' : '✏️ Coller / modifier'}
         </button>
         {editing && (
           <button
