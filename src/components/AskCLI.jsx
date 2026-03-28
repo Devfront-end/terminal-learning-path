@@ -115,15 +115,13 @@ export default function AskCLI() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Barre d'usage */}
-      {usage.requests > 0 && (
-        <div className="px-6 py-2 bg-gray-950/60 border-b border-cyan-900/20 flex gap-6 text-xs font-mono shrink-0">
-          <span className="text-gray-500">Requêtes <span className="text-cyan-300">{usage.requests}</span></span>
-          <span className="text-gray-500">Tokens in <span className="text-green-300">{usage.tokensIn.toLocaleString()}</span></span>
-          <span className="text-gray-500">Tokens out <span className="text-green-300">{usage.tokensOut.toLocaleString()}</span></span>
-          <span className="text-gray-500">Total <span className="text-yellow-300">{totalTokens.toLocaleString()}</span></span>
-          <span className="text-gray-500">Coût <span className="text-orange-300">${cost.toFixed(5)}</span></span>
-        </div>
-      )}
+      <div className="px-6 py-2 bg-gray-950/60 border-b border-cyan-900/20 flex gap-6 text-xs font-mono shrink-0">
+        <span className="text-gray-500">Requêtes <span className="text-cyan-300">{usage.requests}</span></span>
+        <span className="text-gray-500">Tokens in <span className="text-green-300">{usage.tokensIn.toLocaleString()}</span></span>
+        <span className="text-gray-500">Tokens out <span className="text-green-300">{usage.tokensOut.toLocaleString()}</span></span>
+        <span className="text-gray-500">Total <span className="text-yellow-300">{totalTokens.toLocaleString()}</span></span>
+        <span className="text-gray-500">Coût <span className="text-orange-300">${cost.toFixed(5)}</span></span>
+      </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
