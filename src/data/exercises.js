@@ -212,4 +212,150 @@ export const exercises = {
     successMessage: '✓ find + xargs + grep = combo ultime!',
     explanation: "find liste les fichiers PHP, xargs passe cette liste à grep. C'est plus flexible que grep -r car find peut filtrer par date, taille, permissions AVANT que grep cherche dans les résultats. xargs optimise aussi les appels en les regroupant."
   },
+
+  // ── git ──────────────────────────────────────────────────
+  git_init: {
+    category: 'git', title: 'git init — initialiser un dépôt',
+    challenge: 'Initialisez un nouveau dépôt Git dans le dossier courant',
+    hint: 'git init',
+    expectedPatterns: ['git', 'init'],
+    successMessage: '✓ Dépôt Git initialisé !',
+    explanation: "git init crée un dossier caché .git qui contient toute l'histoire du projet. À faire une seule fois au démarrage. Sans git init, aucune commande git ne fonctionnera dans ce dossier."
+  },
+  git_status: {
+    category: 'git', title: 'git status — voir l\'état',
+    challenge: 'Affichez l\'état actuel du dépôt (fichiers modifiés, en attente de commit...)',
+    hint: 'git status',
+    expectedPatterns: ['git', 'status'],
+    successMessage: '✓ git status, votre meilleur ami !',
+    explanation: "git status montre : les fichiers modifiés non stagés (rouge), les fichiers stagés prêts à commiter (vert), et les fichiers non suivis. À utiliser constamment pour savoir où on en est avant de commiter."
+  },
+  git_add_file: {
+    category: 'git', title: 'git add — stager un fichier',
+    challenge: 'Ajoutez le fichier index.php à la zone de staging (préparation au commit)',
+    hint: 'git add index.php',
+    expectedPatterns: ['git', 'add', 'index.php'],
+    successMessage: '✓ Fichier stagé !',
+    explanation: "git add place un fichier dans la zone de staging (index). C'est une étape intermédiaire entre la modification et le commit. Cela vous permet de choisir précisément quels changements inclure dans le prochain commit."
+  },
+  git_add_all: {
+    category: 'git', title: 'git add . — stager tous les fichiers',
+    challenge: 'Ajoutez TOUS les fichiers modifiés au staging d\'un seul coup',
+    hint: 'git add .',
+    expectedPatterns: ['git', 'add', '.'],
+    successMessage: '✓ Tout stagé !',
+    explanation: "git add . stage tous les fichiers modifiés et nouveaux du dossier courant. Le . désigne le répertoire courant. Pratique pour commiter tout d'un coup, mais attention à ne pas inclure des fichiers sensibles (.env, secrets)."
+  },
+  git_commit: {
+    category: 'git', title: 'git commit — créer un commit',
+    challenge: 'Créez un commit avec le message "feat: ajout page accueil"',
+    hint: 'git commit -m "feat: ajout page accueil"',
+    expectedPatterns: ['git', 'commit', '-m'],
+    successMessage: '✓ Commit créé !',
+    explanation: "git commit -m enregistre un snapshot de vos changements stagés. Le message doit être court et descriptif. Convention courante : feat: (nouvelle feature), fix: (bug), refactor: (refactoring), docs: (documentation). Chaque commit est identifié par un hash unique."
+  },
+  git_log: {
+    category: 'git', title: 'git log — voir l\'historique',
+    challenge: 'Affichez l\'historique complet des commits du dépôt',
+    hint: 'git log',
+    expectedPatterns: ['git', 'log'],
+    successMessage: '✓ Historique affiché !',
+    explanation: "git log affiche tous les commits avec leur hash, auteur, date et message. Tapez q pour quitter. Options utiles : --oneline (compact), --graph (visualiser les branches), -5 (5 derniers commits), --author=\"nom\" (filtrer par auteur)."
+  },
+  git_log_oneline: {
+    category: 'git', title: 'git log --oneline — historique compact',
+    challenge: 'Affichez l\'historique en mode compact (un commit par ligne)',
+    hint: 'git log --oneline',
+    expectedPatterns: ['git', 'log', '--oneline'],
+    successMessage: '✓ Vue compacte très pratique !',
+    explanation: "--oneline affiche chaque commit sur une seule ligne : hash court + message. Bien plus lisible que git log classique quand l'historique est long. Combine avec --graph pour visualiser les branches : git log --oneline --graph."
+  },
+  git_diff: {
+    category: 'git', title: 'git diff — voir les modifications',
+    challenge: 'Affichez les différences entre vos fichiers modifiés et le dernier commit',
+    hint: 'git diff',
+    expectedPatterns: ['git', 'diff'],
+    successMessage: '✓ Diff affiché !',
+    explanation: "git diff montre les lignes ajoutées (+, en vert) et supprimées (-, en rouge) depuis le dernier commit. Ne montre que les fichiers NON stagés. Pour voir les fichiers stagés : git diff --staged. Pour comparer deux branches : git diff main..feature."
+  },
+  git_branch: {
+    category: 'git', title: 'git branch — créer une branche',
+    challenge: 'Créez une nouvelle branche appelée "feature/login"',
+    hint: 'git branch feature/login',
+    expectedPatterns: ['git', 'branch', 'feature/login'],
+    successMessage: '✓ Branche créée !',
+    explanation: "git branch crée une branche mais ne bascule pas dessus. Une branche est un pointeur vers un commit — elle permet de travailler en parallèle sans affecter main. Convention : feature/ (nouvelle fonctionnalité), fix/ (correction), hotfix/ (urgence)."
+  },
+  git_checkout_b: {
+    category: 'git', title: 'git checkout -b — créer et basculer',
+    challenge: 'Créez la branche "fix/navbar" ET basculez dessus en une seule commande',
+    hint: 'git checkout -b fix/navbar',
+    expectedPatterns: ['git', 'checkout', '-b', 'fix/navbar'],
+    successMessage: '✓ Branche créée et activée !',
+    explanation: "git checkout -b = git branch + git checkout en une seule commande. C'est la façon la plus rapide de démarrer une nouvelle branche. Équivalent moderne : git switch -c fix/navbar. Vérifiez avec git branch que vous êtes bien sur la bonne branche."
+  },
+  git_checkout: {
+    category: 'git', title: 'git checkout — changer de branche',
+    challenge: 'Basculez sur la branche "main"',
+    hint: 'git checkout main',
+    expectedPatterns: ['git', 'checkout', 'main'],
+    successMessage: '✓ Branche changée !',
+    explanation: "git checkout main bascule vers la branche main. Avant de changer de branche, assurez-vous d'avoir commité ou stagé vos changements (git stash si besoin). Équivalent moderne : git switch main."
+  },
+  git_merge: {
+    category: 'git', title: 'git merge — fusionner une branche',
+    challenge: 'Fusionnez la branche "feature/login" dans la branche courante',
+    hint: 'git merge feature/login',
+    expectedPatterns: ['git', 'merge', 'feature/login'],
+    successMessage: '✓ Fusion réussie !',
+    explanation: "git merge intègre les commits d'une branche dans la branche courante. Si les modifications ne se chevauchent pas, c'est un fast-forward (pas de commit de merge). En cas de conflit, Git marque les fichiers et vous devez les résoudre manuellement, puis git add + git commit."
+  },
+  git_pull: {
+    category: 'git', title: 'git pull — récupérer les modifications',
+    challenge: 'Récupérez et intégrez les derniers commits du dépôt distant (origin/main)',
+    hint: 'git pull origin main',
+    expectedPatterns: ['git', 'pull'],
+    successMessage: '✓ Synchronisé avec le distant !',
+    explanation: "git pull = git fetch + git merge. Il télécharge les nouveaux commits du serveur distant ET les intègre dans votre branche locale. À faire avant de commencer à travailler pour partir d'une base à jour. git pull --rebase est souvent préféré pour éviter les commits de merge inutiles."
+  },
+  git_push: {
+    category: 'git', title: 'git push — envoyer ses commits',
+    challenge: 'Envoyez vos commits locaux vers le dépôt distant (origin main)',
+    hint: 'git push origin main',
+    expectedPatterns: ['git', 'push'],
+    successMessage: '✓ Commits envoyés !',
+    explanation: "git push envoie vos commits locaux vers le serveur distant (GitHub, GitLab...). Si la branche n'existe pas encore en remote, utilisez --set-upstream (ou -u) : git push -u origin ma-branche. Ne jamais force-pusher (--force) sur main sans coordination avec l'équipe."
+  },
+  git_clone: {
+    category: 'git', title: 'git clone — cloner un dépôt',
+    challenge: 'Clonez le dépôt https://github.com/user/projet.git dans le dossier courant',
+    hint: 'git clone https://github.com/user/projet.git',
+    expectedPatterns: ['git', 'clone', 'github.com'],
+    successMessage: '✓ Dépôt cloné !',
+    explanation: "git clone télécharge un dépôt entier (code + historique complet). Crée automatiquement le dossier et configure origin (pointeur vers le dépôt distant). Après le clone, vous avez une copie locale complète et pouvez travailler hors ligne."
+  },
+  git_stash: {
+    category: 'git', title: 'git stash — mettre de côté',
+    challenge: 'Mettez vos modifications en cours de côté sans les commiter (pour changer de branche)',
+    hint: 'git stash',
+    expectedPatterns: ['git', 'stash'],
+    successMessage: '✓ Modifications mises de côté !',
+    explanation: "git stash sauvegarde vos modifications non commitées dans une pile temporaire et nettoie votre working directory. Pratique pour switcher de branche en urgence. Pour récupérer : git stash pop (restaure et supprime) ou git stash apply (restaure sans supprimer). git stash list montre tous les stashs."
+  },
+  git_reset: {
+    category: 'git', title: 'git reset HEAD -- — déstaguer un fichier',
+    challenge: 'Retirez index.php de la zone de staging (sans supprimer vos modifications)',
+    hint: 'git reset HEAD -- index.php',
+    expectedPatterns: ['git', 'reset', 'index.php'],
+    successMessage: '✓ Fichier déstagé !',
+    explanation: "git reset HEAD -- fichier retire un fichier du staging sans toucher aux modifications dans le fichier. C'est l'inverse de git add. Utile si vous avez accidentellement stagé un fichier que vous ne voulez pas inclure dans ce commit."
+  },
+  git_revert: {
+    category: 'git', title: 'git revert — annuler un commit',
+    challenge: 'Annulez le dernier commit en créant un nouveau commit d\'annulation (HEAD)',
+    hint: 'git revert HEAD',
+    expectedPatterns: ['git', 'revert', 'HEAD'],
+    successMessage: '✓ Commit annulé proprement !',
+    explanation: "git revert crée un NOUVEAU commit qui annule les changements d'un commit précédent. C'est la méthode sûre pour annuler en gardant l'historique intact — indispensable sur une branche partagée. Différent de git reset qui réécrit l'historique (dangereux en équipe)."
+  },
 };
