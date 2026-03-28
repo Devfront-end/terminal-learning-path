@@ -2,25 +2,33 @@ import { useState, useRef, useEffect } from 'react';
 import Anthropic from '@anthropic-ai/sdk';
 
 const STORAGE_KEY = 'tlp_anthropic_key';
+const SAVED_KEY   = 'tlp_saved_qa';
 
-// claude-haiku-4-5 pricing : $1/1M input, $5/1M output
 const PRICE_IN  = 1 / 1_000_000;
 const PRICE_OUT = 5 / 1_000_000;
 
 const SYSTEM_PROMPT = `Tu es un assistant expert et pédagogue. Réponds en français, de façon claire et concise.
 Quand la question porte sur une commande ou du code, utilise des blocs de code avec des exemples concrets.`;
 
+function loadSaved() {
+  try { return JSON.parse(localStorage.getItem(SAVED_KEY)) || []; }
+  catch { return []; }
+}
+
 export default function AskCLI() {
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem(STORAGE_KEY) || '');
+  const [apiKey, setApiKey]   = useState(() => localStorage.getItem(STORAGE_KEY) || '');
   const [keyInput, setKeyInput] = useState('');
   const [question, setQuestion] = useState('');
   const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
   const [usage, setUsage] = useState(() => {
     try { return JSON.parse(localStorage.getItem('tlp_usage')) || { requests: 0, tokensIn: 0, tokensOut: 0 }; }
     catch { return { requests: 0, tokensIn: 0, tokensOut: 0 }; }
   });
+  const [saved, setSaved]       = useState(loadSaved);
+  const [showSaved, setShowSaved] = useState(false);
+  const [savedIdx, setSavedIdx]   = useState(new Set());
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -29,37 +37,25 @@ export default function AskCLI() {
 
   const saveKey = () => {
     const k = keyInput.trim();
-    if (!k.startsWith('sk-ant-')) {
-      setError('Clé invalide — elle doit commencer par sk-ant-');
-      return;
-    }
+    if (!k.startsWith('sk-ant-')) { setError('Clé invalide — elle doit commencer par sk-ant-'); return; }
     localStorage.setItem(STORAGE_KEY, k);
-    setApiKey(k);
-    setKeyInput('');
-    setError('');
+    setApiKey(k); setKeyInput(''); setError('');
   };
 
-  const removeKey = () => {
-    localStorage.removeItem(STORAGE_KEY);
-    setApiKey('');
-  };
+  const removeKey = () => { localStorage.removeItem(STORAGE_KEY); setApiKey(''); };
 
   const ask = async () => {
     const q = question.trim();
     if (!q || loading) return;
-    setQuestion('');
-    setError('');
+    setQuestion(''); setError('');
     const newMessages = [...messages, { role: 'user', content: q }];
     setMessages(newMessages);
     setLoading(true);
-
     try {
       const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
       const response = await client.messages.create({
-        model: 'claude-haiku-4-5',
-        max_tokens: 1024,
-        system: SYSTEM_PROMPT,
-        messages: newMessages,
+        model: 'claude-haiku-4-5', max_tokens: 1024,
+        system: SYSTEM_PROMPT, messages: newMessages,
       });
       const answer = response.content.find(b => b.type === 'text')?.text || '';
       setMessages(prev => [...prev, { role: 'assistant', content: answer }]);
@@ -79,36 +75,40 @@ export default function AskCLI() {
     }
   };
 
+  // Sauvegarde la question + réponse associée au message i (assistant)
+  const saveQA = (i) => {
+    const question = messages[i - 1]?.content || '';
+    const answer   = messages[i]?.content || '';
+    const entry = { id: Date.now(), date: new Date().toLocaleDateString('fr-FR'), question, answer };
+    const next = [entry, ...saved];
+    setSaved(next);
+    localStorage.setItem(SAVED_KEY, JSON.stringify(next));
+    setSavedIdx(prev => new Set([...prev, i]));
+  };
+
+  const deleteSaved = (id) => {
+    const next = saved.filter(s => s.id !== id);
+    setSaved(next);
+    localStorage.setItem(SAVED_KEY, JSON.stringify(next));
+  };
+
   if (!apiKey) {
     return (
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md space-y-4">
-          <h2 className="text-cyan-400 font-semibold text-sm">💬 Poser une question CLI</h2>
-          <p className="text-gray-400 text-xs">
-            Cette fonctionnalité utilise l'API Anthropic. Entrez votre clé API — elle est stockée uniquement dans votre navigateur et n'est jamais envoyée ailleurs que chez Anthropic.
-          </p>
-          <a
-            href="https://console.anthropic.com/keys"
-            target="_blank"
-            rel="noreferrer"
-            className="text-cyan-400 text-xs underline"
-          >
+          <h2 className="text-cyan-400 font-semibold text-sm">💬 Poser une question</h2>
+          <p className="text-gray-400 text-xs">Clé API Anthropic — stockée uniquement dans votre navigateur.</p>
+          <a href="https://console.anthropic.com/keys" target="_blank" rel="noreferrer" className="text-cyan-400 text-xs underline">
             Obtenir une clé API →
           </a>
-          <input
-            autoFocus
-            type="password"
-            value={keyInput}
+          <input autoFocus type="password" value={keyInput}
             onChange={e => setKeyInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && saveKey()}
             placeholder="sk-ant-..."
             className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-green-300 font-mono text-sm outline-none focus:border-cyan-600 placeholder-gray-600"
           />
           {error && <p className="text-red-400 text-xs">{error}</p>}
-          <button
-            onClick={saveKey}
-            className="w-full px-3 py-2 text-xs bg-cyan-900/40 border border-cyan-700 text-cyan-300 rounded hover:bg-cyan-900/60 font-semibold"
-          >
+          <button onClick={saveKey} className="w-full px-3 py-2 text-xs bg-cyan-900/40 border border-cyan-700 text-cyan-300 rounded hover:bg-cyan-900/60 font-semibold">
             Enregistrer la clé
           </button>
         </div>
@@ -117,7 +117,33 @@ export default function AskCLI() {
   }
 
   const totalTokens = usage.tokensIn + usage.tokensOut;
-  const cost = (usage.tokensIn * PRICE_IN + usage.tokensOut * PRICE_OUT);
+  const cost = usage.tokensIn * PRICE_IN + usage.tokensOut * PRICE_OUT;
+
+  if (showSaved) {
+    return (
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="px-6 py-3 border-b border-cyan-900/20 bg-gray-950/40 flex items-center gap-3 shrink-0">
+          <button onClick={() => setShowSaved(false)} className="text-cyan-400 text-xs hover:text-cyan-300">← Retour</button>
+          <span className="text-xs text-gray-500">Réponses sauvegardées ({saved.length})</span>
+        </div>
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {saved.length === 0 && <p className="text-gray-500 text-xs">Aucune sauvegarde.</p>}
+          {saved.map(s => (
+            <div key={s.id} className="bg-gray-900/40 border border-gray-800/40 rounded p-4 space-y-2">
+              <div className="flex justify-between items-start">
+                <span className="text-cyan-300 text-xs font-semibold">{s.question}</span>
+                <div className="flex items-center gap-3 shrink-0 ml-4">
+                  <span className="text-gray-600 text-xs">{s.date}</span>
+                  <button onClick={() => deleteSaved(s.id)} className="text-gray-600 hover:text-red-400 text-xs">✕</button>
+                </div>
+              </div>
+              <p className="text-gray-300 text-xs font-mono whitespace-pre-wrap">{s.answer}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -128,35 +154,40 @@ export default function AskCLI() {
         <span className="text-gray-500">Tokens out <span className="text-green-300">{usage.tokensOut.toLocaleString()}</span></span>
         <span className="text-gray-500">Total <span className="text-yellow-300">{totalTokens.toLocaleString()}</span></span>
         <span className="text-gray-500">Coût <span className="text-orange-300">${cost.toFixed(5)}</span></span>
-        <button
-          onClick={() => { const z = { requests: 0, tokensIn: 0, tokensOut: 0 }; setUsage(z); localStorage.setItem('tlp_usage', JSON.stringify(z)); }}
-          className="ml-auto text-gray-700 hover:text-gray-400"
-        >reset</button>
+        <button onClick={() => { const z = { requests: 0, tokensIn: 0, tokensOut: 0 }; setUsage(z); localStorage.setItem('tlp_usage', JSON.stringify(z)); }} className="text-gray-700 hover:text-gray-400">reset</button>
+        <button onClick={() => setShowSaved(true)} className="ml-auto text-cyan-700 hover:text-cyan-400">
+          📌 Sauvegardées ({saved.length})
+        </button>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
-        {messages.length === 0 && (
-          <div className="text-gray-500 text-xs">
-            Posez n'importe quelle question…
-          </div>
-        )}
+        {messages.length === 0 && <div className="text-gray-500 text-xs">Posez n'importe quelle question…</div>}
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-2xl text-xs rounded-lg px-4 py-3 whitespace-pre-wrap font-mono ${
-              m.role === 'user'
-                ? 'bg-cyan-900/30 text-cyan-200 border border-cyan-800/40'
-                : 'bg-gray-900/60 text-gray-200 border border-gray-700/40'
-            }`}>
-              {m.content}
+            <div className="relative group">
+              <div className={`max-w-2xl text-xs rounded-lg px-4 py-3 whitespace-pre-wrap font-mono ${
+                m.role === 'user'
+                  ? 'bg-cyan-900/30 text-cyan-200 border border-cyan-800/40'
+                  : 'bg-gray-900/60 text-gray-200 border border-gray-700/40'
+              }`}>
+                {m.content}
+              </div>
+              {m.role === 'assistant' && (
+                <button
+                  onClick={() => saveQA(i)}
+                  disabled={savedIdx.has(i)}
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-xs px-2 py-0.5 rounded bg-gray-800 border border-gray-700 text-gray-400 hover:text-cyan-300 hover:border-cyan-700 disabled:opacity-30 transition-opacity"
+                >
+                  {savedIdx.has(i) ? '✓' : '📌'}
+                </button>
+              )}
             </div>
           </div>
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-gray-900/60 border border-gray-700/40 rounded-lg px-4 py-3 text-xs text-gray-400 font-mono animate-pulse">
-              ···
-            </div>
+            <div className="bg-gray-900/60 border border-gray-700/40 rounded-lg px-4 py-3 text-xs text-gray-400 font-mono animate-pulse">···</div>
           </div>
         )}
         {error && <p className="text-red-400 text-xs">{error}</p>}
@@ -173,11 +204,8 @@ export default function AskCLI() {
           rows={2}
           className="flex-1 bg-gray-900/60 border border-gray-700 rounded px-3 py-2 text-green-300 font-mono text-xs outline-none focus:border-cyan-600 placeholder-gray-600 resize-none"
         />
-        <button
-          onClick={ask}
-          disabled={loading || !question.trim()}
-          className="px-3 py-2 text-xs bg-cyan-900/40 border border-cyan-700 text-cyan-300 rounded hover:bg-cyan-900/60 disabled:opacity-40 font-semibold"
-        >
+        <button onClick={ask} disabled={loading || !question.trim()}
+          className="px-3 py-2 text-xs bg-cyan-900/40 border border-cyan-700 text-cyan-300 rounded hover:bg-cyan-900/60 disabled:opacity-40 font-semibold">
           ▶
         </button>
       </div>
