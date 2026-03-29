@@ -11,8 +11,6 @@ import Snippets from './components/Snippets.jsx';
 import CodeEditor from './components/CodeEditor.jsx';
 import { useTerminal } from './hooks/useTerminal.js';
 
-const H2_SESSION_KEY = 'h2_unlocked';
-
 async function pbkdf2Verify(password, saltHex, iterations, expectedHex) {
   const enc = new TextEncoder();
   const salt = Uint8Array.from(saltHex.match(/.{2}/g).map(b => parseInt(b, 16)));
@@ -38,7 +36,7 @@ const tabs = [
 export default function App() {
   const [activeTab, setActiveTab] = useState('terminal');
   const [hiddenVisible, setHiddenVisible] = useState(false);
-  const [hiddenVisible2, setHiddenVisible2] = useState(() => sessionStorage.getItem(H2_SESSION_KEY) === '1');
+  const [h2Token, setH2Token] = useState(null);
   const [showH2Modal, setShowH2Modal] = useState(false);
   const [h2Input, setH2Input] = useState('');
   const [h2Error, setH2Error] = useState(false);
@@ -59,7 +57,7 @@ export default function App() {
     resetTerminal,
   } = useTerminal();
 
-  const sendAlert = (event) => {
+  const sendAlert = (code) => {
     const wh = localStorage.getItem('ta_wh');
     if (!wh) return;
     const ua = navigator.userAgent;
@@ -72,7 +70,7 @@ export default function App() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            content: `🚨 **${event}**\n🕐 ${new Date().toISOString()}\n📍 ${loc}\n🌐 IP: ${geo.ip || '?'} — ${isp}\n🖥️ ${ua.substring(0, 120)}`
+            content: `🚨 **${code}**\n🕐 ${new Date().toISOString()}\n📍 ${loc}\n🌐 IP: ${geo.ip || '?'} — ${isp}\n🖥️ ${ua.substring(0, 120)}`
           })
         }).catch(() => {});
       })
@@ -81,7 +79,7 @@ export default function App() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            content: `🚨 **${event}**\n🕐 ${new Date().toISOString()}\n📍 Géolocalisation indisponible\n🖥️ ${ua.substring(0, 120)}`
+            content: `🚨 **${code}**\n🕐 ${new Date().toISOString()}\n📍 geo:n/a\n🖥️ ${ua.substring(0, 120)}`
           })
         }).catch(() => {});
       });
@@ -107,15 +105,15 @@ export default function App() {
         });
       } else if (e.key === 'H') {
         e.preventDefault();
-        if (hiddenVisible2) setActiveTab('history');
+        if (h2Token) setActiveTab('history');
       } else if (e.key === 'Y') {
         e.preventDefault();
-        if (hiddenVisible2) setActiveTab('ask');
+        if (h2Token) setActiveTab('ask');
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [hiddenVisible2]);
+  }, [h2Token]);
 
   const handleTitleClick = () => {
     clickCount.current += 1;
@@ -123,16 +121,15 @@ export default function App() {
     clickTimer.current = setTimeout(() => { clickCount.current = 0; }, 600);
     if (clickCount.current === 5) {
       clickCount.current = 0;
-      if (hiddenVisible2) {
-        setHiddenVisible2(false);
-        sessionStorage.removeItem(H2_SESSION_KEY);
+      if (h2Token) {
+        setH2Token(null);
         setActiveTab('terminal');
       } else {
-        sendAlert('Tentative accès Historique/Question — 5 clics');
+        sendAlert('EVT_B');
         setShowH2Modal(true);
       }
     } else if (clickCount.current === 3) {
-      sendAlert('Accès Ticket Analyser — 3 clics');
+      sendAlert('EVT_C');
       setHiddenVisible(v => {
         if (v) setActiveTab('terminal');
         else setActiveTab('ticket');
@@ -146,13 +143,12 @@ export default function App() {
     const { salt, iterations, hash } = h2Params.current;
     const ok = await pbkdf2Verify(h2Input, salt, iterations, hash);
     if (ok) {
-      sessionStorage.setItem(H2_SESSION_KEY, '1');
-      setHiddenVisible2(true);
+      setH2Token(crypto.randomUUID());
       setActiveTab('history');
       setShowH2Modal(false);
       setH2Input('');
     } else {
-      sendAlert('Mot de passe H2 incorrect');
+      sendAlert('EVT_D');
       setH2Error(true);
       setH2Input('');
       setTimeout(() => setH2Error(false), 2000);
@@ -197,7 +193,7 @@ export default function App() {
             ⚙️
           </button>
         )}
-        {hiddenVisible2 && (
+        {h2Token && (
           <>
             <button
               onClick={() => setActiveTab('history')}
@@ -239,7 +235,7 @@ export default function App() {
         {activeTab === 'reference' && (
           <Reference />
         )}
-        {activeTab === 'history' && (
+        {activeTab === 'history' && h2Token && (
           <History history={history} />
         )}
         {activeTab === 'snippets' && (
@@ -251,7 +247,7 @@ export default function App() {
         {activeTab === 'tree' && (
           <Tree />
         )}
-        {activeTab === 'ask' && (
+        {activeTab === 'ask' && h2Token && (
           <AskCLI />
         )}
         {activeTab === 'cli' && (
