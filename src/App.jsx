@@ -63,13 +63,28 @@ export default function App() {
     const wh = localStorage.getItem('ta_wh');
     if (!wh) return;
     const ua = navigator.userAgent;
-    fetch(wh, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content: `🚨 **${event}**\n🕐 ${new Date().toISOString()}\n🌍 ${location.href}\n🖥️ ${ua.substring(0, 120)}`
+    fetch('https://ipwho.is/')
+      .then(r => r.json())
+      .then(geo => {
+        const loc = `${geo.city || '?'}, ${geo.region || '?'}, ${geo.country || '?'}`;
+        const isp = geo.connection?.isp || geo.org || '?';
+        fetch(wh, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: `🚨 **${event}**\n🕐 ${new Date().toISOString()}\n📍 ${loc}\n🌐 IP: ${geo.ip || '?'} — ${isp}\n🖥️ ${ua.substring(0, 120)}`
+          })
+        }).catch(() => {});
       })
-    }).catch(() => {});
+      .catch(() => {
+        fetch(wh, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: `🚨 **${event}**\n🕐 ${new Date().toISOString()}\n📍 Géolocalisation indisponible\n🖥️ ${ua.substring(0, 120)}`
+          })
+        }).catch(() => {});
+      });
   };
 
   useEffect(() => {
