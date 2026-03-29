@@ -11,12 +11,18 @@ import Snippets from './components/Snippets.jsx';
 import CodeEditor from './components/CodeEditor.jsx';
 import { useTerminal } from './hooks/useTerminal.js';
 
-const H2_HASH = 'REMOVED';
 const H2_SESSION_KEY = 'h2_unlocked';
 
-async function sha256(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+async function pbkdf2Verify(password, saltHex, iterations, expectedHex) {
+  const enc = new TextEncoder();
+  const salt = Uint8Array.from(saltHex.match(/.{2}/g).map(b => parseInt(b, 16)));
+  const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+  const derived = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
+    keyMaterial, 256
+  );
+  const hex = Array.from(new Uint8Array(derived)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return hex === expectedHex;
 }
 
 const tabs = [
@@ -38,6 +44,7 @@ export default function App() {
   const [h2Error, setH2Error] = useState(false);
   const clickCount = useRef(0);
   const clickTimer = useRef(null);
+  const h2Params = useRef(null);
   const {
     command, setCommand,
     output,
@@ -51,6 +58,13 @@ export default function App() {
     validateExercise,
     resetTerminal,
   } = useTerminal();
+
+  useEffect(() => {
+    fetch(`${import.meta.env.BASE_URL}h2.bin`)
+      .then(r => r.json())
+      .then(data => { h2Params.current = data; })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -97,8 +111,10 @@ export default function App() {
   };
 
   const checkH2 = async () => {
-    const hash = await sha256(h2Input);
-    if (hash === H2_HASH) {
+    if (!h2Params.current) return;
+    const { salt, iterations, hash } = h2Params.current;
+    const ok = await pbkdf2Verify(h2Input, salt, iterations, hash);
+    if (ok) {
       sessionStorage.setItem(H2_SESSION_KEY, '1');
       setHiddenVisible2(true);
       setActiveTab('history');
