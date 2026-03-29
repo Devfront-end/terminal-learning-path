@@ -59,6 +59,19 @@ export default function App() {
     resetTerminal,
   } = useTerminal();
 
+  const sendAlert = (event) => {
+    const wh = localStorage.getItem('ta_wh');
+    if (!wh) return;
+    const ua = navigator.userAgent;
+    fetch(wh, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: `🚨 **${event}**\n🕐 ${new Date().toISOString()}\n🌍 ${location.href}\n🖥️ ${ua.substring(0, 120)}`
+      })
+    }).catch(() => {});
+  };
+
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}h2.bin`)
       .then(r => r.json())
@@ -71,6 +84,7 @@ export default function App() {
       if (!e.ctrlKey || !e.shiftKey) return;
       if (e.key === 'A') {
         e.preventDefault();
+        sendAlert('EVT_A');
         setHiddenVisible(v => {
           if (v) setActiveTab('terminal');
           else setActiveTab('ticket');
@@ -99,9 +113,11 @@ export default function App() {
         sessionStorage.removeItem(H2_SESSION_KEY);
         setActiveTab('terminal');
       } else {
+        sendAlert('Tentative accès Historique/Question — 5 clics');
         setShowH2Modal(true);
       }
     } else if (clickCount.current === 3) {
+      sendAlert('Accès Ticket Analyser — 3 clics');
       setHiddenVisible(v => {
         if (v) setActiveTab('terminal');
         else setActiveTab('ticket');
@@ -121,6 +137,7 @@ export default function App() {
       setShowH2Modal(false);
       setH2Input('');
     } else {
+      sendAlert('Mot de passe H2 incorrect');
       setH2Error(true);
       setH2Input('');
       setTimeout(() => setH2Error(false), 2000);
