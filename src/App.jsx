@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, lazy, Suspense } from 'react';
 import Terminal from './components/Terminal.jsx';
 import Exercises from './components/Exercises.jsx';
 import Reference from './components/Reference.jsx';
@@ -7,7 +7,14 @@ import Tree from './components/Tree.jsx';
 import AskCLI from './components/AskCLI.jsx';
 import CLIExercises from './components/CLIExercises.jsx';
 import AccessAnalyser from './components/AccessAnalyser.jsx';
-import CodeVault from './components/CodeVault.jsx';
+// CodeVault est un fichier privé, absent du dépôt public (voir .git/info/exclude).
+// import.meta.glob évite une erreur de build quand le fichier n'existe pas.
+const codeVaultModules = import.meta.glob('./components/CodeVault.jsx');
+const CodeVault = lazy(() =>
+  codeVaultModules['./components/CodeVault.jsx']
+    ? codeVaultModules['./components/CodeVault.jsx']()
+    : Promise.resolve({ default: () => null })
+);
 import Snippets from './components/Snippets.jsx';
 import CodeEditor from './components/CodeEditor.jsx';
 import IPConfig from './components/IPConfig.jsx';
@@ -490,7 +497,9 @@ export default function App() {
           <AccessAnalyser />
         )}
         {activeTab === 'vault' && vaultToken && (
-          <CodeVault creds={vaultCreds} />
+          <Suspense fallback={null}>
+            <CodeVault creds={vaultCreds} />
+          </Suspense>
         )}
       </div>
 
