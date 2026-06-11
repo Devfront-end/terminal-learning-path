@@ -139,7 +139,7 @@ export const gitWorkflowRows = [
   {
     desc: 'Documenter un commit critique dans l\'historique',
     cmds: [
-      'git commit --allow-empty -m "chore: précision fonctionnelle des commits a1b2c3d et e4f5g6h (fusion des branches bugfix/XXXX-description et bugfix/ticket-5678)"',
+      'git commit --allow-empty -m "chore: précision fonctionnelle des commits a1b2c3d et e4f5g6h (fusion des branches bugfix/XXXX-description et bugfix/demande-5678)"',
       'git push origin main',
     ],
     result: 'Historique documenté',
@@ -148,7 +148,7 @@ export const gitWorkflowRows = [
     desc: 'Nettoyer les branches après fusion',
     cmds: [
       'git branch -d bugfix/XXXX-description',
-      'git branch -d bugfix/ticket-5678',
+      'git branch -d bugfix/demande-5678',
     ],
     result: 'Branches nettoyées',
   },

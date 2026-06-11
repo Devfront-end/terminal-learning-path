@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLI Learning Path</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #21262d;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text2: #8b949e;
+      --text3: #484f58;
+      --green: #22c55e;
+      --green-dark: #15803d;
+      --green-bg: #0d2818;
+      --red: #f87171;
+      --blue: #60a5fa;
+      --amber: #fbbf24;
+    }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-sans); }
+    body { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 16px; min-height: 100vh; }
+    .page-title { font-size: 13px; font-weight: 500; color: var(--text2); letter-spacing: 0.05em; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .page-title span { color: var(--green); }
+
+    .app { display: grid; grid-template-columns: 200px 1fr; width: 100%; max-width: 960px; height: calc(100vh - 70px); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+
+    /* Sidebar */
+    .sidebar { background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+    .sb-head { padding: 11px 14px 8px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); border-bottom: 1px solid var(--border); }
+    .sb-prog { padding: 8px 14px 7px; border-bottom: 1px solid var(--border); }
+    .sb-prow { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-bottom: 5px; }
+    .prog-tr { height: 2px; background: var(--border); border-radius: 2px; }
+    .prog-fl { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.4s ease; }
+    .sb-cats { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sb-cats::-webkit-scrollbar { width: 4px; } .sb-cats::-webkit-scrollbar-track { background: transparent; } .sb-cats::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .cat-btn { display: flex; align-items: center; width: 100%; padding: 6px 12px; border: none; background: transparent; cursor: pointer; gap: 6px; border-right: 2px solid transparent; color: var(--text2); font-family: var(--font-sans); transition: all 0.15s; }
+    .cat-btn:hover { background: var(--bg3); color: var(--text); }
+    .cat-btn.active { background: var(--bg3); color: var(--text); font-weight: 500; border-right-color: var(--green); }
+    .cat-name { flex: 1; text-align: left; font-size: 11.5px; }
+    .cat-bd { font-size: 10px; padding: 1px 5px; border-radius: 10px; background: var(--bg3); color: var(--text3); white-space: nowrap; }
+    .cat-bd.full { background: var(--green-bg); color: var(--green); }
+
+    /* Main */
+    .main { display: grid; grid-template-rows: 1fr 300px; overflow: hidden; background: #0d1117; }
+    .ex-panel { overflow-y: auto; display: flex; flex-direction: column; }
+    .ex-panel::-webkit-scrollbar { width: 4px; } .ex-panel::-webkit-scrollbar-track { background: transparent; } .ex-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .cat-head { padding: 12px 16px 8px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: #0d1117; z-index: 5; }
+    .cat-head h2 { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+    .cat-head p { font-size: 11px; color: var(--text2); }
+    .ex-list { padding: 4px 0; }
+    .ex-row { display: flex; align-items: center; gap: 8px; padding: 7px 16px; cursor: pointer; border-left: 2px solid transparent; font-size: 12px; transition: background 0.1s; }
+    .ex-row:hover { background: var(--bg2); }
+    .ex-row.active { background: var(--bg2); border-left-color: var(--text); }
+    .ex-chk { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; color: transparent; transition: all 0.2s; }
+    .ex-row.done .ex-chk { background: var(--green); border-color: var(--green); color: #fff; }
+    .ex-lbl { flex: 1; font-family: var(--font-mono); font-size: 11.5px; color: var(--text); }
+    .ex-row.done .ex-lbl { color: var(--text3); text-decoration: line-through; text-decoration-color: var(--border); }
+    .ex-btn { font-size: 11px; padding: 2px 9px; border: 1px solid var(--border); border-radius: 5px; background: transparent; cursor: pointer; color: var(--text2); font-family: var(--font-sans); white-space: nowrap; transition: all 0.15s; }
+    .ex-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--text3); }
+
+    /* Terminal */
+    .term { background: #090b0f; display: flex; flex-direction: column; border-top: 1px solid var(--border); }
+    .term-bar { display: flex; align-items: center; padding: 6px 12px; border-bottom: 1px solid #1a1d26; flex-shrink: 0; gap: 8px; }
+    .tdots { display: flex; gap: 5px; }
+    .tdot { width: 10px; height: 10px; border-radius: 50%; }
+    .t-r { background: #ff5f57; } .t-y { background: #febc2e; } .t-g { background: #28c840; }
+    .term-lbl { flex: 1; text-align: center; font-size: 11px; color: #2a3040; font-family: var(--font-mono); }
+    .term-body { flex: 1; overflow-y: auto; padding: 10px 16px; font-family: var(--font-mono); font-size: 12px; line-height: 1.7; cursor: text; }
+    .term-body::-webkit-scrollbar { width: 4px; } .term-body::-webkit-scrollbar-track { background: transparent; } .term-body::-webkit-scrollbar-thumb { background: #1a1d26; border-radius: 2px; }
+    .tl { display: flex; flex-wrap: wrap; }
+    .tp { color: var(--green); white-space: pre; }
+    .tc { color: #e2e8f0; white-space: pre-wrap; }
+    .to { color: #6b7a96; white-space: pre-wrap; display: block; }
+    .to.ok { color: var(--green); }
+    .to.err { color: var(--red); }
+    .to.hint { color: var(--blue); border-left: 2px solid #1e3a5f; padding-left: 8px; margin: 3px 0; }
+    .to.sol { color: var(--amber); border-left: 2px solid #451a03; padding-left: 8px; margin: 3px 0; }
+    .to.ctx { color: #2e3d4a; font-size: 11px; margin-bottom: 8px; font-style: italic; }
+    .term-inp { display: flex; align-items: center; padding: 7px 16px; border-top: 1px solid #1a1d26; gap: 8px; flex-shrink: 0; }
+    .pr-cur { color: var(--green); font-family: var(--font-mono); font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+    #cmd-in { flex: 1; background: transparent; border: none; outline: none; color: #e2e8f0; font-family: var(--font-mono); font-size: 12px; caret-color: var(--green); min-width: 0; }
+    .term-foot { display: flex; align-items: center; gap: 6px; padding: 5px 16px; border-top: 1px solid #13151d; background: #060810; flex-shrink: 0; }
+    .tf { font-size: 11px; padding: 2px 9px; border-radius: 4px; border: 1px solid #1e2535; background: transparent; color: #3a4556; cursor: pointer; font-family: var(--font-sans); transition: all 0.15s; }
+    .tf:hover { border-color: #364050; color: #7a8fa8; background: #0c0f16; }
+    .tf:disabled { opacity: 0.25; cursor: default; }
+    .tf.nx { border-color: var(--green); color: var(--green); margin-left: auto; }
+    .tf.nx:hover { background: var(--green-bg); }
+    .tf-st { font-size: 11px; font-family: var(--font-mono); color: #2a3040; margin-left: auto; }
+    .tf-st.ok { color: var(--green); }
+    .tf-st.err { color: var(--red); }
+    .et { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #1a2030; font-family: var(--font-mono); font-size: 12px; gap: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="page-title">terminal-learning-path <span>▸</span> bash essentials</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="sb-head">CLI Learning Path</div>
+    <div class="sb-prog">
+      <div class="sb-prow"><span>Progression</span><span id="p-txt">0 / 0</span></div>
+      <div class="prog-tr"><div class="prog-fl" id="p-fl" style="width:0%"></div></div>
+    </div>
+    <div class="sb-cats" id="sb-cats"></div>
+  </aside>
+  <div class="main">
+    <div class="ex-panel" id="ex-panel">
+      <div class="cat-head"><h2 id="cat-h2">Sélectionnez une catégorie</h2><p id="cat-p"></p></div>
+      <div class="ex-list" id="ex-list"></div>
+    </div>
+    <div class="term">
+      <div class="term-bar">
+        <div class="tdots"><div class="tdot t-r"></div><div class="tdot t-y"></div><div class="tdot t-g"></div></div>
+        <div class="term-lbl" id="t-lbl">bash</div>
+      </div>
+      <div class="term-body" id="t-body">
+        <div class="et"><span>$ _</span><span style="font-size:11px;color:#111820;margin-top:4px">Choisissez un exercice ci-dessus</span></div>
+      </div>
+      <div class="term-inp">
+        <span class="pr-cur" id="pr-cur">$</span>
+        <input id="cmd-in" type="text" autocomplete="off" spellcheck="false" placeholder="" disabled />
+      </div>
+      <div class="term-foot">
+        <button class="tf" id="b-hint" onclick="doHint()" disabled>Indice</button>
+        <button class="tf" id="b-sol" onclick="doSolution()" disabled>Solution</button>
+        <button class="tf" id="b-rst" onclick="doReset()" disabled>↺ Reset</button>
+        <span class="tf-st" id="t-st"></span>
+        <button class="tf nx" id="b-nx" onclick="doNext()" style="display:none">Suivant →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATS = [
+  {id:'nav',label:'Navigation',desc:'cd, pwd — se déplacer dans le système de fichiers',exercises:[
+    {id:'cd1',title:'cd — chemin absolu',desc:'Allez dans /home/john_doe/projets/my_project/app/Model',cwd:'/home/john_doe',answers:['cd /home/john_doe/projets/my_project/app/Model'],output:null,hint:'Un chemin absolu commence toujours par /'},
+    {id:'cd2',title:'cd — chemin relatif',desc:'Depuis /home/john_doe/projets, allez dans my_project/app (sans / au début)',cwd:'/home/john_doe/projets',answers:['cd my_project/app'],output:null,hint:'Le chemin relatif part du répertoire courant, sans / initial'},
+    {id:'cd3',title:'cd .. — remonter un niveau',desc:"Depuis /home/john_doe/projets, remontez d'un niveau vers /home/john_doe",cwd:'/home/john_doe/projets',answers:['cd ..'],output:null,hint:'.. = répertoire parent direct'},
+    {id:'cd4',title:'cd ../.. — remonter deux niveaux',desc:'Depuis /home/john_doe/projets/my_project, remontez de DEUX niveaux',cwd:'/home/john_doe/projets/my_project',answers:['cd ../..'],output:null,hint:'Chaînez deux .. séparés par un /'},
+    {id:'cd5',title:'cd ~ — retour au home',desc:'Peu importe où vous êtes, revenez dans /home/john_doe',cwd:'/var/log/nginx',answers:['cd ~','cd'],output:null,hint:'~ = votre home. cd sans argument fait la même chose'},
+    {id:'cd6',title:'cd - — répertoire précédent',desc:'Revenez dans /home/john_doe/projets après avoir navigué ailleurs',cwd:'/tmp',answers:['cd -'],output:'/home/john_doe/projets',hint:'cd - utilise $OLDPWD pour revenir en arrière'},
+    {id:'cd7',title:'cd / — racine du système',desc:'Allez à la racine du système de fichiers',cwd:'/home/john_doe',answers:['cd /'],output:null,hint:'/ seul = racine du système'},
+    {id:'pwd1',title:'pwd — afficher le répertoire courant',desc:'Affichez le chemin absolu du répertoire courant',cwd:'/home/john_doe/projets/my_project',answers:['pwd'],output:'/home/john_doe/projets/my_project',hint:'pwd = Print Working Directory'},
+  ]},
+  {id:'ls',label:'Listing (ls)',desc:'ls — lister le contenu des répertoires',exercises:[
+    {id:'ls1',title:'ls — lister le répertoire courant',desc:'Listez le contenu du répertoire /home/john_doe',cwd:'/home/john_doe',answers:['ls'],output:'Bureau  Documents  Images  Musique  Téléchargements  projets',hint:'ls sans argument liste le répertoire courant'},
+    {id:'ls2',title:'ls -l — format long',desc:'Listez avec permissions, taille et date de modification',cwd:'/home/john_doe',answers:['ls -l'],output:'total 24\ndrwxr-xr-x 2 john_doe john_doe 4096 janv. 15 Bureau\ndrwxr-xr-x 3 john_doe john_doe 4096 févr. 01 Documents\ndrwxr-xr-x 5 john_doe john_doe 4096 févr. 10 projets',hint:'-l = long format. Affiche permissions, propriétaire, taille, date'},
+    {id:'ls3',title:'ls -a — fichiers cachés',desc:'Listez TOUS les fichiers, y compris ceux commençant par .',cwd:'/home/john_doe',answers:['ls -a'],output:'.  ..  .bash_history  .bashrc  .profile  .ssh  Bureau  Documents  projets',hint:'Les fichiers cachés commencent par un point'},
+    {id:'ls4',title:'ls -la — long + cachés',desc:'Combinez -l et -a pour voir tout avec les détails',cwd:'/home/john_doe',answers:['ls -la','ls -al'],output:'total 48\ndrwxr-xr-x 8 john_doe john_doe 4096 févr. 15 .\ndrwxr-xr-x 3 root     root     4096 oct.  05 ..\n-rw------- 1 john_doe john_doe  220 oct.  05 .bash_history\n-rw-r--r-- 1 john_doe john_doe 3526 oct.  05 .bashrc\ndrwxr-xr-x 5 john_doe john_doe 4096 févr. 10 projets',hint:'-la ou -al, les deux fonctionnent'},
+    {id:'ls5',title:'ls /path — lister un autre répertoire',desc:'Listez /var/log sans vous y déplacer',cwd:'/home/john_doe',answers:['ls /var/log'],output:'apt  auth.log  dpkg.log  kern.log  nginx  syslog',hint:'ls accepte un chemin en argument'},
+  ]},
+  {id:'create',label:'Créer (touch/mkdir)',desc:'touch, mkdir — créer fichiers et répertoires',exercises:[
+    {id:'cr1',title:'touch — créer un fichier vide',desc:'Créez un fichier vide nommé notes.txt',cwd:'/home/john_doe',answers:['touch notes.txt'],output:null,hint:'touch crée un fichier vide ou met à jour sa date'},
+    {id:'cr2',title:'touch — plusieurs fichiers',desc:'Créez a.txt, b.txt et c.txt en une seule commande',cwd:'/home/john_doe',answers:['touch a.txt b.txt c.txt'],output:null,hint:'touch accepte plusieurs noms séparés par des espaces'},
+    {id:'cr3',title:'mkdir — créer un répertoire',desc:'Créez un répertoire nommé archives',cwd:'/home/john_doe',answers:['mkdir archives'],output:null,hint:'mkdir = make directory'},
+    {id:'cr4',title:'mkdir -p — répertoires imbriqués',desc:'Créez projets/2024/janvier/rapports en une seule commande',cwd:'/home/john_doe',answers:['mkdir -p projets/2024/janvier/rapports'],output:null,hint:'-p crée tous les intermédiaires si nécessaire'},
+    {id:'cr5',title:'mkdir — plusieurs répertoires',desc:'Créez src, dist et tests en une commande',cwd:'/home/john_doe/my_project',answers:['mkdir src dist tests'],output:null,hint:'mkdir accepte plusieurs noms séparés par des espaces'},
+  ]},
+  {id:'manage',label:'Gérer (cp/mv/rm)',desc:'cp, mv, rm — copier, déplacer, supprimer',exercises:[
+    {id:'mg1',title:'cp — copier un fichier',desc:'Copiez config.txt vers config.bak',cwd:'/home/john_doe',answers:['cp config.txt config.bak'],output:null,hint:'cp source destination'},
+    {id:'mg2',title:'cp -r — copier un répertoire',desc:'Copiez tout le répertoire projets/ vers projets_backup/',cwd:'/home/john_doe',answers:['cp -r projets projets_backup','cp -r projets/ projets_backup/','cp -r projets/ projets_backup'],output:null,hint:'-r (récursif) est obligatoire pour les répertoires'},
+    {id:'mg3',title:'mv — renommer un fichier',desc:'Renommez old_name.txt en new_name.txt',cwd:'/home/john_doe',answers:['mv old_name.txt new_name.txt'],output:null,hint:'mv sert à déplacer ET à renommer'},
+    {id:'mg4',title:'mv — déplacer un fichier',desc:'Déplacez rapport.pdf vers le répertoire Documents/',cwd:'/home/john_doe',answers:['mv rapport.pdf Documents/','mv rapport.pdf Documents'],output:null,hint:'mv source répertoire_cible/'},
+    {id:'mg5',title:'rm — supprimer un fichier',desc:'Supprimez le fichier temp.txt',cwd:'/home/john_doe',answers:['rm temp.txt'],output:null,hint:'⚠ rm est irréversible — pas de corbeille !'},
+    {id:'mg6',title:'rm -rf — supprimer un répertoire',desc:'Supprimez récursivement old_project/ et tout son contenu',cwd:'/home/john_doe',answers:['rm -rf old_project','rm -rf old_project/'],output:null,hint:'-r = récursif, -f = force. Très dangereux !'},
+  ]},
+  {id:'view',label:'Voir le contenu',desc:'cat, head, tail, wc — lire les fichiers',exercises:[
+    {id:'vw1',title:'cat — afficher un fichier',desc:'Affichez le contenu du fichier README.md',cwd:'/home/john_doe/projets',answers:['cat README.md'],output:'# Mon Projet\n\nCe projet est une application web.\n\n## Installation\nnpm install && npm start',hint:'cat = concatenate. Affiche un ou plusieurs fichiers'},
+    {id:'vw2',title:'head — premières lignes',desc:'Affichez les 10 premières lignes de access.log',cwd:'/var/log/nginx',answers:['head access.log'],output:'192.168.1.1 - [GET / HTTP/1.1] 200 1234\n192.168.1.2 - [GET /about] 200 543\n192.168.1.3 - [GET /api] 404 89\n... (7 autres lignes)',hint:'head = 10 premières lignes par défaut'},
+    {id:'vw3',title:'head -n — choisir le nombre',desc:'Affichez les 3 premières lignes de access.log',cwd:'/var/log/nginx',answers:['head -n 3 access.log','head -3 access.log'],output:'192.168.1.1 - [GET / HTTP/1.1] 200\n192.168.1.2 - [GET /about] 200\n192.168.1.3 - [GET /api] 404',hint:'-n 3 = afficher seulement 3 lignes'},
+    {id:'vw4',title:'tail — dernières lignes',desc:'Affichez les 10 dernières lignes de error.log',cwd:'/var/log/nginx',answers:['tail error.log'],output:'2024/02/15 14:20:11 [error] connect() failed\n2024/02/15 14:21:33 [error] upstream timed out\n... (8 lignes précédentes)',hint:'tail = 10 dernières lignes par défaut'},
+    {id:'vw5',title:'tail -f — suivre en temps réel',desc:'Surveillez les nouvelles lignes de error.log en direct',cwd:'/var/log/nginx',answers:['tail -f error.log'],output:'2024/02/15 14:20:11 [error] upstream timed out\n[Ctrl+C pour arrêter — nouvelles lignes en temps réel]',hint:'-f = follow. Reste ouvert et affiche les nouvelles lignes'},
+    {id:'vw6',title:'wc -l — compter les lignes',desc:'Comptez le nombre de lignes dans access.log',cwd:'/var/log/nginx',answers:['wc -l access.log'],output:'1458 access.log',hint:'wc = word count. -l=lignes, -w=mots, -c=octets'},
+  ]},
+  {id:'search',label:'Recherche',desc:'grep, find, which — trouver du texte et des fichiers',exercises:[
+    {id:'sr1',title:'grep — chercher dans un fichier',desc:'Trouvez toutes les lignes contenant "ERROR" dans app.log',cwd:'/home/john_doe/projets',answers:['grep ERROR app.log','grep "ERROR" app.log',"grep 'ERROR' app.log"],output:'2024-02-15 10:23:01 ERROR Database connection failed\n2024-02-15 10:25:14 ERROR Null pointer exception',hint:'grep pattern fichier — affiche les lignes correspondantes'},
+    {id:'sr2',title:'grep -i — insensible à la casse',desc:'Cherchez "warning" sans tenir compte des majuscules',cwd:'/home/john_doe/projets',answers:['grep -i warning app.log','grep -i "warning" app.log'],output:'2024-02-15 09:14:22 WARNING Low memory\n2024-02-15 11:30:01 Warning Deprecated function',hint:'-i = case insensitive. Trouve WARNING, Warning, warning…'},
+    {id:'sr3',title:'grep -r — recherche récursive',desc:'Cherchez "TODO" dans tous les fichiers du répertoire src/',cwd:'/home/john_doe/projets/my_project',answers:['grep -r TODO src/','grep -r "TODO" src/','grep -r TODO src'],output:'src/main.py:42:  # TODO: fix this later\nsrc/utils.py:15:  # TODO: add validation\nsrc/api.py:88:  # TODO: handle error',hint:'-r = récursif, cherche dans tous les sous-répertoires'},
+    {id:'sr4',title:'find -name — trouver par nom',desc:'Trouvez tous les fichiers .log dans /var/log',cwd:'/home/john_doe',answers:['find /var/log -name "*.log"',"find /var/log -name '*.log'"],output:'/var/log/syslog\n/var/log/auth.log\n/var/log/dpkg.log\n/var/log/nginx/access.log\n/var/log/nginx/error.log',hint:"Mettez *.log entre guillemets pour éviter l'expansion du shell"},
+    {id:'sr5',title:'find -type — trouver par type',desc:'Trouvez tous les répertoires dans /home/john_doe/projets',cwd:'/home/john_doe',answers:['find /home/john_doe/projets -type d','find projets -type d'],output:'/home/john_doe/projets\n/home/john_doe/projets/my_project\n/home/john_doe/projets/my_project/src',hint:'-type d = directory, -type f = file, -type l = symlink'},
+    {id:'sr6',title:'which — localiser une commande',desc:'Trouvez où est installé Python sur le système',cwd:'/home/john_doe',answers:['which python','which python3'],output:'/usr/bin/python3',hint:"which cherche l'exécutable dans les répertoires du PATH"},
+  ]},
+  {id:'perm',label:'Permissions',desc:"chmod, chown — droits d'accès aux fichiers",exercises:[
+    {id:'pm1',title:'chmod +x — rendre exécutable',desc:'Rendez le script deploy.sh exécutable',cwd:'/home/john_doe/projets',answers:['chmod +x deploy.sh'],output:null,hint:"+x ajoute le droit d'exécution. Nécessaire pour ./deploy.sh"},
+    {id:'pm2',title:'chmod 755 — notation octale',desc:'Donnez les permissions 755 (rwxr-xr-x) à setup.sh',cwd:'/home/john_doe',answers:['chmod 755 setup.sh'],output:null,hint:'7=rwx(proprio), 5=r-x(groupe), 5=r-x(autres)'},
+    {id:'pm3',title:'chmod 644 — fichier standard',desc:'Donnez les permissions 644 (rw-r--r--) à config.txt',cwd:'/home/john_doe',answers:['chmod 644 config.txt'],output:null,hint:'6=rw-(proprio), 4=r--(groupe), 4=r--(autres)'},
+    {id:'pm4',title:'chown — changer le propriétaire',desc:'Changez le propriétaire de app.log pour www-data:www-data',cwd:'/var/log',answers:['chown www-data:www-data app.log'],output:null,hint:'chown utilisateur:groupe fichier. Requiert souvent sudo'},
+  ]},
+  {id:'proc',label:'Processus',desc:'ps, kill, jobs — gérer les processus',exercises:[
+    {id:'pc1',title:'ps aux — tous les processus',desc:"Listez tous les processus en cours d'exécution",cwd:'/home/john_doe',answers:['ps aux'],output:'USER       PID %CPU %MEM COMMAND\nroot         1  0.0  0.1 /sbin/init\njohn_doe  2341  0.5  2.1 python3 server.py\nnginx     1234  0.1  0.5 nginx: worker',hint:'a=tous utilisateurs, u=format lisible, x=sans terminal'},
+    {id:'pc2',title:'ps + grep — filtrer les processus',desc:'Trouvez le processus nginx parmi tous les processus',cwd:'/home/john_doe',answers:['ps aux | grep nginx'],output:'nginx     1234  0.1  0.5 nginx: master process\nnginx     1235  0.0  0.3 nginx: worker process',hint:'Combinez ps aux avec grep via un pipe |'},
+    {id:'pc3',title:'kill — arrêter proprement',desc:'Terminez proprement le processus avec le PID 2341',cwd:'/home/john_doe',answers:['kill 2341'],output:null,hint:'kill envoie SIGTERM (arrêt propre). PID obtenu via ps'},
+    {id:'pc4',title:"kill -9 — forcer l'arrêt",desc:"Forcez l'arrêt immédiat du processus 5678",cwd:'/home/john_doe',answers:['kill -9 5678'],output:null,hint:'-9 = SIGKILL. Tué immédiatement, sans nettoyage'},
+    {id:'pc5',title:'& — lancer en arrière-plan',desc:'Lancez long_task.sh en arrière-plan pour libérer le terminal',cwd:'/home/john_doe',answers:['./long_task.sh &','bash long_task.sh &'],output:'[1] 3456',hint:"Ajoutez & à la fin. Le PID s'affiche entre crochets"},
+  ]},
+  {id:'text',label:'Traitement texte',desc:'echo, sort, uniq, cut — manipuler du texte',exercises:[
+    {id:'tx1',title:'echo — afficher du texte',desc:'Affichez "Hello, World!" dans le terminal',cwd:'/home/john_doe',answers:['echo "Hello, World!"',"echo 'Hello, World!'"],output:'Hello, World!',hint:'echo affiche du texte. Les guillemets sont recommandés'},
+    {id:'tx2',title:'echo > — écrire dans un fichier',desc:'Créez message.txt contenant "Bonjour le monde"',cwd:'/home/john_doe',answers:['echo "Bonjour le monde" > message.txt',"echo 'Bonjour le monde' > message.txt"],output:null,hint:'> redirige la sortie vers un fichier (écrase le contenu)'},
+    {id:'tx3',title:'echo >> — ajouter à un fichier',desc:'Ajoutez "Nouvelle ligne" à la fin de notes.txt',cwd:'/home/john_doe',answers:['echo "Nouvelle ligne" >> notes.txt',"echo 'Nouvelle ligne' >> notes.txt"],output:null,hint:'>> ajoute à la fin sans écraser le contenu existant'},
+    {id:'tx4',title:'sort — trier les lignes',desc:'Triez alphabétiquement les lignes de noms.txt',cwd:'/home/john_doe',answers:['sort noms.txt'],output:'Alice\nBob\nCharlie\nDavid\nÈve',hint:"sort trie par ordre alphabétique. -r pour l'inverse"},
+    {id:'tx5',title:'sort | uniq — supprimer les doublons',desc:'Triez fruits.txt et supprimez les lignes dupliquées',cwd:'/home/john_doe',answers:['sort fruits.txt | uniq'],output:'banane\nmangue\npomme',hint:"uniq supprime les lignes consécutives identiques — triez d'abord"},
+    {id:'tx6',title:'cut — extraire des colonnes',desc:'Extrayez la 1ère colonne (séparateur :) de /etc/passwd',cwd:'/home/john_doe',answers:['cut -d: -f1 /etc/passwd',"cut -d ':' -f1 /etc/passwd"],output:'root\ndaemon\nbin\njohn_doe',hint:'-d = délimiteur, -f = numéro de champ'},
+  ]},
+  {id:'pipes',label:'Pipes & Redirections',desc:'|, >, >>, 2> — flux de données',exercises:[
+    {id:'pi1',title:'| — connecter deux commandes',desc:'Listez /etc et filtrez avec grep pour "conf"',cwd:'/home/john_doe',answers:['ls /etc | grep conf'],output:'apt.conf\nnginx.conf\nphp.conf\nssh_config',hint:"| = pipe. Sortie d'une commande → entrée de la suivante"},
+    {id:'pi2',title:'> — rediriger vers un fichier',desc:'Sauvegardez la liste de /etc dans liste.txt',cwd:'/home/john_doe',answers:['ls /etc > liste.txt'],output:null,hint:">> écrase le fichier s'il existe déjà"},
+    {id:'pi3',title:'>> — ajouter à un fichier',desc:'Ajoutez la date courante à la fin de journal.txt',cwd:'/home/john_doe',answers:['date >> journal.txt'],output:null,hint:'>> ajoute à la fin sans écraser le contenu existant'},
+    {id:'pi4',title:'2> — rediriger les erreurs',desc:'Exécutez find / -name "secret.txt" en cachant les erreurs',cwd:'/home/john_doe',answers:['find / -name "secret.txt" 2>/dev/null','find / -name "secret.txt" 2> /dev/null',"find / -name 'secret.txt' 2>/dev/null"],output:'/root/secret.txt',hint:'2> redirige stderr (fd 2). /dev/null = poubelle système'},
+    {id:'pi5',title:'2>&1 — combiner stdout et stderr',desc:'Redirigez stdout ET stderr vers output.log',cwd:'/home/john_doe',answers:['ls /home /nonexistant > output.log 2>&1'],output:null,hint:'2>&1 = stderr vers le même endroit que stdout'},
+  ]},
+  {id:'arch',label:'Archives',desc:'tar, gzip — compresser et archiver',exercises:[
+    {id:'ar1',title:'tar -czf — créer une archive',desc:'Créez backup.tar.gz du répertoire projets/',cwd:'/home/john_doe',answers:['tar -czf backup.tar.gz projets/','tar -czf backup.tar.gz projets'],output:null,hint:'-c=créer, -z=gzip, -f=fichier. Ordre des options important !'},
+    {id:'ar2',title:'tar -xzf — extraire une archive',desc:'Extrayez le contenu de backup.tar.gz dans le répertoire courant',cwd:'/home/john_doe',answers:['tar -xzf backup.tar.gz'],output:null,hint:'-x = extract (remplace -c). -z = gzip, -f = fichier'},
+    {id:'ar3',title:'tar -tzf — lister le contenu',desc:"Listez le contenu de backup.tar.gz sans l'extraire",cwd:'/home/john_doe',answers:['tar -tzf backup.tar.gz'],output:'projets/\nprojets/my_project/\nprojets/my_project/src/\nprojets/my_project/src/main.py',hint:"-t = table of contents. Inoffensif, n'extrait rien"},
+    {id:'ar4',title:'gzip — compresser un fichier',desc:'Compressez access.log avec gzip',cwd:'/var/log',answers:['gzip access.log'],output:null,hint:"Crée access.log.gz et supprime l'original. gunzip pour décompresser"},
+  ]},
+  {id:'net',label:'Réseau',desc:'ping, curl, ssh — connectivité et transfert',exercises:[
+    {id:'nt1',title:'ping -c — tester la connectivité',desc:'Vérifiez si google.com est accessible en envoyant 4 paquets',cwd:'/home/john_doe',answers:['ping -c 4 google.com'],output:'PING google.com (142.250.75.46) 56 octets\n64 octets : icmp_seq=1 ttl=117 temps=12.4 ms\n64 octets : icmp_seq=2 ttl=117 temps=11.8 ms\n4 packets, 0% packet loss, rtt avg 12.05 ms',hint:'-c 4 = envoyer exactement 4 paquets. Sans -c = infini'},
+    {id:'nt2',title:'curl — requête HTTP GET',desc:'Faites une requête GET sur https://api.github.com/users/torvalds',cwd:'/home/john_doe',answers:['curl https://api.github.com/users/torvalds'],output:'{\n  "login": "torvalds",\n  "name": "Linus Torvalds",\n  "public_repos": 8\n}',hint:"curl récupère le contenu d'une URL. Très utilisé pour tester les APIs"},
+    {id:'nt3',title:'curl -O — télécharger un fichier',desc:"Téléchargez https://example.com/data.csv en gardant son nom d'origine",cwd:'/home/john_doe',answers:['curl -O https://example.com/data.csv'],output:'  % Total    % Received\n100  2048  100  2048  -- 5120 B/s',hint:"-O (majuscule) sauvegarde avec le nom d'origine de l'URL"},
+    {id:'nt4',title:'ssh — connexion distante',desc:"Connectez-vous à prod.example.com avec l'utilisateur deploy",cwd:'/home/john_doe',answers:['ssh deploy@prod.example.com'],output:"deploy@prod.example.com's password:\nWelcome to Ubuntu 22.04 LTS\nLast login: Wed Feb 14 09:23:01 2024",hint:'Format : ssh utilisateur@serveur. Préférez les clés SSH'},
+  ]},
+  {id:'sys',label:'Infos système',desc:'uname, df, du, free, whoami — état du système',exercises:[
+    {id:'sy1',title:'whoami — utilisateur courant',desc:"Affichez le nom de l'utilisateur actuellement connecté",cwd:'/home/john_doe',answers:['whoami'],output:'john_doe',hint:'Utile dans les scripts pour vérifier qui exécute la commande'},
+    {id:'sy2',title:'uname -a — infos système complètes',desc:'Affichez toutes les infos système (noyau, version, architecture)',cwd:'/home/john_doe',answers:['uname -a'],output:'Linux srv-prod 6.1.0-18-amd64 #1 SMP Debian 6.1.76-1 x86_64 GNU/Linux',hint:'-a = all : noyau, hostname, version, date, architecture'},
+    {id:'sy3',title:'df -h — espace disque',desc:"Affichez l'utilisation de l'espace disque (format lisible)",cwd:'/home/john_doe',answers:['df -h'],output:'Sys. de fichiers  Taille  Utilisé  Dispo  Uti%\n/dev/sda1          50G      32G     18G   65%\ntmpfs             2.0G        0    2.0G    0%',hint:"-h = human-readable. Affiche Go et Mo au lieu d'octets"},
+    {id:'sy4',title:"du -sh — taille d'un répertoire",desc:"Affichez la taille totale du répertoire projets/",cwd:'/home/john_doe',answers:['du -sh projets/','du -sh projets'],output:'245M\tprojets/',hint:'-s = summary (total seulement), -h = human-readable'},
+    {id:'sy5',title:"free -h — utilisation de la RAM",desc:"Affichez l'utilisation de la mémoire RAM et du swap",cwd:'/home/john_doe',answers:['free -h'],output:'               total   utilisé   libre   disponible\nMem:           7.8G     3.2G    1.5G       4.1G\nSwap:          2.0G       0B    2.0G',hint:"-h = human-readable. Affiche Go au lieu d'octets bruts"},
+    {id:'sy6',title:"history — historique des commandes",desc:"Affichez les 5 dernières commandes de l'historique",cwd:'/home/john_doe',answers:['history 5','history | tail -5','history | tail -n 5'],output:'  496  ls -la\n  497  cd projets\n  498  cat README.md\n  499  git status\n  500  history 5',hint:'history N = N dernières commandes. Utilisez ↑/↓ dans le terminal'},
+  ]},
+  {id:'env',label:'Environnement',desc:"env, export, alias — variables et raccourcis",exercises:[
+    {id:'en1',title:"env — variables d'environnement",desc:"Affichez toutes les variables d'environnement actuelles",cwd:'/home/john_doe',answers:['env'],output:'SHELL=/bin/bash\nHOME=/home/john_doe\nUSER=john_doe\nPATH=/usr/local/bin:/usr/bin:/bin\nLANG=fr_FR.UTF-8',hint:'echo $VAR pour afficher une seule variable'},
+    {id:'en2',title:'echo $VAR — afficher une variable',desc:'Affichez la valeur de la variable PATH',cwd:'/home/john_doe',answers:['echo $PATH'],output:'/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games',hint:'Préfixez le nom de la variable avec $ pour obtenir sa valeur'},
+    {id:'en3',title:'export — définir une variable',desc:'Créez la variable MY_PORT avec la valeur 3000',cwd:'/home/john_doe',answers:['export MY_PORT=3000'],output:null,hint:'export rend la variable disponible pour les processus enfants'},
+    {id:'en4',title:'alias — raccourci de commande',desc:"Créez un alias ll qui exécute ls -la",cwd:'/home/john_doe',answers:["alias ll='ls -la'",'alias ll="ls -la"'],output:null,hint:"Ajoutez dans ~/.bashrc pour rendre l'alias permanent"},
+  ]},
+];
+
+const S = { catId:null, exId:null, done:new Set(), cmds:[], hidx:-1, lines:[] };
+const exMap={}, catMap={};
+CATS.forEach(c => { catMap[c.id]=c; c.exercises.forEach(e => exMap[e.id]=e); });
+const total = CATS.reduce((n,c)=>n+c.exercises.length,0);
+
+function fp(cwd) {
+  const H='/home/john_doe';
+  const d = cwd===H?'~':cwd.startsWith(H+'/')?'~'+cwd.slice(H.length):cwd;
+  return `john_doe@machine:${d}$`;
+}
+function nrm(s){return s.trim().replace(/\s+/g,' ');}
+function ok(inp,ex){return ex.answers.some(a=>nrm(a)===nrm(inp));}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+
+function rSidebar() {
+  document.getElementById('sb-cats').innerHTML = CATS.map(c=>{
+    const d=c.exercises.filter(e=>S.done.has(e.id)).length;
+    const f=d===c.exercises.length;
+    return `<button class="cat-btn${S.catId===c.id?' active':''}" onclick="selCat('${c.id}')"><span class="cat-name">${c.label}</span><span class="cat-bd${f?' full':''}">${d}/${c.exercises.length}</span></button>`;
+  }).join('');
+  const d=S.done.size;
+  document.getElementById('p-txt').textContent=`${d} / ${total}`;
+  document.getElementById('p-fl').style.width=(d/total*100)+'%';
+}
+
+function rExList() {
+  const cat=catMap[S.catId]; if(!cat)return;
+  document.getElementById('cat-h2').textContent=cat.label;
+  document.getElementById('cat-p').textContent=cat.desc;
+  document.getElementById('ex-list').innerHTML=cat.exercises.map(e=>{
+    const done=S.done.has(e.id), active=S.exId===e.id;
+    return `<div class="ex-row${active?' active':''}${done?' done':''}" onclick="selEx('${e.id}')">
+      <div class="ex-chk">${done?'✓':''}</div>
+      <span class="ex-lbl">${e.title}</span>
+      <button class="ex-btn" onclick="event.stopPropagation();selEx('${e.id}')">${done?'↻':'Commencer'}</button>
+    </div>`;
+  }).join('');
+}
+
+function rTerm() {
+  const ex=exMap[S.exId];
+  const inp=document.getElementById('cmd-in');
+  const body=document.getElementById('t-body');
+  ['b-hint','b-sol','b-rst'].forEach(id=>document.getElementById(id).disabled=!ex);
+  inp.disabled=!ex;
+  if(!ex){
+    document.getElementById('pr-cur').textContent='$';
+    document.getElementById('t-lbl').textContent='bash';
+    body.innerHTML='<div class="et"><span>$ _</span><span style="font-size:11px;color:#111820;margin-top:4px">Choisissez un exercice ci-dessus</span></div>';
+    return;
+  }
+  document.getElementById('t-lbl').textContent=`bash — ${ex.title}`;
+  document.getElementById('pr-cur').textContent=fp(ex.cwd)+' ';
+  let h=`<div class="to ctx">◎ ${esc(ex.desc)}</div>`;
+  S.lines.forEach(l=>{
+    if(l.t==='cmd') h+=`<div class="tl"><span class="tp">${esc(fp(ex.cwd))}&nbsp;</span><span class="tc">${esc(l.v)}</span></div>`;
+    else { const c=l.t==='ok'?' ok':l.t==='err'?' err':l.t==='hint'?' hint':l.t==='sol'?' sol':''; h+=`<div class="to${c}">${esc(l.v)}</div>`; }
+  });
+  body.innerHTML=h;
+  body.scrollTop=body.scrollHeight;
+}
+
+function clrSt(){document.getElementById('t-st').textContent='';document.getElementById('t-st').className='tf-st';}
+
+function selCat(id) {
+  S.catId=id; S.exId=null; S.lines=[];
+  rSidebar(); rExList(); rTerm(); clrSt();
+  document.getElementById('b-nx').style.display='none';
+  const cat=catMap[id];
+  if(cat&&cat.exercises.length) selEx(cat.exercises[0].id);
+}
+
+function selEx(id) {
+  S.exId=id; S.lines=[]; S.hidx=S.cmds.length; clrSt();
+  document.getElementById('b-nx').style.display='none';
+  rExList(); rTerm();
+  const inp=document.getElementById('cmd-in');
+  inp.value=''; inp.focus();
+}
+
+function submit(cmd) {
+  const ex=exMap[S.exId]; if(!ex||!cmd.trim())return;
+  S.cmds.push(cmd); S.hidx=S.cmds.length;
+  S.lines.push({t:'cmd',v:cmd});
+  if(ok(cmd,ex)) {
+    if(ex.output!=null) S.lines.push({t:'ok',v:ex.output});
+    S.lines.push({t:'ok',v:'✓ Correct !'});
+    S.done.add(ex.id);
+    document.getElementById('t-st').textContent='✓ Correct !';
+    document.getElementById('t-st').className='tf-st ok';
+    document.getElementById('b-nx').style.display='block';
+    rSidebar(); rExList();
+  } else {
+    S.lines.push({t:'err',v:'bash: commande ou syntaxe incorrecte'});
+    document.getElementById('t-st').textContent='✗ Incorrect';
+    document.getElementById('t-st').className='tf-st err';
+  }
+  rTerm();
+}
+
+function doHint(){const ex=exMap[S.exId];if(!ex)return;S.lines.push({t:'hint',v:'💡 '+ex.hint});rTerm();}
+function doSolution(){const ex=exMap[S.exId];if(!ex)return;S.lines.push({t:'sol',v:'→ '+ex.answers[0]});rTerm();}
+function doReset(){
+  if(!S.exId)return; S.done.delete(S.exId); S.lines=[]; clrSt();
+  document.getElementById('b-nx').style.display='none';
+  rSidebar(); rExList(); rTerm(); document.getElementById('cmd-in').focus();
+}
+function doNext(){
+  const cat=catMap[S.catId]; if(!cat)return;
+  const i=cat.exercises.findIndex(e=>e.id===S.exId);
+  if(i<cat.exercises.length-1) selEx(cat.exercises[i+1].id);
+  else { const ci=CATS.findIndex(c=>c.id===S.catId); if(ci<CATS.length-1) selCat(CATS[ci+1].id); }
+}
+
+document.getElementById('cmd-in').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const v=e.target.value;e.target.value='';submit(v);}
+  else if(e.key==='ArrowUp'){e.preventDefault();if(S.hidx>0){S.hidx--;e.target.value=S.cmds[S.hidx]||'';}}
+  else if(e.key==='ArrowDown'){e.preventDefault();if(S.hidx<S.cmds.length-1){S.hidx++;e.target.value=S.cmds[S.hidx]||'';}else{S.hidx=S.cmds.length;e.target.value='';}}
+});
+document.getElementById('t-body').addEventListener('click',()=>document.getElementById('cmd-in').focus());
+
+rSidebar(); rExList(); rTerm(); selCat('nav');
+</script>
+</body>
+</html>
