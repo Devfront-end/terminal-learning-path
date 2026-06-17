@@ -53,7 +53,7 @@ const tabs = [
   { id: 'ipconfig', label: '🌐 Réseau' },
 ];
 
-const DEFAULT_TRACK_URL = 'https://tlp-alert.jules-augustin.workers.dev/track';
+const DEFAULT_TRACK_URL = 'https://tlp-alert.julesaugustin.workers.dev/track';
 
 function getSessionId() {
   const key = 'tlp_session_id';
@@ -327,7 +327,7 @@ export default function App() {
     const now = Date.now();
     if (now - last > 24 * 60 * 60 * 1000) {
       localStorage.setItem(key, String(now));
-      fetch('https://tlp-alert.jules-augustin.workers.dev/canary').catch(() => {});
+      fetch('https://tlp-alert.julesaugustin.workers.dev/canary').catch(() => {});
     }
   }, []);
 
