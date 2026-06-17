@@ -19,6 +19,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "gh-pages": "^6.3.0",
     "javascript-obfuscator": "^5.4.1",
+    "playwright": "^1.61.0",
     "tailwindcss": "^4.2.2",
     "vite": "^6.0.5"
   }

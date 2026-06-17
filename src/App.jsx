@@ -233,6 +233,7 @@ export default function App() {
   const [showVaultModal, setShowVaultModal] = useState(false);
   const [vaultInput, setVaultInput] = useState('');
   const [vaultError, setVaultError] = useState(false);
+  const [vaultLoadError, setVaultLoadError] = useState(false);
   const clickCount = useRef(0);
   const clickTimer = useRef(null);
   const h2Params = useRef(null);
@@ -276,9 +277,9 @@ export default function App() {
       .then(data => { h2Params.current = data; })
       .catch(() => {});
     fetch(`${import.meta.env.BASE_URL}h3.bin`)
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(data => { vaultParams.current = data; })
-      .catch(() => {});
+      .catch(() => { setVaultLoadError(true); });
 
     const key = 'tlp_seen';
     const last = parseInt(localStorage.getItem(key) || '0', 10);
@@ -318,6 +319,7 @@ export default function App() {
           setActiveTab('terminal');
         } else {
           setShowVaultModal(true);
+          setVaultLoadError(false);
         }
       }
     };
@@ -349,7 +351,7 @@ export default function App() {
   };
 
   const checkVault = async () => {
-    if (!vaultParams.current) return;
+    if (!vaultParams.current) { setVaultLoadError(true); return; }
     const { salt, iterations, hash } = vaultParams.current;
     const ok = await pbkdf2Verify(vaultInput, salt, iterations, hash);
     if (ok) {
@@ -521,6 +523,7 @@ export default function App() {
               <button onClick={checkVault} className="px-4 py-2 bg-cyan-600/20 border border-cyan-600/40 text-cyan-300 rounded text-sm font-semibold hover:bg-cyan-600/30">→</button>
             </div>
             {vaultError && <div className="text-red-400 text-xs">Mot de passe incorrect</div>}
+            {vaultLoadError && <div className="text-orange-400 text-xs">Impossible de charger la config — rechargez la page</div>}
           </div>
         </div>
       )}
