@@ -219,7 +219,48 @@ function useInspectionGuard(onDetect) {
   }, [onDetect]);
 }
 
+const TURNSTILE_SITE_KEY = '0x4AAAAAADmMVlLUolFG-f5W';
+
+function TurnstileGate({ onVerified }) {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    let widgetId;
+    let cancelled = false;
+
+    const tryRender = () => {
+      if (cancelled) return;
+      if (window.turnstile && containerRef.current) {
+        widgetId = window.turnstile.render(containerRef.current, {
+          sitekey: TURNSTILE_SITE_KEY,
+          theme: 'dark',
+          callback: () => {
+            sessionStorage.setItem('tlp_verified', '1');
+            onVerified();
+          },
+        });
+      } else {
+        setTimeout(tryRender, 150);
+      }
+    };
+
+    tryRender();
+    return () => {
+      cancelled = true;
+      if (widgetId !== undefined && window.turnstile) window.turnstile.remove(widgetId);
+    };
+  }, [onVerified]);
+
+  return (
+    <div className="fixed inset-0 bg-gray-950 flex flex-col items-center justify-center gap-6 z-[9999]">
+      <div className="text-cyan-400 font-mono text-sm tracking-widest select-none">TERMINAL LEARNING PATH</div>
+      <div ref={containerRef} />
+    </div>
+  );
+}
+
 export default function App() {
+  const [verified, setVerified] = useState(() => !!sessionStorage.getItem('tlp_verified'));
   const [activeTab, setActiveTab] = useState('terminal');
   const [inspectionBlocked, setInspectionBlocked] = useState(false);
   const [hiddenVisible, setHiddenVisible] = useState(false);
@@ -393,6 +434,10 @@ export default function App() {
     }
     return base + ' border-transparent text-gray-500 hover:text-cyan-300 cursor-pointer';
   };
+
+  if (!verified) {
+    return <TurnstileGate onVerified={() => setVerified(true)} />;
+  }
 
   return (
     <div className="w-full h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex flex-col overflow-hidden">
