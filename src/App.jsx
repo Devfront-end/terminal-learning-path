@@ -29,16 +29,20 @@ async function deriveVaultToken(password) {
   return Array.from(new Uint8Array(derived)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-async function pbkdf2Verify(password, saltHex, iterations, expectedHex) {
-  const enc = new TextEncoder();
-  const salt = Uint8Array.from(saltHex.match(/.{2}/g).map(b => parseInt(b, 16)));
-  const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
-  const derived = await crypto.subtle.deriveBits(
-    { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
-    keyMaterial, 256
-  );
-  const hex = Array.from(new Uint8Array(derived)).map(b => b.toString(16).padStart(2, '0')).join('');
-  return hex === expectedHex;
+// Password check happens server-side (see workers/alert-worker.js /gate/verify) —
+// the PBKDF2 salt/hash never ships in this bundle, so guesses can't be tested offline.
+async function verifyGate(gate, password) {
+  try {
+    const res = await fetch(`${ALERT_WORKER_URL}/gate/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gate, password }),
+    });
+    if (!res.ok) return { ok: false };
+    return res.json();
+  } catch {
+    return { ok: false, networkError: true };
+  }
 }
 
 const tabs = [
@@ -53,7 +57,8 @@ const tabs = [
   { id: 'ipconfig', label: '🌐 Réseau' },
 ];
 
-const DEFAULT_TRACK_URL = 'https://tlp-alert.julesaugustin.workers.dev/track';
+const ALERT_WORKER_URL = 'https://tlp-alert.julesaugustin.workers.dev';
+const DEFAULT_TRACK_URL = `${ALERT_WORKER_URL}/track`;
 
 function getSessionId() {
   const key = 'tlp_session_id';
@@ -66,6 +71,7 @@ function getSessionId() {
 }
 
 function getTrackingUrl() {
+  if (localStorage.getItem('ta_track_enabled') !== '1') return null;
   return localStorage.getItem('ta_track') || DEFAULT_TRACK_URL;
 }
 
@@ -221,8 +227,22 @@ function useInspectionGuard(onDetect) {
 
 const TURNSTILE_SITE_KEY = '0x4AAAAAADmMVlLUolFG-f5W';
 
+async function verifyTurnstileToken(token) {
+  try {
+    const res = await fetch(`${ALERT_WORKER_URL}/turnstile/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 function TurnstileGate({ onVerified }) {
   const containerRef = useRef(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     let widgetId;
@@ -234,9 +254,16 @@ function TurnstileGate({ onVerified }) {
         widgetId = window.turnstile.render(containerRef.current, {
           sitekey: TURNSTILE_SITE_KEY,
           theme: 'dark',
-          callback: () => {
-            sessionStorage.setItem('tlp_verified', '1');
-            onVerified();
+          callback: async (token) => {
+            setError(false);
+            const ok = await verifyTurnstileToken(token);
+            if (ok) {
+              sessionStorage.setItem('tlp_verified', '1');
+              onVerified();
+            } else {
+              setError(true);
+              if (window.turnstile && widgetId !== undefined) window.turnstile.reset(widgetId);
+            }
           },
         });
       } else {
@@ -255,6 +282,7 @@ function TurnstileGate({ onVerified }) {
     <div className="fixed inset-0 bg-gray-950 flex flex-col items-center justify-center gap-6 z-[9999]">
       <div className="text-cyan-400 font-mono text-sm tracking-widest select-none">TERMINAL LEARNING PATH</div>
       <div ref={containerRef} />
+      {error && <div className="text-red-400 text-xs">Verification impossible. Rechargez la page.</div>}
     </div>
   );
 }
@@ -277,8 +305,6 @@ export default function App() {
   const [vaultLoadError, setVaultLoadError] = useState(false);
   const clickCount = useRef(0);
   const clickTimer = useRef(null);
-  const h2Params = useRef(null);
-  const vaultParams = useRef(null);
   const {
     command, setCommand,
     output,
@@ -313,21 +339,12 @@ export default function App() {
   useInspectionGuard(handleInspectionDetected);
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}h2.bin`)
-      .then(r => r.json())
-      .then(data => { h2Params.current = data; })
-      .catch(() => {});
-    fetch(`${import.meta.env.BASE_URL}h3.bin`)
-      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(data => { vaultParams.current = data; })
-      .catch(() => { setVaultLoadError(true); });
-
     const key = 'tlp_seen';
     const last = parseInt(localStorage.getItem(key) || '0', 10);
     const now = Date.now();
     if (now - last > 24 * 60 * 60 * 1000) {
       localStorage.setItem(key, String(now));
-      fetch('https://tlp-alert.julesaugustin.workers.dev/canary').catch(() => {});
+      fetch(`${ALERT_WORKER_URL}/canary`).catch(() => {});
     }
   }, []);
 
@@ -392,13 +409,12 @@ export default function App() {
   };
 
   const checkVault = async () => {
-    if (!vaultParams.current) { setVaultLoadError(true); return; }
-    const { salt, iterations, hash } = vaultParams.current;
-    const ok = await pbkdf2Verify(vaultInput, salt, iterations, hash);
-    if (ok) {
+    const result = await verifyGate('vault', vaultInput);
+    if (result.networkError) { setVaultLoadError(true); return; }
+    if (result.ok) {
       const token = await deriveVaultToken(vaultInput);
       setVaultToken(crypto.randomUUID());
-      setVaultCreds({ password: vaultInput, salt, token });
+      setVaultCreds({ password: vaultInput, salt: result.salt, token });
       setActiveTab('vault');
       setShowVaultModal(false);
       setVaultInput('');
@@ -411,10 +427,8 @@ export default function App() {
   };
 
   const checkH2 = async () => {
-    if (!h2Params.current) return;
-    const { salt, iterations, hash } = h2Params.current;
-    const ok = await pbkdf2Verify(h2Input, salt, iterations, hash);
-    if (ok) {
+    const result = await verifyGate('h2', h2Input);
+    if (result.ok) {
       setH2Token(crypto.randomUUID());
       setActiveTab('history');
       setShowH2Modal(false);
@@ -568,7 +582,7 @@ export default function App() {
               <button onClick={checkVault} className="px-4 py-2 bg-cyan-600/20 border border-cyan-600/40 text-cyan-300 rounded text-sm font-semibold hover:bg-cyan-600/30">→</button>
             </div>
             {vaultError && <div className="text-red-400 text-xs">Mot de passe incorrect</div>}
-            {vaultLoadError && <div className="text-orange-400 text-xs">Impossible de charger la config — rechargez la page</div>}
+            {vaultLoadError && <div className="text-orange-400 text-xs">Connexion au serveur impossible — réessayez</div>}
           </div>
         </div>
       )}
