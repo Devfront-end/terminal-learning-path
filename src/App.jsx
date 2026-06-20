@@ -245,7 +245,6 @@ async function verifyTurnstileToken(token) {
 function TurnstileGate({ onVerified }) {
   const containerRef = useRef(null);
   const [error, setError] = useState(false);
-  const [showManualAccess, setShowManualAccess] = useState(false);
 
   const allowAccess = useCallback(() => {
     sessionStorage.setItem('tlp_verified', '1');
@@ -255,9 +254,6 @@ function TurnstileGate({ onVerified }) {
   useEffect(() => {
     let widgetId;
     let cancelled = false;
-    const timeout = window.setTimeout(() => {
-      setShowManualAccess(true);
-    }, 5000);
 
     const tryRender = () => {
       if (cancelled) return;
@@ -284,7 +280,6 @@ function TurnstileGate({ onVerified }) {
     tryRender();
     return () => {
       cancelled = true;
-      window.clearTimeout(timeout);
       if (widgetId !== undefined && window.turnstile) window.turnstile.remove(widgetId);
     };
   }, [allowAccess]);
@@ -293,22 +288,7 @@ function TurnstileGate({ onVerified }) {
     <div className="fixed inset-0 bg-gray-950 flex flex-col items-center justify-center gap-6 z-[9999]">
       <div className="text-cyan-400 font-mono text-sm tracking-widest select-none">TERMINAL LEARNING PATH</div>
       <div ref={containerRef} />
-      {showManualAccess && (
-        <div className="flex flex-col items-center gap-3 text-center">
-          <div className={error ? 'text-red-400 text-xs' : 'text-gray-400 text-xs'}>
-            {error
-              ? 'Verification impossible depuis ce navigateur.'
-              : 'La verification peut etre bloquee sur certains postes.'}
-          </div>
-          <button
-            type="button"
-            onClick={allowAccess}
-            className="px-4 py-2 border border-cyan-500/50 bg-cyan-500/10 text-cyan-200 text-xs font-semibold hover:bg-cyan-500/20"
-          >
-            Continuer
-          </button>
-        </div>
-      )}
+      {error && <div className="text-red-400 text-xs">Verification impossible. Rechargez la page.</div>}
     </div>
   );
 }
