@@ -39,8 +39,9 @@ async function verifyGate(gate, password) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ gate, password }),
     });
-    if (!res.ok) return { ok: false };
-    return res.json();
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return { ok: false, error: data.error };
+    return data;
   } catch {
     return { ok: false, networkError: true };
   }
@@ -308,7 +309,7 @@ export default function App() {
   const [showVaultModal, setShowVaultModal] = useState(false);
   const [vaultInput, setVaultInput] = useState('');
   const [vaultError, setVaultError] = useState(false);
-  const [vaultLoadError, setVaultLoadError] = useState(false);
+  const [vaultLoadError, setVaultLoadError] = useState('');
   const clickCount = useRef(0);
   const clickTimer = useRef(null);
   const {
@@ -383,7 +384,7 @@ export default function App() {
           setActiveTab('terminal');
         } else {
           setShowVaultModal(true);
-          setVaultLoadError(false);
+          setVaultLoadError('');
         }
       }
     };
@@ -416,7 +417,11 @@ export default function App() {
 
   const checkVault = async () => {
     const result = await verifyGate('vault', vaultInput);
-    if (result.networkError) { setVaultLoadError(true); return; }
+    if (result.networkError) { setVaultLoadError('Connexion au serveur impossible — réessayez'); return; }
+    if (result.error === 'gate_not_configured') {
+      setVaultLoadError('Vault non configuré côté serveur');
+      return;
+    }
     if (result.ok) {
       const token = await deriveVaultToken(vaultInput);
       setVaultToken(crypto.randomUUID());
@@ -424,6 +429,7 @@ export default function App() {
       setActiveTab('vault');
       setShowVaultModal(false);
       setVaultInput('');
+      setVaultLoadError('');
     } else {
       sendAlert('EVT_F');
       setVaultError(true);
@@ -591,7 +597,7 @@ export default function App() {
               <button onClick={checkVault} className="px-4 py-2 bg-cyan-600/20 border border-cyan-600/40 text-cyan-300 rounded text-sm font-semibold hover:bg-cyan-600/30">→</button>
             </div>
             {vaultError && <div className="text-red-400 text-xs">Mot de passe incorrect</div>}
-            {vaultLoadError && <div className="text-orange-400 text-xs">Connexion au serveur impossible — réessayez</div>}
+            {vaultLoadError && <div className="text-orange-400 text-xs">{vaultLoadError}</div>}
           </div>
         </div>
       )}
