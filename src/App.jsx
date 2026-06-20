@@ -19,6 +19,7 @@ import Snippets from './components/Snippets.jsx';
 import CodeEditor from './components/CodeEditor.jsx';
 import IPConfig from './components/IPConfig.jsx';
 import StageExercises from './components/StageExercises.jsx';
+import PHPErrors from './components/PHPErrors.jsx';
 import { useTerminal } from './hooks/useTerminal.js';
 
 async function deriveVaultToken(password) {
@@ -52,6 +53,7 @@ const tabs = [
   { id: 'reference', label: '📖 Référence' },
   { id: 'snippets', label: '🗂️ Snippets' },
   { id: 'editor', label: '✏️ Éditeur' },
+  { id: 'php-errors', label: '🐘 Erreurs PHP' },
   { id: 'tree', label: '🌲 Arborescence' },
   { id: 'cli', label: '🖥️ Bash Essentials' },
   { id: 'ipconfig', label: '🌐 Réseau' },
@@ -243,10 +245,19 @@ async function verifyTurnstileToken(token) {
 function TurnstileGate({ onVerified }) {
   const containerRef = useRef(null);
   const [error, setError] = useState(false);
+  const [showManualAccess, setShowManualAccess] = useState(false);
+
+  const allowAccess = useCallback(() => {
+    sessionStorage.setItem('tlp_verified', '1');
+    onVerified();
+  }, [onVerified]);
 
   useEffect(() => {
     let widgetId;
     let cancelled = false;
+    const timeout = window.setTimeout(() => {
+      setShowManualAccess(true);
+    }, 5000);
 
     const tryRender = () => {
       if (cancelled) return;
@@ -258,8 +269,7 @@ function TurnstileGate({ onVerified }) {
             setError(false);
             const ok = await verifyTurnstileToken(token);
             if (ok) {
-              sessionStorage.setItem('tlp_verified', '1');
-              onVerified();
+              allowAccess();
             } else {
               setError(true);
               if (window.turnstile && widgetId !== undefined) window.turnstile.reset(widgetId);
@@ -274,15 +284,31 @@ function TurnstileGate({ onVerified }) {
     tryRender();
     return () => {
       cancelled = true;
+      window.clearTimeout(timeout);
       if (widgetId !== undefined && window.turnstile) window.turnstile.remove(widgetId);
     };
-  }, [onVerified]);
+  }, [allowAccess]);
 
   return (
     <div className="fixed inset-0 bg-gray-950 flex flex-col items-center justify-center gap-6 z-[9999]">
       <div className="text-cyan-400 font-mono text-sm tracking-widest select-none">TERMINAL LEARNING PATH</div>
       <div ref={containerRef} />
-      {error && <div className="text-red-400 text-xs">Verification impossible. Rechargez la page.</div>}
+      {showManualAccess && (
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className={error ? 'text-red-400 text-xs' : 'text-gray-400 text-xs'}>
+            {error
+              ? 'Verification impossible depuis ce navigateur.'
+              : 'La verification peut etre bloquee sur certains postes.'}
+          </div>
+          <button
+            type="button"
+            onClick={allowAccess}
+            className="px-4 py-2 border border-cyan-500/50 bg-cyan-500/10 text-cyan-200 text-xs font-semibold hover:bg-cyan-500/20"
+          >
+            Continuer
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -541,6 +567,9 @@ export default function App() {
         )}
         {activeTab === 'editor' && (
           <CodeEditor />
+        )}
+        {activeTab === 'php-errors' && (
+          <PHPErrors />
         )}
         {activeTab === 'tree' && (
           <Tree />
