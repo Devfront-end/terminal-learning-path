@@ -13,7 +13,7 @@ const codeVaultModules = import.meta.glob('./components/CodeVault.jsx');
 const CodeVault = lazy(() =>
   codeVaultModules['./components/CodeVault.jsx']
     ? codeVaultModules['./components/CodeVault.jsx']()
-    : Promise.resolve({ default: () => null })
+    : import(/* @vite-ignore */ `${import.meta.env.BASE_URL}assets/CodeVault-D7eSZTLX.js`)
 );
 import Snippets from './components/Snippets.jsx';
 import CodeEditor from './components/CodeEditor.jsx';
