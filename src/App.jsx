@@ -7,14 +7,7 @@ import Tree from './components/Tree.jsx';
 import AskCLI from './components/AskCLI.jsx';
 import CLIExercises from './components/CLIExercises.jsx';
 import AccessAnalyser from './components/AccessAnalyser.jsx';
-// CodeVault est un fichier privé, absent du dépôt public (voir .git/info/exclude).
-// import.meta.glob évite une erreur de build quand le fichier n'existe pas.
-const codeVaultModules = import.meta.glob('./components/CodeVault.jsx');
-const CodeVault = lazy(() =>
-  codeVaultModules['./components/CodeVault.jsx']
-    ? codeVaultModules['./components/CodeVault.jsx']()
-    : import(/* @vite-ignore */ `${import.meta.env.BASE_URL}assets/CodeVault-D7eSZTLX.js`)
-);
+const CodeVault = lazy(() => import('./components/CodeVault.jsx'));
 import Snippets from './components/Snippets.jsx';
 import CodeEditor from './components/CodeEditor.jsx';
 import IPConfig from './components/IPConfig.jsx';
@@ -502,7 +495,7 @@ export default function App() {
           <AccessAnalyser />
         )}
         {activeTab === 'vault' && vaultToken && (
-          <Suspense fallback={null}>
+          <Suspense fallback={<div className="p-6 text-xs text-gray-400">Chargement du Vault...</div>}>
             <CodeVault creds={vaultCreds} />
           </Suspense>
         )}

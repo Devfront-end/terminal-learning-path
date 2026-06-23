@@ -11,7 +11,7 @@ function obfuscatorPlugin() {
     closeBundle() {
       const dir = 'dist/assets'
       try {
-        const files = readdirSync(dir).filter(f => f.endsWith('.js') && f !== 'CodeVault-D7eSZTLX.js')
+        const files = readdirSync(dir).filter(f => f.endsWith('.js'))
         files.forEach(file => {
           const path = join(dir, file)
           const code = readFileSync(path, 'utf8')
