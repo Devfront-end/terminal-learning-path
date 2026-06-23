@@ -228,74 +228,7 @@ function useInspectionGuard(onDetect) {
   }, [onDetect]);
 }
 
-const TURNSTILE_SITE_KEY = '0x4AAAAAADmMVlLUolFG-f5W';
-
-async function verifyTurnstileToken(token) {
-  try {
-    const res = await fetch(`${ALERT_WORKER_URL}/turnstile/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token }),
-    });
-    return res.ok;
-  } catch {
-    return false;
-  }
-}
-
-function TurnstileGate({ onVerified }) {
-  const containerRef = useRef(null);
-  const [error, setError] = useState(false);
-
-  const allowAccess = useCallback(() => {
-    sessionStorage.setItem('tlp_verified', '1');
-    onVerified();
-  }, [onVerified]);
-
-  useEffect(() => {
-    let widgetId;
-    let cancelled = false;
-
-    const tryRender = () => {
-      if (cancelled) return;
-      if (window.turnstile && containerRef.current) {
-        widgetId = window.turnstile.render(containerRef.current, {
-          sitekey: TURNSTILE_SITE_KEY,
-          theme: 'dark',
-          callback: async (token) => {
-            setError(false);
-            const ok = await verifyTurnstileToken(token);
-            if (ok) {
-              allowAccess();
-            } else {
-              setError(true);
-              if (window.turnstile && widgetId !== undefined) window.turnstile.reset(widgetId);
-            }
-          },
-        });
-      } else {
-        setTimeout(tryRender, 150);
-      }
-    };
-
-    tryRender();
-    return () => {
-      cancelled = true;
-      if (widgetId !== undefined && window.turnstile) window.turnstile.remove(widgetId);
-    };
-  }, [allowAccess]);
-
-  return (
-    <div className="fixed inset-0 bg-gray-950 flex flex-col items-center justify-center gap-6 z-[9999]">
-      <div className="text-cyan-400 font-mono text-sm tracking-widest select-none">TERMINAL LEARNING PATH</div>
-      <div ref={containerRef} />
-      {error && <div className="text-red-400 text-xs">Verification impossible. Rechargez la page.</div>}
-    </div>
-  );
-}
-
 export default function App() {
-  const [verified, setVerified] = useState(() => !!sessionStorage.getItem('tlp_verified'));
   const [activeTab, setActiveTab] = useState('terminal');
   const [inspectionBlocked, setInspectionBlocked] = useState(false);
   const [hiddenVisible, setHiddenVisible] = useState(false);
@@ -460,10 +393,6 @@ export default function App() {
     }
     return base + ' border-transparent text-gray-500 hover:text-cyan-300 cursor-pointer';
   };
-
-  if (!verified) {
-    return <TurnstileGate onVerified={() => setVerified(true)} />;
-  }
 
   return (
     <div className="w-full h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex flex-col overflow-hidden">
