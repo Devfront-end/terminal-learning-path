@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, lazy, Suspense } from 'react';
+import { Component, useState, useRef, useEffect, useCallback, lazy, Suspense } from 'react';
 import Terminal from './components/Terminal.jsx';
 import Exercises from './components/Exercises.jsx';
 import Reference from './components/Reference.jsx';
@@ -15,9 +15,39 @@ import StageExercises from './components/StageExercises.jsx';
 import PHPErrors from './components/PHPErrors.jsx';
 import { useTerminal } from './hooks/useTerminal.js';
 
+const VAULT_SALT = 'b7e2a4f1c8d3e6b092a5f4e1d2c3b4a5';
+
+class VaultErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { error: '' };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { error: error?.message || 'Erreur de chargement du Vault.' };
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="h-full bg-gray-950 text-gray-200 p-6">
+          <div className="border border-red-900/60 bg-red-950/20 rounded p-4 text-sm">
+            <div className="font-semibold text-red-200">Vault indisponible</div>
+            <div className="mt-2 text-red-100/80">
+              Le Vault n'a pas pu se charger. Rechargez la page puis reessayez.
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 async function deriveVaultToken(password) {
   const enc = new TextEncoder();
-  const salt = Uint8Array.from('b7e2a4f1c8d3e6b092a5f4e1d2c3b4a5'.match(/.{2}/g).map(b => parseInt(b, 16)));
+  const salt = Uint8Array.from(VAULT_SALT.match(/.{2}/g).map(b => parseInt(b, 16)));
   const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
   const derived = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' }, keyMaterial, 256);
   return Array.from(new Uint8Array(derived)).map(b => b.toString(16).padStart(2, '0')).join('');
@@ -351,7 +381,7 @@ export default function App() {
     if (result.ok) {
       const token = await deriveVaultToken(vaultInput);
       setVaultToken(crypto.randomUUID());
-      setVaultCreds({ password: vaultInput, salt: result.salt, token });
+      setVaultCreds({ password: vaultInput, salt: result.salt || VAULT_SALT, token });
       setActiveTab('vault');
       setShowVaultModal(false);
       setVaultInput('');
@@ -495,9 +525,11 @@ export default function App() {
           <AccessAnalyser />
         )}
         {activeTab === 'vault' && vaultToken && (
-          <Suspense fallback={<div className="p-6 text-xs text-gray-400">Chargement du Vault...</div>}>
-            <CodeVault creds={vaultCreds} />
-          </Suspense>
+          <VaultErrorBoundary key={vaultToken}>
+            <Suspense fallback={<div className="p-6 text-xs text-gray-400">Chargement du Vault...</div>}>
+              <CodeVault creds={vaultCreds} />
+            </Suspense>
+          </VaultErrorBoundary>
         )}
       </div>
 
