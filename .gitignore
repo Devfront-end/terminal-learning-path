@@ -5,6 +5,9 @@ backups/
 suivi_stage/
 .DS_Store
 
+# Security documentation (contient des conseils spécifiques à l'utilisateur)
+github-security-checklist.md
+
 # wrangler files
 .wrangler
 .dev.vars*
