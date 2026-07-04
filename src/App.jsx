@@ -63,11 +63,22 @@ async function verifyGate(gate, password) {
       body: JSON.stringify({ gate, password }),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) return { ok: false, error: data.error };
+    if (!res.ok) return { ok: false, error: data.error, status: res.status };
     return data;
   } catch {
     return { ok: false, networkError: true };
   }
+}
+
+// Distinguishes "wrong password" from other gate failures (rate limit, origin
+// blocked, server errors) so the UI doesn't mislabel them all as an incorrect password.
+function gateLoadErrorMessage(result) {
+  if (result.error === 'rate_limited') return 'Trop de tentatives — réessayez dans quelques minutes';
+  if (result.error === 'gate_not_configured') return 'Porte non configurée côté serveur';
+  if (result.status === 403) return 'Accès refusé depuis cette origine';
+  if (result.status === 429) return 'Trop de tentatives — réessayez dans quelques minutes';
+  if (result.status >= 500) return 'Erreur serveur — réessayez plus tard';
+  return null;
 }
 
 const tabs = [
@@ -191,75 +202,82 @@ function useTabTracking(activeTab) {
   }, [activeTab]);
 }
 
-function useInspectionGuard(onDetect) {
+const TURNSTILE_SITE_KEY = '0x4AAAAAADmMVlLUolFG-f5W';
+
+async function verifyTurnstileToken(token) {
+  try {
+    const res = await fetch(`${ALERT_WORKER_URL}/turnstile/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+function TurnstileGate({ onVerified }) {
+  const containerRef = useRef(null);
+  const [error, setError] = useState(false);
+
+  const allowAccess = useCallback(() => {
+    sessionStorage.setItem('tlp_verified', '1');
+    onVerified();
+  }, [onVerified]);
+
   useEffect(() => {
-    let detected = false;
+    let widgetId;
+    let cancelled = false;
 
-    const trigger = () => {
-      if (!detected) {
-        detected = true;
-        onDetect();
+    const tryRender = () => {
+      if (cancelled) return;
+      if (window.turnstile && containerRef.current) {
+        widgetId = window.turnstile.render(containerRef.current, {
+          sitekey: TURNSTILE_SITE_KEY,
+          theme: 'dark',
+          callback: async (token) => {
+            setError(false);
+            const ok = await verifyTurnstileToken(token);
+            if (ok) {
+              allowAccess();
+            } else {
+              setError(true);
+              if (window.turnstile && widgetId !== undefined) window.turnstile.reset(widgetId);
+            }
+          },
+        });
+      } else {
+        setTimeout(tryRender, 150);
       }
     };
 
-    const onContextMenu = (e) => {
-      e.preventDefault();
-      trigger();
-    };
-
-    const onKeyDown = (e) => {
-      const key = e.key.toLowerCase();
-      const blocked =
-        e.key === 'F12' ||
-        ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i', 'j', 'c'].includes(key)) ||
-        ((e.ctrlKey || e.metaKey) && ['u', 's'].includes(key)) ||
-        (e.metaKey && e.altKey && ['i', 'j', 'c'].includes(key));
-
-      if (blocked) {
-        e.preventDefault();
-        e.stopPropagation();
-        trigger();
-      }
-    };
-
-    const detectOpenDevtools = () => {
-      const sizeThreshold = 170;
-      if (
-        window.outerWidth - window.innerWidth > sizeThreshold ||
-        window.outerHeight - window.innerHeight > sizeThreshold
-      ) {
-        trigger();
-      }
-
-      const started = performance.now();
-      debugger;
-      if (performance.now() - started > 100) {
-        trigger();
-      }
-    };
-
-    document.addEventListener('contextmenu', onContextMenu);
-    window.addEventListener('keydown', onKeyDown, true);
-    const interval = window.setInterval(detectOpenDevtools, 1200);
-    detectOpenDevtools();
-
+    tryRender();
     return () => {
-      document.removeEventListener('contextmenu', onContextMenu);
-      window.removeEventListener('keydown', onKeyDown, true);
-      window.clearInterval(interval);
+      cancelled = true;
+      if (widgetId !== undefined && window.turnstile) window.turnstile.remove(widgetId);
     };
-  }, [onDetect]);
+  }, [allowAccess]);
+
+  return (
+    <div className="fixed inset-0 bg-gray-950 flex flex-col items-center justify-center gap-6 z-[9999]">
+      <div className="text-cyan-400 font-mono text-sm tracking-widest select-none">TERMINAL LEARNING PATH</div>
+      <div ref={containerRef} />
+      {error && <div className="text-red-400 text-xs">Verification impossible. Rechargez la page.</div>}
+    </div>
+  );
 }
 
 export default function App() {
+  const [verified, setVerified] = useState(() => !!sessionStorage.getItem('tlp_verified') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
   const [activeTab, setActiveTab] = useState('terminal');
-  const [inspectionBlocked, setInspectionBlocked] = useState(false);
   const [hiddenVisible, setHiddenVisible] = useState(false);
   const [stageVisible, setStageVisible] = useState(false);
   const [h2Token, setH2Token] = useState(null);
   const [showH2Modal, setShowH2Modal] = useState(false);
   const [h2Input, setH2Input] = useState('');
   const [h2Error, setH2Error] = useState(false);
+  const [h2LoadError, setH2LoadError] = useState('');
   const [vaultToken, setVaultToken] = useState(null);
   const [vaultCreds, setVaultCreds] = useState(null);
   const [showVaultModal, setShowVaultModal] = useState(false);
@@ -293,13 +311,6 @@ export default function App() {
       body: JSON.stringify({ code }),
     }).catch(() => {});
   }, []);
-
-  const handleInspectionDetected = useCallback(() => {
-    sendAlert('EVT_INSPECT');
-    setInspectionBlocked(true);
-  }, [sendAlert]);
-
-  useInspectionGuard(handleInspectionDetected);
 
   useEffect(() => {
     const key = 'tlp_seen';
@@ -374,10 +385,8 @@ export default function App() {
   const checkVault = async () => {
     const result = await verifyGate('vault', vaultInput);
     if (result.networkError) { setVaultLoadError('Connexion au serveur impossible — réessayez'); return; }
-    if (result.error === 'gate_not_configured') {
-      setVaultLoadError('Vault non configuré côté serveur');
-      return;
-    }
+    const loadError = gateLoadErrorMessage(result);
+    if (loadError) { setVaultLoadError(loadError); return; }
     if (result.ok) {
       const token = await deriveVaultToken(vaultInput);
       setVaultToken(crypto.randomUUID());
@@ -396,11 +405,15 @@ export default function App() {
 
   const checkH2 = async () => {
     const result = await verifyGate('h2', h2Input);
+    if (result.networkError) { setH2LoadError('Connexion au serveur impossible — réessayez'); return; }
+    const loadError = gateLoadErrorMessage(result);
+    if (loadError) { setH2LoadError(loadError); return; }
     if (result.ok) {
       setH2Token(crypto.randomUUID());
       setActiveTab('history');
       setShowH2Modal(false);
       setH2Input('');
+      setH2LoadError('');
     } else {
       sendAlert('EVT_D');
       setH2Error(true);
@@ -419,18 +432,6 @@ export default function App() {
 
   return (
     <div className="w-full h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex flex-col overflow-hidden">
-      {inspectionBlocked && (
-        <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center p-6">
-          <div className="max-w-md border border-red-500/50 bg-red-950/20 px-6 py-5 text-center shadow-2xl">
-            <div className="text-5xl animate-door">🚪</div>
-            <div className="mt-3 text-red-300 text-sm font-semibold tracking-wide">Oups, mauvaise porte !</div>
-            <div className="mt-3 text-xs leading-6 text-red-100/80">
-              Cette pièce est fermée à clé. Ferme les outils de développement et recharge l'application pour ressortir.
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Header */}
       <div className="border-b border-cyan-900/30 bg-gray-950/50 px-6 py-4">
         <div className="flex items-center gap-3 mb-2">
@@ -577,6 +578,7 @@ export default function App() {
               >→</button>
             </div>
             {h2Error && <div className="text-red-400 text-xs">Mot de passe incorrect</div>}
+            {h2LoadError && <div className="text-orange-400 text-xs">{h2LoadError}</div>}
           </div>
         </div>
       )}

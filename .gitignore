@@ -1,6 +1,8 @@
 node_modules/
 dist/
 agent-os/
+backups/
+suivi_stage/
 .DS_Store
 
 # wrangler files
