@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import Terminal from './components/Terminal.jsx';
 import Exercises from './components/Exercises.jsx';
 import Reference from './components/Reference.jsx';
@@ -6,18 +6,15 @@ import History from './components/History.jsx';
 import Tree from './components/Tree.jsx';
 import AskCLI from './components/AskCLI.jsx';
 import CLIExercises from './components/CLIExercises.jsx';
-import AccessAnalyser from './components/AccessAnalyser.jsx';
 import Snippets from './components/Snippets.jsx';
 import CodeEditor from './components/CodeEditor.jsx';
 import IPConfig from './components/IPConfig.jsx';
-import StageExercises from './components/StageExercises.jsx';
 import PHPErrors from './components/PHPErrors.jsx';
 import { useTerminal } from './hooks/useTerminal.js';
 
 const tabs = [
   { id: 'terminal', label: '⚡ Terminal' },
   { id: 'exercises', label: '📚 Exercices' },
-  { id: 'stage', label: '🧪 PHP/JS', hidden: true },
   { id: 'reference', label: '📖 Référence' },
   { id: 'snippets', label: '🗂️ Snippets' },
   { id: 'editor', label: '✏️ Éditeur' },
@@ -37,8 +34,6 @@ const getTabClass = (tab, activeTab) => {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('terminal');
-  const [hiddenVisible, setHiddenVisible] = useState(false);
-  const [stageVisible, setStageVisible] = useState(false);
   const {
     command, setCommand,
     output,
@@ -53,40 +48,20 @@ export default function App() {
     resetTerminal,
   } = useTerminal();
 
-  const handleTitleClick = () => {
-    setHiddenVisible(v => {
-      if (v) setActiveTab('terminal');
-      else setActiveTab('audit');
-      return !v;
-    });
-  };
-
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.key.toLowerCase() === 'p') {
-        e.preventDefault();
-        setStageVisible(true);
-        setActiveTab('stage');
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
-
   return (
     <div className="w-full h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex flex-col overflow-hidden">
       {/* Header */}
       <div className="border-b border-cyan-900/30 bg-gray-950/50 px-6 py-4">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></div>
-          <h1 className="text-xl font-bold text-cyan-400 cursor-default select-none" onClick={handleTitleClick}>TERMINAL LEARNING PATH</h1>
+          <h1 className="text-xl font-bold text-cyan-400 cursor-default select-none">TERMINAL LEARNING PATH</h1>
         </div>
         <p className="text-xs text-gray-400">CLI Linux et Git</p>
       </div>
 
       {/* Tabs */}
       <div className="flex border-b border-cyan-900/30 bg-gray-950/30 px-6">
-        {tabs.filter(tab => !tab.hidden || (tab.id === 'stage' && stageVisible)).map(tab => (
+        {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -95,14 +70,6 @@ export default function App() {
             {tab.label}
           </button>
         ))}
-        {hiddenVisible && (
-          <button
-            onClick={() => setActiveTab('audit')}
-            className={getTabClass('audit', activeTab)}
-          >
-            ⚙️
-          </button>
-        )}
       </div>
 
       {/* Content */}
@@ -126,9 +93,6 @@ export default function App() {
         {activeTab === 'exercises' && (
           <Exercises onValidate={validateExercise} />
         )}
-        {activeTab === 'stage' && (
-          <StageExercises />
-        )}
         {activeTab === 'reference' && (
           <Reference />
         )}
@@ -149,9 +113,6 @@ export default function App() {
         )}
         {activeTab === 'ipconfig' && (
           <IPConfig />
-        )}
-        {activeTab === 'audit' && (
-          <AccessAnalyser />
         )}
       </div>
 

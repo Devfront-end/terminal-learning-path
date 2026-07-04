@@ -13,6 +13,10 @@ SECURITY_AUDIT_CODE_SNIPPETS.md
 REMOVED_FEATURES_BACKUP.jsx
 App_with_protections.jsx
 src/App.jsx.backup
+SENSITIVE_CODE_BACKUP.md
+
+# Fichiers .bin (données chiffrées)
+public/*.bin
 
 # wrangler files
 .wrangler
