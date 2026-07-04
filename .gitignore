@@ -7,6 +7,7 @@ suivi_stage/
 
 # Security documentation (contient des conseils spécifiques à l'utilisateur)
 github-security-checklist.md
+SECURITY_AUDIT_CODE_SNIPPETS.md
 
 # wrangler files
 .wrangler
