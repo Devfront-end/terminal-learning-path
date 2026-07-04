@@ -9,6 +9,11 @@ suivi_stage/
 github-security-checklist.md
 SECURITY_AUDIT_CODE_SNIPPETS.md
 
+# Fichiers de backup contenant du code sensible (ne pas commiter)
+REMOVED_FEATURES_BACKUP.jsx
+App_with_protections.jsx
+src/App.jsx.backup
+
 # wrangler files
 .wrangler
 .dev.vars*

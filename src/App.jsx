@@ -1,4 +1,4 @@
-import { Component, useState, useRef, useEffect, useCallback, lazy, Suspense } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Terminal from './components/Terminal.jsx';
 import Exercises from './components/Exercises.jsx';
 import Reference from './components/Reference.jsx';
@@ -7,77 +7,12 @@ import Tree from './components/Tree.jsx';
 import AskCLI from './components/AskCLI.jsx';
 import CLIExercises from './components/CLIExercises.jsx';
 import AccessAnalyser from './components/AccessAnalyser.jsx';
-const CodeVault = lazy(() => import('./components/CodeVault.jsx'));
 import Snippets from './components/Snippets.jsx';
 import CodeEditor from './components/CodeEditor.jsx';
 import IPConfig from './components/IPConfig.jsx';
 import StageExercises from './components/StageExercises.jsx';
 import PHPErrors from './components/PHPErrors.jsx';
 import { useTerminal } from './hooks/useTerminal.js';
-
-class VaultErrorBoundary extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { error: '' };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { error: error?.message || 'Erreur de chargement du Vault.' };
-  }
-
-  render() {
-    if (this.state.error) {
-      return (
-        <div className="h-full bg-gray-950 text-gray-200 p-6">
-          <div className="border border-red-900/60 bg-red-950/20 rounded p-4 text-sm">
-            <div className="font-semibold text-red-200">Vault indisponible</div>
-            <div className="mt-2 text-red-100/80">
-              Le Vault n'a pas pu se charger. Rechargez la page puis reessayez.
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
-
-async function deriveVaultToken(password, saltHex) {
-  const enc = new TextEncoder();
-  const salt = Uint8Array.from(saltHex.match(/.{2}/g).map(b => parseInt(b, 16)));
-  const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
-  const derived = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' }, keyMaterial, 256);
-  return Array.from(new Uint8Array(derived)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-// Password check happens server-side (see workers/alert-worker.js /gate/verify) —
-// the PBKDF2 salt/hash never ships in this bundle, so guesses can't be tested offline.
-async function verifyGate(gate, password) {
-  try {
-    const res = await fetch(`${ALERT_WORKER_URL}/gate/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ gate, password }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) return { ok: false, error: data.error, status: res.status };
-    return data;
-  } catch {
-    return { ok: false, networkError: true };
-  }
-}
-
-// Distinguishes "wrong password" from other gate failures (rate limit, origin
-// blocked, server errors) so the UI doesn't mislabel them all as an incorrect password.
-function gateLoadErrorMessage(result) {
-  if (result.error === 'rate_limited') return 'Trop de tentatives — réessayez dans quelques minutes';
-  if (result.error === 'gate_not_configured') return 'Porte non configurée côté serveur';
-  if (result.status === 403) return 'Accès refusé depuis cette origine';
-  if (result.status === 429) return 'Trop de tentatives — réessayez dans quelques minutes';
-  if (result.status >= 500) return 'Erreur serveur — réessayez plus tard';
-  return null;
-}
 
 const tabs = [
   { id: 'terminal', label: '⚡ Terminal' },
@@ -92,198 +27,18 @@ const tabs = [
   { id: 'ipconfig', label: '🌐 Réseau' },
 ];
 
-const ALERT_WORKER_URL = 'https://tlp-alert.julesaugustin.workers.dev';
-const DEFAULT_TRACK_URL = `${ALERT_WORKER_URL}/track`;
-
-function getSessionId() {
-  const key = 'tlp_session_id';
-  let sessionId = localStorage.getItem(key);
-  if (!sessionId) {
-    sessionId = crypto.randomUUID();
-    localStorage.setItem(key, sessionId);
+const getTabClass = (tab, activeTab) => {
+  const base = 'px-4 py-3 text-xs font-semibold border-b-2 transition-all';
+  if (activeTab === tab) {
+    return base + ' border-cyan-400 text-cyan-400';
   }
-  return sessionId;
-}
-
-function getTrackingUrl() {
-  if (localStorage.getItem('ta_track_enabled') !== '1') return null;
-  return localStorage.getItem('ta_track') || DEFAULT_TRACK_URL;
-}
-
-function sendTrackEvent(payload, options = {}) {
-  const url = getTrackingUrl();
-  if (!url) return;
-
-  const body = JSON.stringify({
-    app: 'terminal-learning-path',
-    sessionId: getSessionId(),
-    path: window.location.pathname,
-    href: window.location.href,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    userAgent: navigator.userAgent,
-    at: new Date().toISOString(),
-    ...payload,
-  });
-
-  if (options.beacon && navigator.sendBeacon) {
-    const blob = new Blob([body], { type: 'application/json' });
-    if (navigator.sendBeacon(url, blob)) return;
-  }
-
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body,
-    keepalive: true,
-  }).catch(() => {});
-}
-
-function useTabTracking(activeTab) {
-  const activeTabRef = useRef(activeTab);
-  const startedAtRef = useRef(Date.now());
-
-  useEffect(() => {
-    sendTrackEvent({ event: 'session_start', tab: activeTab });
-  }, []);
-
-  useEffect(() => {
-    const now = Date.now();
-    const previousTab = activeTabRef.current;
-    const durationMs = now - startedAtRef.current;
-
-    if (previousTab !== activeTab) {
-      sendTrackEvent({
-        event: 'tab_duration',
-        tab: previousTab,
-        durationMs,
-        startedAt: new Date(startedAtRef.current).toISOString(),
-        endedAt: new Date(now).toISOString(),
-      });
-
-      sendTrackEvent({ event: 'tab_open', tab: activeTab });
-      activeTabRef.current = activeTab;
-      startedAtRef.current = now;
-    }
-  }, [activeTab]);
-
-  useEffect(() => {
-    const flushCurrentTab = (event = 'session_end') => {
-      const now = Date.now();
-      sendTrackEvent({
-        event,
-        tab: activeTabRef.current,
-        durationMs: now - startedAtRef.current,
-        startedAt: new Date(startedAtRef.current).toISOString(),
-        endedAt: new Date(now).toISOString(),
-      }, { beacon: true });
-      startedAtRef.current = now;
-    };
-
-    const onVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') flushCurrentTab('tab_hidden');
-      if (document.visibilityState === 'visible') {
-        activeTabRef.current = activeTab;
-        startedAtRef.current = Date.now();
-        sendTrackEvent({ event: 'tab_visible', tab: activeTab });
-      }
-    };
-
-    const onPageHide = () => flushCurrentTab('session_end');
-
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    window.addEventListener('pagehide', onPageHide);
-
-    return () => {
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      window.removeEventListener('pagehide', onPageHide);
-    };
-  }, [activeTab]);
-}
-
-const TURNSTILE_SITE_KEY = '0x4AAAAAADmMVlLUolFG-f5W';
-
-async function verifyTurnstileToken(token) {
-  try {
-    const res = await fetch(`${ALERT_WORKER_URL}/turnstile/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token }),
-    });
-    return res.ok;
-  } catch {
-    return false;
-  }
-}
-
-function TurnstileGate({ onVerified }) {
-  const containerRef = useRef(null);
-  const [error, setError] = useState(false);
-
-  const allowAccess = useCallback(() => {
-    sessionStorage.setItem('tlp_verified', '1');
-    onVerified();
-  }, [onVerified]);
-
-  useEffect(() => {
-    let widgetId;
-    let cancelled = false;
-
-    const tryRender = () => {
-      if (cancelled) return;
-      if (window.turnstile && containerRef.current) {
-        widgetId = window.turnstile.render(containerRef.current, {
-          sitekey: TURNSTILE_SITE_KEY,
-          theme: 'dark',
-          callback: async (token) => {
-            setError(false);
-            const ok = await verifyTurnstileToken(token);
-            if (ok) {
-              allowAccess();
-            } else {
-              setError(true);
-              if (window.turnstile && widgetId !== undefined) window.turnstile.reset(widgetId);
-            }
-          },
-        });
-      } else {
-        setTimeout(tryRender, 150);
-      }
-    };
-
-    tryRender();
-    return () => {
-      cancelled = true;
-      if (widgetId !== undefined && window.turnstile) window.turnstile.remove(widgetId);
-    };
-  }, [allowAccess]);
-
-  return (
-    <div className="fixed inset-0 bg-gray-950 flex flex-col items-center justify-center gap-6 z-[9999]">
-      <div className="text-cyan-400 font-mono text-sm tracking-widest select-none">TERMINAL LEARNING PATH</div>
-      <div ref={containerRef} />
-      {error && <div className="text-red-400 text-xs">Verification impossible. Rechargez la page.</div>}
-    </div>
-  );
-}
+  return base + ' border-transparent text-gray-500 hover:text-cyan-300 cursor-pointer';
+};
 
 export default function App() {
-  const [verified, setVerified] = useState(() => !!sessionStorage.getItem('tlp_verified') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
   const [activeTab, setActiveTab] = useState('terminal');
   const [hiddenVisible, setHiddenVisible] = useState(false);
   const [stageVisible, setStageVisible] = useState(false);
-  const [h2Token, setH2Token] = useState(null);
-  const [showH2Modal, setShowH2Modal] = useState(false);
-  const [h2Input, setH2Input] = useState('');
-  const [h2Error, setH2Error] = useState(false);
-  const [h2LoadError, setH2LoadError] = useState('');
-  const [vaultToken, setVaultToken] = useState(null);
-  const [vaultCreds, setVaultCreds] = useState(null);
-  const [showVaultModal, setShowVaultModal] = useState(false);
-  const [vaultInput, setVaultInput] = useState('');
-  const [vaultError, setVaultError] = useState(false);
-  const [vaultLoadError, setVaultLoadError] = useState('');
-  const clickCount = useRef(0);
-  const clickTimer = useRef(null);
   const {
     command, setCommand,
     output,
@@ -298,135 +53,25 @@ export default function App() {
     resetTerminal,
   } = useTerminal();
 
-  useTabTracking(activeTab);
-
-  const sendAlert = useCallback((code) => {
-    const workerUrl = localStorage.getItem('ta_wk');
-    if (!workerUrl) return;
-    fetch(workerUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code }),
-    }).catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    const key = 'tlp_seen';
-    const last = parseInt(localStorage.getItem(key) || '0', 10);
-    const now = Date.now();
-    if (now - last > 24 * 60 * 60 * 1000) {
-      localStorage.setItem(key, String(now));
-      fetch(`${ALERT_WORKER_URL}/canary`).catch(() => {});
-    }
-  }, []);
+  const handleTitleClick = () => {
+    setHiddenVisible(v => {
+      if (v) setActiveTab('terminal');
+      else setActiveTab('audit');
+      return !v;
+    });
+  };
 
   useEffect(() => {
     const onKey = (e) => {
-      if (!e.ctrlKey || !e.shiftKey) return;
-      if (e.key === 'A') {
-        e.preventDefault();
-        sendAlert('EVT_A');
-        setHiddenVisible(v => {
-          if (v) setActiveTab('terminal');
-          else setActiveTab('audit');
-          return !v;
-        });
-      } else if (e.key === 'H') {
-        e.preventDefault();
-        if (h2Token) setActiveTab('history');
-      } else if (e.key === 'Y') {
-        e.preventDefault();
-        if (h2Token) setActiveTab('ask');
-      } else if (e.key.toLowerCase() === 'p') {
+      if (e.key.toLowerCase() === 'p') {
         e.preventDefault();
         setStageVisible(true);
         setActiveTab('stage');
-      } else if (e.key === 'V') {
-        e.preventDefault();
-        sendAlert('EVT_E');
-        if (vaultToken) {
-          setVaultToken(null);
-          setActiveTab('terminal');
-        } else {
-          setShowVaultModal(true);
-          setVaultLoadError('');
-        }
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [h2Token, vaultToken]);
-
-  const handleTitleClick = () => {
-    clickCount.current += 1;
-    clearTimeout(clickTimer.current);
-    clickTimer.current = setTimeout(() => { clickCount.current = 0; }, 600);
-    if (clickCount.current === 5) {
-      clickCount.current = 0;
-      if (h2Token) {
-        setH2Token(null);
-        setActiveTab('terminal');
-      } else {
-        sendAlert('EVT_B');
-        setShowH2Modal(true);
-      }
-    } else if (clickCount.current === 3) {
-      sendAlert('EVT_C');
-      setHiddenVisible(v => {
-        if (v) setActiveTab('terminal');
-        else setActiveTab('audit');
-        return !v;
-      });
-    }
-  };
-
-  const checkVault = async () => {
-    const result = await verifyGate('vault', vaultInput);
-    if (result.networkError) { setVaultLoadError('Connexion au serveur impossible — réessayez'); return; }
-    const loadError = gateLoadErrorMessage(result);
-    if (loadError) { setVaultLoadError(loadError); return; }
-    if (result.ok) {
-      const token = await deriveVaultToken(vaultInput, result.salt);
-      setVaultToken(crypto.randomUUID());
-      setVaultCreds({ password: vaultInput, salt: result.salt, token });
-      setActiveTab('vault');
-      setShowVaultModal(false);
-      setVaultInput('');
-      setVaultLoadError('');
-    } else {
-      sendAlert('EVT_F');
-      setVaultError(true);
-      setVaultInput('');
-      setTimeout(() => setVaultError(false), 2000);
-    }
-  };
-
-  const checkH2 = async () => {
-    const result = await verifyGate('h2', h2Input);
-    if (result.networkError) { setH2LoadError('Connexion au serveur impossible — réessayez'); return; }
-    const loadError = gateLoadErrorMessage(result);
-    if (loadError) { setH2LoadError(loadError); return; }
-    if (result.ok) {
-      setH2Token(crypto.randomUUID());
-      setActiveTab('history');
-      setShowH2Modal(false);
-      setH2Input('');
-      setH2LoadError('');
-    } else {
-      sendAlert('EVT_D');
-      setH2Error(true);
-      setH2Input('');
-      setTimeout(() => setH2Error(false), 2000);
-    }
-  };
-
-  const getTabClass = (tab) => {
-    const base = 'px-4 py-3 text-xs font-semibold border-b-2 transition-all';
-    if (activeTab === tab) {
-      return base + ' border-cyan-400 text-cyan-400';
-    }
-    return base + ' border-transparent text-gray-500 hover:text-cyan-300 cursor-pointer';
-  };
+  }, []);
 
   return (
     <div className="w-full h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex flex-col overflow-hidden">
@@ -445,7 +90,7 @@ export default function App() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={getTabClass(tab.id)}
+            className={getTabClass(tab.id, activeTab)}
           >
             {tab.label}
           </button>
@@ -453,19 +98,10 @@ export default function App() {
         {hiddenVisible && (
           <button
             onClick={() => setActiveTab('audit')}
-            className={getTabClass('audit')}
+            className={getTabClass('audit', activeTab)}
           >
             ⚙️
           </button>
-        )}
-        {h2Token && (
-          <>
-            <button onClick={() => setActiveTab('history')} className={getTabClass('history')}>✓ Historique</button>
-            <button onClick={() => setActiveTab('ask')} className={getTabClass('ask')}>💬 Question</button>
-          </>
-        )}
-        {vaultToken && (
-          <button onClick={() => setActiveTab('vault')} className={getTabClass('vault')}>🗄️ Vault</button>
         )}
       </div>
 
@@ -496,9 +132,6 @@ export default function App() {
         {activeTab === 'reference' && (
           <Reference />
         )}
-        {activeTab === 'history' && h2Token && (
-          <History history={history} />
-        )}
         {activeTab === 'snippets' && (
           <Snippets />
         )}
@@ -511,9 +144,6 @@ export default function App() {
         {activeTab === 'tree' && (
           <Tree />
         )}
-        {activeTab === 'ask' && h2Token && (
-          <AskCLI />
-        )}
         {activeTab === 'cli' && (
           <CLIExercises />
         )}
@@ -523,63 +153,7 @@ export default function App() {
         {activeTab === 'audit' && (
           <AccessAnalyser />
         )}
-        {activeTab === 'vault' && vaultToken && (
-          <VaultErrorBoundary key={vaultToken}>
-            <Suspense fallback={<div className="p-6 text-xs text-gray-400">Chargement du Vault...</div>}>
-              <CodeVault creds={vaultCreds} />
-            </Suspense>
-          </VaultErrorBoundary>
-        )}
       </div>
-
-      {/* Modal Vault */}
-      {showVaultModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-gray-950 border border-cyan-900/50 rounded-lg p-6 flex flex-col gap-4 shadow-xl">
-            <div className="text-cyan-400 text-sm font-semibold">🗄️ Code Vault</div>
-            <div className="flex gap-2">
-              <input
-                type="password"
-                value={vaultInput}
-                onChange={e => setVaultInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') checkVault(); if (e.key === 'Escape') { setShowVaultModal(false); setVaultInput(''); } }}
-                placeholder="Mot de passe…"
-                autoFocus
-                className={`bg-gray-900 border rounded px-3 py-2 text-sm text-gray-200 outline-none font-mono ${vaultError ? 'border-red-500' : 'border-gray-700 focus:border-cyan-600'}`}
-              />
-              <button onClick={checkVault} className="px-4 py-2 bg-cyan-600/20 border border-cyan-600/40 text-cyan-300 rounded text-sm font-semibold hover:bg-cyan-600/30">→</button>
-            </div>
-            {vaultError && <div className="text-red-400 text-xs">Mot de passe incorrect</div>}
-            {vaultLoadError && <div className="text-orange-400 text-xs">{vaultLoadError}</div>}
-          </div>
-        </div>
-      )}
-
-      {/* Modal H2 */}
-      {showH2Modal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-gray-950 border border-cyan-900/50 rounded-lg p-6 flex flex-col gap-4 shadow-xl">
-            <div className="text-cyan-400 text-sm font-semibold">🔒 Accès restreint</div>
-            <div className="flex gap-2">
-              <input
-                type="password"
-                value={h2Input}
-                onChange={e => setH2Input(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') checkH2(); if (e.key === 'Escape') { setShowH2Modal(false); setH2Input(''); } }}
-                placeholder="Mot de passe…"
-                autoFocus
-                className={`bg-gray-900 border rounded px-3 py-2 text-sm text-gray-200 outline-none font-mono ${h2Error ? 'border-red-500' : 'border-gray-700 focus:border-cyan-600'}`}
-              />
-              <button
-                onClick={checkH2}
-                className="px-4 py-2 bg-cyan-600/20 border border-cyan-600/40 text-cyan-300 rounded text-sm font-semibold hover:bg-cyan-600/30"
-              >→</button>
-            </div>
-            {h2Error && <div className="text-red-400 text-xs">Mot de passe incorrect</div>}
-            {h2LoadError && <div className="text-orange-400 text-xs">{h2LoadError}</div>}
-          </div>
-        </div>
-      )}
 
       {/* Footer */}
       <div className="border-t border-cyan-900/30 bg-gray-950/50 px-6 py-2 flex items-center justify-between text-xs text-gray-500">
