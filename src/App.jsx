@@ -10,6 +10,7 @@ import Snippets from './components/Snippets.jsx';
 import CodeEditor from './components/CodeEditor.jsx';
 import IPConfig from './components/IPConfig.jsx';
 import PHPErrors from './components/PHPErrors.jsx';
+import PHPConfig from './components/PHPConfig.jsx';
 import { useTerminal } from './hooks/useTerminal.js';
 
 const tabs = [
@@ -19,6 +20,7 @@ const tabs = [
   { id: 'snippets', label: '🗂️ Snippets' },
   { id: 'editor', label: '✏️ Éditeur' },
   { id: 'php-errors', label: '🐘 Erreurs PHP' },
+  { id: 'php-config', label: '⚙️ Config PHP' },
   { id: 'tree', label: '🌲 Arborescence' },
   { id: 'cli', label: '🖥️ Bash Essentials' },
   { id: 'ipconfig', label: '🌐 Réseau' },
@@ -56,7 +58,7 @@ export default function App() {
           <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></div>
           <h1 className="text-xl font-bold text-cyan-400 cursor-default select-none">TERMINAL LEARNING PATH</h1>
         </div>
-        <p className="text-xs text-gray-400">CLI Linux et Git</p>
+        <p className="text-xs text-gray-400">CLI Linux, Git et PHP</p>
       </div>
 
       {/* Tabs */}
@@ -104,6 +106,9 @@ export default function App() {
         )}
         {activeTab === 'php-errors' && (
           <PHPErrors />
+        )}
+        {activeTab === 'php-config' && (
+          <PHPConfig />
         )}
         {activeTab === 'tree' && (
           <Tree />
