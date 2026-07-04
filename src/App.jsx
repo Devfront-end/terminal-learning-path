@@ -15,8 +15,6 @@ import StageExercises from './components/StageExercises.jsx';
 import PHPErrors from './components/PHPErrors.jsx';
 import { useTerminal } from './hooks/useTerminal.js';
 
-const VAULT_SALT = 'b7e2a4f1c8d3e6b092a5f4e1d2c3b4a5';
-
 class VaultErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -45,9 +43,9 @@ class VaultErrorBoundary extends Component {
   }
 }
 
-async function deriveVaultToken(password) {
+async function deriveVaultToken(password, saltHex) {
   const enc = new TextEncoder();
-  const salt = Uint8Array.from(VAULT_SALT.match(/.{2}/g).map(b => parseInt(b, 16)));
+  const salt = Uint8Array.from(saltHex.match(/.{2}/g).map(b => parseInt(b, 16)));
   const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
   const derived = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' }, keyMaterial, 256);
   return Array.from(new Uint8Array(derived)).map(b => b.toString(16).padStart(2, '0')).join('');
@@ -388,9 +386,9 @@ export default function App() {
     const loadError = gateLoadErrorMessage(result);
     if (loadError) { setVaultLoadError(loadError); return; }
     if (result.ok) {
-      const token = await deriveVaultToken(vaultInput);
+      const token = await deriveVaultToken(vaultInput, result.salt);
       setVaultToken(crypto.randomUUID());
-      setVaultCreds({ password: vaultInput, salt: result.salt || VAULT_SALT, token });
+      setVaultCreds({ password: vaultInput, salt: result.salt, token });
       setActiveTab('vault');
       setShowVaultModal(false);
       setVaultInput('');
