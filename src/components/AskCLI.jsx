@@ -1,295 +1,326 @@
 import { useState, useRef, useEffect } from 'react';
-import Anthropic from '@anthropic-ai/sdk';
+import { exercises } from '../data/exercises.js';
+import { cdRows, findRows, grepRows, gitRows, findUsageRows, grepUsageRows } from '../data/reference.js';
+import { phpArrayRows, phpStringRows, phpUtilRows } from '../data/reference-php.js';
 
-const STORAGE_KEY = 'tlp_anthropic_key';
-const SAVED_KEY   = 'tlp_saved_qa';
+// Base de connaissances locale
+const allCommands = [
+  ...cdRows,
+  ...findRows,
+  ...grepRows,
+  ...gitRows,
+  ...findUsageRows,
+  ...grepUsageRows,
+  ...phpArrayRows,
+  ...phpStringRows,
+  ...phpUtilRows,
+];
 
-const PRICE_IN  = 1 / 1_000_000;
-const PRICE_OUT = 5 / 1_000_000;
+const exerciseQA = [];
+Object.entries(exercises).forEach(([id, ex]) => {
+  exerciseQA.push({
+    question: ex.challenge,
+    answer: ex.explanation || ex.hint || ex.successMessage,
+    category: ex.category,
+    type: 'exercise',
+  });
+});
 
-const SYSTEM_PROMPT = `Tu es un assistant expert et pédagogue. Réponds en français, de façon claire et concise.
-Quand la question porte sur une commande ou du code, utilise des blocs de code avec des exemples concrets.`;
+const commandQA = allCommands.map(cmd => ({
+  question: `Qu'est-ce que ${cmd.cmd} ?`,
+  answer: `${cmd.desc}\n\nExemple: \`${cmd.example || cmd.cmd}\`\n${cmd.note ? `\nNote: ${cmd.note}` : ''}`,
+  category: 'command',
+  type: 'reference',
+}));
 
-function loadSaved() {
-  try { return JSON.parse(localStorage.getItem(SAVED_KEY)) || []; }
-  catch { return []; }
+const predefinedQA = [
+  {
+    question: 'Comment lister tous les fichiers dans un dossier ?',
+    answer: 'Utilisez la commande `ls` pour lister les fichiers.\n\nVariantes utiles:\n- `ls -l` : affiche les détails (permissions, taille, date)\n- `ls -a` : inclut les fichiers cachés (commencant par .)\n- `ls -la` : combine les deux\n- `ls /chemin/du/dossier` : lister un dossier spécifique',
+    category: 'ls',
+    type: 'predefined',
+  },
+  {
+    question: 'Comment changer de répertoire ?',
+    answer: 'Utilisez `cd` (change directory) :\n\nNavigation de base:\n- `cd nom_du_dossier` : aller dans un sous-dossier\n- `cd ..` : remonter d\'un niveau\n- `cd /` : aller à la racine\n- `cd ~` : retourner dans votre home\n- `cd -` : retourner au répertoire précédent\n\nChemins:\n- Chemin relatif: `cd projets/my_app` (depuis votre position actuelle)\n- Chemin absolu: `cd /home/user/projects` (depuis n\'importe où)',
+    category: 'cd',
+    type: 'predefined',
+  },
+  {
+    question: 'Comment trouver un fichier ?',
+    answer: 'Utilisez `find` pour rechercher des fichiers :\n\nExemples:\n- `find . -name "fichier.txt"` : cherche dans le dossier courant\n- `find /home -name "*.php"` : cherche tous les fichiers PHP depuis /home\n- `find . -type f -name "*.js"` : seulement les fichiers (pas dossiers)\n- `find . -type d -name "config"` : seulement les dossiers\n- `find . -mtime -7` : fichiers modifiés dans les 7 derniers jours\n- `find . -size +10M` : fichiers de plus de 10 Mo',
+    category: 'find',
+    type: 'predefined',
+  },
+  {
+    question: 'Comment chercher du texte dans un fichier ?',
+    answer: 'Utilisez `grep` pour rechercher du texte :\n\nExemples:\n- `grep "erreur" fichier.log` : cherche "erreur" dans fichier.log\n- `grep -i "erreur" fichier.log` : recherche insensitve à la casse\n- `grep -n "TODO" code.php` : affiche aussi le numéro de ligne\n- `grep -r "fonction" .` : recherche récursivement dans tous les fichiers\n- `grep -v "debug" file.txt` : affiche les lignes qui NE contiennent PAS "debug"\n- `cat file.txt | grep "pattern"` : combine avec d\'autres commandes',
+    category: 'grep',
+    type: 'predefined',
+  },
+  {
+    question: 'Comment voir le contenu d\'un fichier ?',
+    answer: 'Plusieurs options selon vos besoins:\n\n- `cat fichier.txt` : affiche tout le contenu\n- `head fichier.txt` : affiche les 10 premières lignes\n- `head -n 20 fichier.txt` : affiche les 20 premières lignes\n- `tail fichier.txt` : affiche les 10 dernières lignes\n- `tail -f fichier.log` : suit le fichier en temps réel (utile pour les logs)\n- `less fichier.txt` : affichage paginé (appuyez sur q pour quitter)\n- `more fichier.txt` : affichage page par page',
+    category: 'view',
+    type: 'predefined',
+  },
+  {
+    question: 'Quelles sont les commandes Git de base ?',
+    answer: 'Commandes Git essentielles:\n\nConfiguration:\n- `git config --global user.name "Votre Nom"`\n- `git config --global user.email "votre@email.com"`\n\nCréation:\n- `git init` : initialiser un dépôt\n- `git clone url` : cloner un dépôt existant\n\nTravail quotidien:\n- `git status` : voir l\'état des modifications\n- `git add fichier` : ajouter un fichier au staging\n- `git add .` : ajouter tous les fichiers\n- `git commit -m "message"` : commiter les modifications\n- `git push origin main` : pousser vers le dépôt distant\n- `git pull origin main` : tirer les modifications\n\nBranches:\n- `git branch` : lister les branches\n- `git checkout nom-branche` : changer de branche\n- `git branch nouvelle-branche` : créer une nouvelle branche\n- `git merge nom-branche` : fusionner une branche',
+    category: 'git',
+    type: 'predefined',
+  },
+  {
+    question: 'Comment créer un fichier ?',
+    answer: 'Vous pouvez créer un fichier de plusieurs manières:\n\n- `touch fichier.txt` : crée un fichier vide\n- `echo "contenu" > fichier.txt` : crée un fichier avec du contenu\n- `echo "ajout" >> fichier.txt` : ajoute du contenu à la fin\n- `nano fichier.txt` ou `vim fichier.txt` : crée/édite avec un éditeur\n\nNote: Utilisez `>` pour écraser, `>>` pour ajouter.',
+    category: 'create',
+    type: 'predefined',
+  },
+  {
+    question: 'Comment supprimer un fichier ou un dossier ?',
+    answer: 'Attention, ces commandes sont irréversibles !\n\n- `rm fichier.txt` : supprime un fichier\n- `rm -f fichier.txt` : force la suppression (sans confirmation)\n- `rm -r dossier/` : supprime un dossier ET son contenu (récursif)\n- `rmdir dossier/` : supprime un dossier VIDE uniquement\n\n⚠️  Pour supprimer définitivement, ajoutez `-f` mais soyez très prudent !',
+    category: 'delete',
+    type: 'predefined',
+  },
+  {
+    question: 'Comment connaître l\'espace disque utilisé ?',
+    answer: 'Commandes pour vérifier l\'espace:\n\n- `df -h` : affiche l\'espace disque disponible sur tous les systèmes de fichiers (h = humain, en Go/Mo)\n- `du -sh dossier/` : affiche la taille totale d\'un dossier (s = summary, h = humain)\n- `du -sh *` : affiche la taille de tous les fichiers/dossiers dans le répertoire courant\n- `free -h` : affiche l\'utilisation de la mémoire RAM',
+    category: 'system',
+    type: 'predefined',
+  },
+  {
+    question: 'Comment voir les processus en cours ?',
+    answer: 'Utilisez `ps` pour voir les processus:\n\n- `ps aux` : affiche tous les processus avec détails\n- `ps aux | grep nom` : filtre pour un nom de processus\n- `top` : affichage interactif des processus (appuyez sur q pour quitter)\n- `htop` : version améliorée de top (si installé)\n- `kill PID` : termine un processus par son ID\n- `kill -9 PID` : force la terminaison (sigkill)',
+    category: 'process',
+    type: 'predefined',
+  },
+];
+
+const knowledgeBase = [...predefinedQA, ...exerciseQA, ...commandQA];
+
+function normalizeText(text) {
+  return text
+    .toLowerCase()
+    .replace(/[\u00C0-\u017F]/g, c => c.normalize('NFD').replace(/\u0300-\u036f/g, ''))
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
-export default function AskCLI() {
-  const [apiKey, setApiKey]     = useState(() => localStorage.getItem(STORAGE_KEY) || '');
-  const [keyInput, setKeyInput] = useState('');
-  const [question, setQuestion] = useState('');
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
-  const [usage, setUsage] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('tlp_usage')) || { requests: 0, tokensIn: 0, tokensOut: 0 }; }
-    catch { return { requests: 0, tokensIn: 0, tokensOut: 0 }; }
+function fuzzyMatch(query, text, threshold = 0.5) {
+  const queryWords = normalizeText(query).split(' ');
+  const textWords = normalizeText(text).split(' ');
+  const matches = queryWords.filter(queryWord =>
+    textWords.some(textWord => textWord.includes(queryWord))
+  );
+  return matches.length / Math.max(queryWords.length, 1) >= threshold;
+}
+
+function searchKnowledgeBase(query) {
+  const normalizedQuery = normalizeText(query);
+  const exactMatches = knowledgeBase.filter(item =>
+    normalizeText(item.question).includes(normalizedQuery)
+  );
+  if (exactMatches.length > 0) return exactMatches.slice(0, 5);
+  const answerMatches = knowledgeBase.filter(item =>
+    normalizeText(item.answer).includes(normalizedQuery)
+  );
+  if (answerMatches.length > 0) return answerMatches.slice(0, 5);
+  const fuzzyMatches = knowledgeBase.filter(item =>
+    fuzzyMatch(query, item.question) || fuzzyMatch(query, item.answer)
+  );
+  if (fuzzyMatches.length > 0) return fuzzyMatches.slice(0, 5);
+  const keywordMatches = knowledgeBase.filter(item => {
+    const keywords = [item.category, item.type, ...item.question.split(' '), ...item.answer.split(' ')];
+    return keywords.some(kw => normalizeText(kw).includes(normalizedQuery));
   });
-  const [saved, setSaved]           = useState(loadSaved);
-  const [showSaved, setShowSaved]   = useState(false);
-  const [savedIdx, setSavedIdx]     = useState(new Set());
-  const [editingIdx, setEditingIdx] = useState(null);
-  const [editText, setEditText]     = useState('');
+  return keywordMatches.slice(0, 5);
+}
+
+const exampleQuestions = [
+  'Comment lister les fichiers cachés ?',
+  'Quelle est la différence entre cd et cd ~ ?',
+  'Comment trouver tous les fichiers PHP ?',
+  'Comment chercher du texte dans plusieurs fichiers ?',
+  'Comment voir les 20 dernières lignes d\'un fichier ?',
+  'Comment supprimer un dossier et son contenu ?',
+  'Comment créer une nouvelle branche Git ?',
+  'Comment voir l\'historique des commits ?',
+  'Comment utiliser find avec plusieurs conditions ?',
+  'Comment compter le nombre de lignes contenant un mot ?',
+];
+
+export default function AskCLI() {
+  const [question, setQuestion] = useState('');
+  const [answers, setAnswers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showExamples, setShowExamples] = useState(false);
+  const [selectedExample, setSelectedExample] = useState(null);
   const bottomRef = useRef(null);
-  const editRef   = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
+  }, [answers, loading, showExamples]);
 
-  useEffect(() => {
-    if (editingIdx !== null) editRef.current?.focus();
-  }, [editingIdx]);
-
-  const saveKey = () => {
-    const k = keyInput.trim();
-    if (!k.startsWith('sk-ant-')) { setError('Clé invalide — elle doit commencer par sk-ant-'); return; }
-    localStorage.setItem(STORAGE_KEY, k);
-    setApiKey(k); setKeyInput(''); setError('');
-  };
-
-  const removeKey = () => { localStorage.removeItem(STORAGE_KEY); setApiKey(''); };
-
-  const callAPI = async (msgs) => {
-    const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
-    const response = await client.messages.create({
-      model: 'claude-haiku-4-5', max_tokens: 1024,
-      system: SYSTEM_PROMPT, messages: msgs,
-    });
-    const answer = response.content.find(b => b.type === 'text')?.text || '';
-    setUsage(prev => {
-      const next = {
-        requests: prev.requests + 1,
-        tokensIn: prev.tokensIn + (response.usage?.input_tokens || 0),
-        tokensOut: prev.tokensOut + (response.usage?.output_tokens || 0),
-      };
-      localStorage.setItem('tlp_usage', JSON.stringify(next));
-      return next;
-    });
-    return answer;
-  };
-
-  const ask = async () => {
+  const handleSearch = () => {
     const q = question.trim();
-    if (!q || loading) return;
-    setQuestion(''); setError('');
-    const newMessages = [...messages, { role: 'user', content: q }];
-    setMessages(newMessages);
+    if (!q) {
+      setAnswers([]);
+      setShowExamples(true);
+      return;
+    }
     setLoading(true);
-    try {
-      const answer = await callAPI(newMessages);
-      setMessages(prev => [...prev, { role: 'assistant', content: answer }]);
-    } catch (e) {
-      setError(e.message || 'Erreur API');
-    } finally {
+    setShowExamples(false);
+    setTimeout(() => {
+      const results = searchKnowledgeBase(q);
+      setAnswers(results);
       setLoading(false);
+    }, 200);
+  };
+
+  const handleExampleClick = (example) => {
+    setQuestion(example);
+    setSelectedExample(example);
+    setShowExamples(false);
+    setTimeout(() => handleSearch(), 100);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !loading) {
+      handleSearch();
+    }
+    if (e.key === 'ArrowDown' && showExamples && exampleQuestions.length > 0) {
+      e.preventDefault();
+      const currentIndex = exampleQuestions.findIndex(q => q === selectedExample);
+      const nextIndex = (currentIndex + 1) % exampleQuestions.length;
+      setSelectedExample(exampleQuestions[nextIndex]);
+      setQuestion(exampleQuestions[nextIndex]);
+    }
+    if (e.key === 'ArrowUp' && showExamples && exampleQuestions.length > 0) {
+      e.preventDefault();
+      const currentIndex = exampleQuestions.findIndex(q => q === selectedExample);
+      const prevIndex = (currentIndex - 1 + exampleQuestions.length) % exampleQuestions.length;
+      setSelectedExample(exampleQuestions[prevIndex]);
+      setQuestion(exampleQuestions[prevIndex]);
     }
   };
-
-  // Supprimer une paire question/réponse (index de la question)
-  const deletePair = (i) => {
-    setMessages(prev => {
-      const next = [...prev];
-      // supprimer la réponse si elle suit
-      if (next[i + 1]?.role === 'assistant') next.splice(i, 2);
-      else next.splice(i, 1);
-      return next;
-    });
-    setSavedIdx(prev => {
-      const next = new Set(prev);
-      next.delete(i + 1);
-      return next;
-    });
-  };
-
-  // Démarrer l'édition d'un message utilisateur
-  const startEdit = (i) => {
-    setEditingIdx(i);
-    setEditText(messages[i].content);
-  };
-
-  // Confirmer l'édition : remplace le message et regénère la réponse
-  const confirmEdit = async () => {
-    const q = editText.trim();
-    if (!q || loading) return;
-    setEditingIdx(null);
-    setError('');
-    // Tronquer l'historique jusqu'à ce message (inclus) et relancer
-    const truncated = [...messages.slice(0, editingIdx), { role: 'user', content: q }];
-    setMessages(truncated);
-    setLoading(true);
-    try {
-      const answer = await callAPI(truncated);
-      setMessages([...truncated, { role: 'assistant', content: answer }]);
-    } catch (e) {
-      setError(e.message || 'Erreur API');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const saveQA = (i) => {
-    const q = messages[i - 1]?.content || '';
-    const a = messages[i]?.content || '';
-    const entry = { id: Date.now(), date: new Date().toLocaleDateString('fr-FR'), question: q, answer: a };
-    const next = [entry, ...saved];
-    setSaved(next);
-    localStorage.setItem(SAVED_KEY, JSON.stringify(next));
-    setSavedIdx(prev => new Set([...prev, i]));
-  };
-
-  const deleteSaved = (id) => {
-    const next = saved.filter(s => s.id !== id);
-    setSaved(next);
-    localStorage.setItem(SAVED_KEY, JSON.stringify(next));
-  };
-
-  if (!apiKey) {
-    return (
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-md space-y-4">
-          <h2 className="text-cyan-400 font-semibold text-sm">💬 Poser une question</h2>
-          <p className="text-gray-400 text-xs">Clé API Anthropic — stockée uniquement dans votre navigateur.</p>
-          <a href="https://console.anthropic.com/keys" target="_blank" rel="noreferrer" className="text-cyan-400 text-xs underline">
-            Obtenir une clé API →
-          </a>
-          <input autoFocus type="password" value={keyInput}
-            onChange={e => setKeyInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && saveKey()}
-            placeholder="sk-ant-..."
-            className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-green-300 font-mono text-sm outline-none focus:border-cyan-600 placeholder-gray-600"
-          />
-          {error && <p className="text-red-400 text-xs">{error}</p>}
-          <button onClick={saveKey} className="w-full px-3 py-2 text-xs bg-cyan-900/40 border border-cyan-700 text-cyan-300 rounded hover:bg-cyan-900/60 font-semibold">
-            Enregistrer la clé
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const totalTokens = usage.tokensIn + usage.tokensOut;
-  const cost = usage.tokensIn * PRICE_IN + usage.tokensOut * PRICE_OUT;
-
-  if (showSaved) {
-    return (
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="px-6 py-3 border-b border-cyan-900/20 bg-gray-950/40 flex items-center gap-3 shrink-0">
-          <button onClick={() => setShowSaved(false)} className="text-cyan-400 text-xs hover:text-cyan-300">← Retour</button>
-          <span className="text-xs text-gray-500">Réponses sauvegardées ({saved.length})</span>
-        </div>
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {saved.length === 0 && <p className="text-gray-500 text-xs">Aucune sauvegarde.</p>}
-          {saved.map(s => (
-            <div key={s.id} className="bg-gray-900/40 border border-gray-800/40 rounded p-4 space-y-2">
-              <div className="flex justify-between items-start">
-                <span className="text-cyan-300 text-xs font-semibold">{s.question}</span>
-                <div className="flex items-center gap-3 shrink-0 ml-4">
-                  <span className="text-gray-600 text-xs">{s.date}</span>
-                  <button onClick={() => deleteSaved(s.id)} className="text-gray-600 hover:text-red-400 text-xs">✕</button>
-                </div>
-              </div>
-              <p className="text-gray-300 text-xs font-mono whitespace-pre-wrap">{s.answer}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Barre d'usage */}
-      <div className="px-6 py-2 bg-gray-950/60 border-b border-cyan-900/20 flex gap-6 text-xs font-mono shrink-0">
-        <span className="text-gray-500">Requêtes <span className="text-cyan-300">{usage.requests}</span></span>
-        <span className="text-gray-500">Tokens in <span className="text-green-300">{usage.tokensIn.toLocaleString()}</span></span>
-        <span className="text-gray-500">Tokens out <span className="text-green-300">{usage.tokensOut.toLocaleString()}</span></span>
-        <span className="text-gray-500">Total <span className="text-yellow-300">{totalTokens.toLocaleString()}</span></span>
-        <span className="text-gray-500">Coût <span className="text-orange-300">${cost.toFixed(5)}</span></span>
-        <button onClick={() => { const z = { requests: 0, tokensIn: 0, tokensOut: 0 }; setUsage(z); localStorage.setItem('tlp_usage', JSON.stringify(z)); }} className="text-gray-700 hover:text-gray-400">reset</button>
-        <button onClick={() => setShowSaved(true)} className="ml-auto text-cyan-700 hover:text-cyan-400">
-          📌 Sauvegardées ({saved.length})
-        </button>
+    <div className="flex h-full min-h-0 bg-gray-950 text-gray-200 flex-col">
+      <div className="border-b border-cyan-900/30 p-4 bg-gray-950/50">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
+          <h2 className="text-sm font-semibold text-cyan-400">Assistant CLI Local</h2>
+        </div>
+        <p className="text-xs text-gray-500">
+          🔍 Recherche dans la base de connaissances locale - 100% transparent, sans appel externe
+        </p>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
-        {messages.length === 0 && <div className="text-gray-500 text-xs">Posez n'importe quelle question…</div>}
-        {messages.map((m, i) => (
-          <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {m.role === 'user' ? (
-              <div className="relative group max-w-2xl">
-                {editingIdx === i ? (
-                  <div className="space-y-2">
-                    <textarea
-                      ref={editRef}
-                      value={editText}
-                      onChange={e => setEditText(e.target.value)}
-                      onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); confirmEdit(); } if (e.key === 'Escape') setEditingIdx(null); }}
-                      rows={3}
-                      className="w-full bg-cyan-950/40 border border-cyan-600 rounded px-3 py-2 text-cyan-200 font-mono text-xs outline-none resize-none"
-                    />
-                    <div className="flex gap-2 justify-end">
-                      <button onClick={() => setEditingIdx(null)} className="px-3 py-1 text-xs bg-gray-800 border border-gray-700 text-gray-300 rounded hover:bg-gray-700">Annuler</button>
-                      <button onClick={confirmEdit} disabled={loading} className="px-3 py-1 text-xs bg-cyan-900/60 border border-cyan-700 text-cyan-300 rounded hover:bg-cyan-900 disabled:opacity-40">Envoyer</button>
-                    </div>
+      <div className="p-4 border-b border-cyan-900/30 bg-gray-950/30">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={question}
+            onChange={(e) => {
+              setQuestion(e.target.value);
+              if (selectedExample) setSelectedExample(null);
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder={showExamples ? "Tapez votre question ou choisissez un exemple..." : "Poser une question sur CLI, Linux ou Git..."}
+            disabled={loading}
+            className="flex-1 bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-gray-100 outline-none focus:border-cyan-600 font-mono"
+            autoFocus
+            autoComplete="off"
+          />
+          <button
+            onClick={handleSearch}
+            disabled={loading}
+            className="px-4 py-2 rounded bg-cyan-700/30 border border-cyan-600/60 text-cyan-100 text-sm font-semibold hover:bg-cyan-700/40 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {loading ? '...' : '🔍'}
+          </button>
+        </div>
+        {!showExamples && question === '' && (
+          <button
+            onClick={() => {
+              setShowExamples(true);
+              setSelectedExample(exampleQuestions[0]);
+            }}
+            className="mt-2 text-xs text-cyan-500 hover:text-cyan-300 cursor-pointer text-left"
+          >
+            Afficher des exemples de questions
+          </button>
+        )}
+      </div>
+
+      <div className="flex-1 min-h-0 overflow-auto p-4">
+        {showExamples && question === '' && (
+          <div className="space-y-2">
+            <p className="text-xs text-gray-500 mb-3">
+              Essayez l'une de ces questions :
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {exampleQuestions.map((example, index) => (
+                <button
+                  key={example}
+                  onClick={() => handleExampleClick(example)}
+                  className={`w-full text-left px-3 py-2 rounded text-sm text-gray-300 hover:bg-cyan-900/30 border border-transparent hover:border-cyan-800/50 transition-all ${
+                    selectedExample === example ? 'bg-cyan-900/40 border-cyan-700/60 text-cyan-100' : ''
+                  }`}
+                  style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}
+                >
+                  {example}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {answers.length > 0 && (
+          <div className="space-y-4">
+            {answers.map((answer, index) => (
+              <div
+                key={`${answer.question}-${index}`}
+                className="bg-gray-900/50 border border-cyan-900/30 rounded-lg p-4"
+              >
+                <div className="mb-2">
+                  <span className="text-cyan-400 text-sm font-semibold">Q:</span>
+                  <span className="ml-2 text-gray-300">{answer.question}</span>
+                </div>
+                <div className="pl-6">
+                  <span className="text-green-400 text-sm font-semibold">A:</span>
+                  <div className="ml-2 mt-1 text-gray-200 text-sm leading-6 whitespace-pre-wrap">
+                    {answer.answer}
                   </div>
-                ) : (
-                  <div className="bg-cyan-900/30 text-cyan-200 border border-cyan-800/40 text-xs rounded-lg px-4 py-3 whitespace-pre-wrap font-mono">
-                    {m.content}
-                    <div className="hidden group-hover:flex gap-3 mt-2 pt-2 border-t border-cyan-800/30">
-                      <button onClick={() => startEdit(i)} className="text-gray-500 hover:text-cyan-400 text-xs">✏️ Modifier</button>
-                      <button onClick={() => deletePair(i)} className="text-gray-500 hover:text-red-400 text-xs">🗑️ Supprimer</button>
-                    </div>
+                </div>
+                {answer.category && (
+                  <div className="mt-2 pl-6">
+                    <span className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">
+                      {answer.category}
+                    </span>
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="relative group max-w-2xl">
-                <div className="bg-gray-900/60 text-gray-200 border border-gray-700/40 text-xs rounded-lg px-4 py-3 whitespace-pre-wrap font-mono">
-                  {m.content}
-                </div>
-                <button
-                  onClick={() => saveQA(i)}
-                  disabled={savedIdx.has(i)}
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-xs px-2 py-0.5 rounded bg-gray-800 border border-gray-700 text-gray-400 hover:text-cyan-300 hover:border-cyan-700 disabled:opacity-30 transition-opacity"
-                >
-                  {savedIdx.has(i) ? '✓' : '📌'}
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-        {loading && (
-          <div className="flex justify-start">
-            <div className="bg-gray-900/60 border border-gray-700/40 rounded-lg px-4 py-3 text-xs text-gray-400 font-mono animate-pulse">···</div>
+            ))}
           </div>
         )}
-        {error && <p className="text-red-400 text-xs">{error}</p>}
+        {question && answers.length === 0 && !loading && !showExamples && (
+          <div className="text-center py-8 text-gray-500">
+            <p className="text-sm">
+              Aucune réponse trouvée dans la base de connaissances locale.
+            </p>
+            <p className="text-xs mt-2 text-gray-600">
+              Essayez une formulation différente ou consultez les onglets Reference, Exercices ou Arborescence.
+            </p>
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
-      <div className="border-t border-cyan-900/20 px-6 py-4 bg-gray-950/40 flex gap-2 items-end">
-        <textarea
-          value={question}
-          onChange={e => setQuestion(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); } }}
-          placeholder="Posez n'importe quelle question… (Entrée pour envoyer)"
-          rows={2}
-          className="flex-1 bg-gray-900/60 border border-gray-700 rounded px-3 py-2 text-green-300 font-mono text-xs outline-none focus:border-cyan-600 placeholder-gray-600 resize-none"
-        />
-        <button onClick={ask} disabled={loading || !question.trim()}
-          className="px-3 py-2 text-xs bg-cyan-900/40 border border-cyan-700 text-cyan-300 rounded hover:bg-cyan-900/60 disabled:opacity-40 font-semibold">
-          ▶
-        </button>
-      </div>
-
-      {/* Footer */}
-      <div className="px-6 py-1 border-t border-gray-800/40 text-xs text-gray-600 flex justify-between">
-        <span>claude-haiku-4-5 · $1/1M in · $5/1M out</span>
-        <button onClick={removeKey} className="hover:text-gray-400">Changer de clé</button>
+      <div className="border-t border-cyan-900/30 p-3 bg-gray-950/50">
+        <p className="text-xs text-gray-500 text-center">
+          Recherche locale uniquement - Aucune donnée n'est envoyée à des serveurs externes
+        </p>
       </div>
     </div>
   );
