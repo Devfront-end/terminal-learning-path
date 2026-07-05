@@ -15,7 +15,6 @@ import Glossary from './components/Glossary.jsx';
 import Links from './components/Links.jsx';
 // import PHPConfig from './components/PHPConfig.jsx';
 import { useTerminal } from './hooks/useTerminal.js';
-import BlankPageError from './components/BlankPageError.jsx';
 
 const tabs = [
   { id: 'terminal', label: '⚡ Terminal' },
@@ -28,7 +27,6 @@ const tabs = [
   { id: 'tree', label: '🌲 Arborescence' },
   { id: 'cli', label: '🖥️ Bash Essentials' },
   { id: 'ipconfig', label: '🌐 Réseau' },
-  { id: 'blank-page', label: '🔍 Erreur 500' },
   { id: 'glossary', label: '📖 Glossaire' },
   { id: 'links', label: '🔗 Liens' },
 ];
@@ -115,9 +113,6 @@ export default function App() {
         )}
         {activeTab === 'php-errors' && (
           <PHPErrors />
-        )}
-        {activeTab === 'blank-page' && (
-          <BlankPageError />
         )}
         {activeTab === 'php-fundamentals' && (
           <PHPFundamentals />
