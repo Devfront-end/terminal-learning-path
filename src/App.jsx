@@ -22,7 +22,7 @@ const tabs = [
   { id: 'reference', label: '📖 Référence' },
   { id: 'snippets', label: '🗂️ Snippets' },
   { id: 'editor', label: '✏️ Éditeur' },
-  { id: 'php-errors', label: '🐘 Erreurs PHP' },
+  { id: 'php-errors', label: '🛡️ Gestion des erreurs' },
   { id: 'php-fundamentals', label: '📘 Fondamentaux PHP' },
   { id: 'tree', label: '🌲 Arborescence' },
   { id: 'cli', label: '🖥️ Bash Essentials' },

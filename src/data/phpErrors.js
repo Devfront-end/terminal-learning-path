@@ -4,6 +4,7 @@ export const phpErrorCategories = [
   { id: 'runtime', label: 'Execution' },
   { id: 'data', label: 'Donnees' },
   { id: 'framework', label: 'Framework' },
+  { id: 'error-handling', label: 'Gestion erreurs' },
 ];
 
 export const phpErrors = [
@@ -380,6 +381,194 @@ export const phpErrors = [
       'php -m | grep mbstring',
       'sudo apt install php8.2-mbstring',
       'php -r "echo function_exists(\'mb_strlen\') ? \'OK\' : \'KO\';"',
+    ],
+  },
+  {
+    id: 'try-catch-exceptions',
+    category: 'error-handling',
+    title: 'Utilisation de try/catch pour les exceptions',
+    symptom: 'Le code ne capture pas les exceptions et s arrete brutalement avec des erreurs non gerees.',
+    causes: [
+      'Absence de blocs try/catch autour du code susceptible de lever des exceptions.',
+      'Catching des exceptions trop generiques (Exception) sans traitement specifique.',
+      'Exceptions levees mais jamais capturees dans les fonctions appelantes.',
+    ],
+    diagnosis: [
+      'Identifier les parties du code qui peuvent echouer (appels API, base de donnees, fichiers).',
+      'Verifier que chaque appel a une gestion d erreur appropriee.',
+      'Lire les logs pour voir quelles exceptions ne sont pas capturees.',
+    ],
+    fixes: [
+      'Entourer le code risque avec try/catch.',
+      'Catcher des exceptions specifiques avant les generiques.',
+      'Ajouter un logging dans le bloc catch pour le debug.',
+      'Relancer l exception si elle ne peut pas etre geree localement.',
+    ],
+    commands: [
+      'try { $pdo->query("SELECT * FROM users"); } catch (PDOException $e) { error_log($e->getMessage()); }',
+      'catch (Exception $e) { echo "Erreur: " . $e->getMessage(); }',
+    ],
+  },
+  {
+    id: 'custom-error-handler',
+    category: 'error-handling',
+    title: 'Gestionnaire d erreurs personnalise avec set_error_handler',
+    symptom: 'Les erreurs et warnings ne sont pas logiquees ou formats de maniere consistante.',
+    causes: [
+      'Pas de gestionnaire d erreurs global configure.',
+      'Le gestionnaire existant ne traite pas tous les niveaux d erreur.',
+      'Les erreurs sont affichees directement a l utilisateur.',
+    ],
+    diagnosis: [
+      'Verifier si set_error_handler est appele au demarrage de l application.',
+      'Tester avec trigger_error() pour voir comment les erreurs sont gerees.',
+      'Consulter les logs pour voir si les erreurs sont bien journalisees.',
+    ],
+    fixes: [
+      'Creer un gestionnaire personnalise avec set_error_handler().',
+      'Journaliser les erreurs dans un fichier dedie.',
+      'Envoyer des notifications en environnement de production.',
+      'Ne pas afficher les erreurs directement a l utilisateur.',
+    ],
+    commands: [
+      'set_error_handler(function($errno, $errstr, $errfile, $errline) { error_log("[$errno] $errstr in $errfile:$errline"); })',
+      'trigger_error("Test error", E_USER_NOTICE);',
+      'restore_error_handler();',
+    ],
+  },
+  {
+    id: 'custom-exception-handler',
+    category: 'error-handling',
+    title: 'Gestionnaire d exceptions personnalise avec set_exception_handler',
+    symptom: 'Les exceptions non capturees s affichent directement ou ne sont pas logiquees.',
+    causes: [
+      'Pas de gestionnaire d exceptions global configure.',
+      'Les exceptions sortent du scope des blocs try/catch.',
+      'Le gestionnaire ne traite pas correctement les differentes classes d exceptions.',
+    ],
+    diagnosis: [
+      'Verifier si set_exception_handler est appele au demarrage.',
+      'Tester avec throw new Exception() pour voir le comportement.',
+      'Vérifier que les exceptions sont bien logiquees.',
+    ],
+    fixes: [
+      'Configurer set_exception_handler pour capturer toutes les exceptions non gerees.',
+      'Envoyer les exceptions vers un service de monitoring (Sentry, etc.).',
+      'Afficher une page d erreur amicale en production.',
+      'Journaliser le stack trace complet pour le debug.',
+    ],
+    commands: [
+      'set_exception_handler(function($e) { error_log("Exception: " . $e->getMessage() . "\n" . $e->getTraceAsString()); })',
+      'throw new RuntimeException("Test exception");',
+      'restore_exception_handler();',
+    ],
+  },
+  {
+    id: 'pdo-exceptions',
+    category: 'error-handling',
+    title: 'Gestion des exceptions PDO',
+    symptom: 'Les erreurs de base de donnees avec PDO ne sont pas gerees correctement.',
+    causes: [
+      'PDO n est pas configure pour lancer des exceptions (ATTR_ERRMODE).',
+      'Les erreurs PDO sont ignorees ou mal capturees.',
+      'Les transactions ne sont pas rolleback en cas d erreur.',
+    ],
+    diagnosis: [
+      'Verifier le mode d erreur PDO avec $pdo->getAttribute(PDO::ATTR_ERRMODE).',
+      'Tester avec une requete invalide pour voir le comportement.',
+      'Vérifier que les blocs catch capturent PDOException.',
+    ],
+    fixes: [
+      'Configurer PDO pour lancer des exceptions: PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION.',
+      'Toujours catcher PDOException specifiquement avant Exception.',
+      'Utiliser les transactions avec try/catch pour le rollback.',
+      'Journaliser les requetes qui echouent.',
+    ],
+    commands: [
+      '$pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);',
+      'try { $pdo->beginTransaction(); $pdo->exec("INSERT..."); $pdo->commit(); } catch (PDOException $e) { $pdo->rollBack(); throw $e; }',
+      '$pdo->getAttribute(PDO::ATTR_ERRMODE);',
+    ],
+  },
+  {
+    id: 'custom-exceptions',
+    category: 'error-handling',
+    title: 'Creation et utilisation d exceptions personnalisees',
+    symptom: 'Le code utilise uniquement les exceptions generiques sans contexte specifique.',
+    causes: [
+      'Pas de classes d exception personnalisees pour les erreurs metier.',
+      'Les exceptions personnalisees n heritent pas correctement de Exception.',
+      'Pas de messages ou codes d erreur standardises.',
+    ],
+    diagnosis: [
+      'Chercher les throw new Exception() dans le code.',
+      'Identifier les cas d erreur specifiques au domaine metier.',
+      'Verifier la hierarchie des classes d exception.',
+    ],
+    fixes: [
+      'Creer des classes d exception personnalisees (ex: UserNotFoundException).',
+      'Faire heriter des exceptions standard (RuntimeException, LogicException).',
+      'Ajouter des codes d erreur et messages standardises.',
+      'Documenter les exceptions dans l API.',
+    ],
+    commands: [
+      'class UserNotFoundException extends RuntimeException { public function __construct($userId) { parent::__construct("User #$userId not found"); } }',
+      'throw new UserNotFoundException($id);',
+      'catch (UserNotFoundException $e) { // traitement specifique }',
+    ],
+  },
+  {
+    id: 'error-vs-exception',
+    category: 'error-handling',
+    title: 'Difference entre Error et Exception en PHP',
+    symptom: 'Confusion entre les erreurs fatales (Error) et les exceptions (Exception) dans la gestion d erreur.',
+    causes: [
+      'Pas de comprehension claire de la difference.',
+      'Tentative de catcher des Error comme des Exception (impossible avant PHP 7).',
+      'Mauvaise utilisation de Error vs Exception dans le code.',
+    ],
+    diagnosis: [
+      'Lister les classes qui heritent de Error (TypeError, ParseError, etc.).',
+      'Lister les classes qui heritent de Exception.',
+      'Verifier la version de PHP (seulement PHP 7+ permet de catcher Error).',
+    ],
+    fixes: [
+      'Utiliser try/catch pour les Exception (que vous controlez).',
+      'Pour PHP 7+, catcher Error et Exception separement ou avec Throwable.',
+      'Pour PHP < 7, utiliser set_error_handler pour convertir les Error en Exception.',
+      'Comprendre que Error = erreurs du moteur PHP, Exception = erreurs du code.',
+    ],
+    commands: [
+      'try { // code } catch (Throwable $t) { // capture Error et Exception (PHP 7+) }',
+      'try { // code } catch (Exception $e) { } catch (Error $e) { } // PHP 7+',
+      'php -v | head -n 1',
+    ],
+  },
+  {
+    id: 'error-logging-best-practices',
+    category: 'error-handling',
+    title: 'Bonnes pratiques de journalisation des erreurs',
+    symptom: 'Les erreurs sont journalisees de maniere inconsistante ou avec des informations insuffisantes.',
+    causes: [
+      'Pas de strategie de logging unifiee.',
+      'Les logs ne contiennent pas assez de contexte (requete, utilisateur, timestamp).',
+      'Les erreurs sont logiquees dans different fichiers ou formats.',
+    ],
+    diagnosis: [
+      'Verifier les emplacements et formats des logs actuels.',
+      'Identifier quelles informations manquent dans les logs.',
+      'Evaluer la retention et rotation des fichiers de log.',
+    ],
+    fixes: [
+      'Utiliser un logger standard (Monolog, PSR-3).',
+      'Inclure contexte riche: timestamp, severity, message, stack trace, request data.',
+      'Configurer la rotation des logs pour eviter les fichiers trop gros.',
+      'Centraliser les logs en production (ELK, Sentry, Datadog).',
+    ],
+    commands: [
+      'error_log("[ERROR] " . date("Y-m-d H:i:s") . " - " . $message . "\n", 3, "/var/log/php-errors.log");',
+      'error_log(print_r($context, true));',
+      'tail -f /var/log/php-errors.log',
     ],
   },
 ];
