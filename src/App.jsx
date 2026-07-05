@@ -15,6 +15,7 @@ import Glossary from './components/Glossary.jsx';
 import Links from './components/Links.jsx';
 // import PHPConfig from './components/PHPConfig.jsx';
 import { useTerminal } from './hooks/useTerminal.js';
+import DocPhpOfficielle from './components/DocPhpOfficielle.jsx';
 
 const tabs = [
   { id: 'terminal', label: '⚡ Terminal' },
@@ -23,6 +24,7 @@ const tabs = [
   { id: 'snippets', label: '🗂️ Snippets' },
   { id: 'editor', label: '✏️ Éditeur' },
   { id: 'php-errors', label: '🛡️ Gestion des erreurs' },
+  { id: 'doc-php', label: '📚 Doc PHP Officielle' },
   { id: 'php-fundamentals', label: '📘 Fondamentaux PHP' },
   { id: 'tree', label: '🌲 Arborescence' },
   { id: 'cli', label: '🖥️ Bash Essentials' },
@@ -113,6 +115,9 @@ export default function App() {
         )}
         {activeTab === 'php-errors' && (
           <PHPErrors />
+        )}
+        {activeTab === 'doc-php' && (
+          <DocPhpOfficielle />
         )}
         {activeTab === 'php-fundamentals' && (
           <PHPFundamentals />
