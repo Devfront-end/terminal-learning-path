@@ -380,30 +380,285 @@ error_log = /var/log/php_errors.log`}
           </div>
         </div>
 
-        {/* Section 7: Commandes utiles */}
+        {/* Section 7: Commandes Complètes de Diagnostic */}
         <div className="bg-gray-900/40 border border-blue-800/50 rounded-lg px-4 py-3">
           <h3 className="text-blue-400 text-sm font-semibold mb-3">
-            🔹 7. Commandes pour Vérifier la Configuration
+            🔹 7. Commandes Complètes de Diagnostic par Catégorie
           </h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <code className="block bg-black/40 border border-blue-800 rounded px-3 py-2 text-blue-300 text-xs">
-              php -i | grep -i error
-            </code>
-            <code className="block bg-black/40 border border-blue-800 rounded px-3 py-2 text-blue-300 text-xs">
-              php -r "ini_get('error_reporting');"
-            </code>
-            <code className="block bg-black/40 border border-blue-800 rounded px-3 py-2 text-blue-300 text-xs">
-              php -r "ini_get('display_errors');"
-            </code>
-            <code className="block bg-black/40 border border-blue-800 rounded px-3 py-2 text-blue-300 text-xs">
-              phpinfo();  // Dans un script PHP
-            </code>
+          {/* 7.1 Commandes de LOGS */}
+          <div className="mb-4">
+            <h4 className="text-cyan-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
+              📁 7.1. LOGS - Afficher les erreurs
+            </h4>
+            <div className="overflow-x-auto">
+              <table className="text-xs">
+                <thead>
+                  <tr className="border-b border-gray-700">
+                    <th className="text-left text-cyan-300 px-2 py-1">Commande</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">À quoi ça sert ?</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">Résultat</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">Contexte</th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-300">
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">tail -n 100 /var/log/php*-fpm.log</td>
+                    <td className="px-2 py-1">100 dernières lignes des logs PHP-FPM</td>
+                    <td className="px-2 py-1">Erreurs PHP (Parse error, Warning, Notice, Fatal)</td>
+                    <td className="px-2 py-1">Serveur avec PHP-FPM</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">tail -n 100 /var/log/apache2/error.log</td>
+                    <td className="px-2 py-1">100 dernières erreurs Apache</td>
+                    <td className="px-2 py-1">Erreurs HTTP (500, 404, 403)</td>
+                    <td className="px-2 py-1">Serveur Apache</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">tail -n 100 /var/log/nginx/error.log</td>
+                    <td className="px-2 py-1">100 dernières erreurs Nginx</td>
+                    <td className="px-2 py-1">Erreurs upstream, timeouts, connexions</td>
+                    <td className="px-2 py-1">Serveur Nginx</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">tail -n 100 var/log/*.log</td>
+                    <td className="px-2 py-1">100 dernières lignes des logs applicatifs</td>
+                    <td className="px-2 py-1">Logs Symfony, Laravel, etc.</td>
+                    <td className="px-2 py-1">Dans votre projet</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">journalctl -u php*-fpm -n 50 --no-pager</td>
+                    <td className="px-2 py-1">50 derniers logs système PHP-FPM</td>
+                    <td className="px-2 py-1">Format systemd avec timestamp</td>
+                    <td className="px-2 py-1">Linux moderne (systemd)</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">journalctl -u nginx -n 80 --no-pager</td>
+                    <td className="px-2 py-1">80 derniers logs système Nginx</td>
+                    <td className="px-2 py-1">Format systemd avec timestamp</td>
+                    <td className="px-2 py-1">Linux moderne (systemd)</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">journalctl -u apache2 -n 80 --no-pager</td>
+                    <td className="px-2 py-1">80 derniers logs système Apache</td>
+                    <td className="px-2 py-1">Format systemd avec timestamp</td>
+                    <td className="px-2 py-1">Linux moderne (systemd)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-gray-500 text-xs mt-2">
+              <strong className="text-cyan-300">Astuce :</strong> <code>--no-pager</code> empêche l'utilisation d'un paginateur
+            </p>
           </div>
-          
-          <p className="text-gray-400 text-xs mt-3">
-            <strong className="text-cyan-300">Astuce :</strong> <code>php -i | grep -i error</code> affiche TOUTES les directives liées aux erreurs avec leurs valeurs actuelles.
-          </p>
+
+          {/* 7.2 Commandes DOCKER */}
+          <div className="mb-4">
+            <h4 className="text-cyan-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
+              🐳 7.2. DOCKER - Debug des conteneurs
+            </h4>
+            <div className="overflow-x-auto">
+              <table className="text-xs">
+                <thead>
+                  <tr className="border-b border-gray-700">
+                    <th className="text-left text-cyan-300 px-2 py-1">Commande</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">À quoi ça sert ?</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">Résultat</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">Contexte</th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-300">
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">docker logs --tail 100 nom_conteneur_php</td>
+                    <td className="px-2 py-1">100 dernières lignes des logs du conteneur PHP</td>
+                    <td className="px-2 py-1">Logs PHP-FPM, erreurs applicatives</td>
+                    <td className="px-2 py-1">Environnement Docker</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">docker logs --tail 100 nom_conteneur_web</td>
+                    <td className="px-2 py-1">100 dernières lignes des logs du conteneur web</td>
+                    <td className="px-2 py-1">Logs Nginx/Apache</td>
+                    <td className="px-2 py-1">Environnement Docker</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">docker exec -it nom_conteneur bash</td>
+                    <td className="px-2 py-1">Ouvre un shell interactif dans le conteneur</td>
+                    <td className="px-2 py-1">Accès direct au filesystem, permet d'exécuter des commandes</td>
+                    <td className="px-2 py-1">Debug avancé</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-gray-500 text-xs mt-2">
+              <strong className="text-cyan-300">Astuce :</strong> <code>exec -it</code> = execute + interactive + TTY
+            </p>
+          </div>
+
+          {/* 7.3 Commandes PHP */}
+          <div className="mb-4">
+            <h4 className="text-cyan-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
+              🔍 7.3. PHP - Diagnostic du code
+            </h4>
+            <div className="overflow-x-auto">
+              <table className="text-xs">
+                <thead>
+                  <tr className="border-b border-gray-700">
+                    <th className="text-left text-cyan-300 px-2 py-1">Commande</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">À quoi ça sert ?</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">Résultat</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">Contexte</th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-300">
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">php -l fichier_problematique.php</td>
+                    <td className="px-2 py-1">Vérifie la syntaxe PHP</td>
+                    <td className="px-2 py-1">"No syntax errors detected" ✅ ou "Parse error..." ❌</td>
+                    <td className="px-2 py-1">Trouver les erreurs de syntaxe</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">php -v | head -n 1</td>
+                    <td className="px-2 py-1">Affiche la version de PHP</td>
+                    <td className="px-2 py-1">Ex: PHP 8.2.12 (cli)</td>
+                    <td className="px-2 py-1">Vérifier la compatibilité</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">php -m</td>
+                    <td className="px-2 py-1">Liste toutes les extensions PHP chargées</td>
+                    <td className="px-2 py-1">bcmath, curl, gd, mbstring, pdo_mysql...</td>
+                    <td className="px-2 py-1">Vérifier qu'une extension est installée</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">php -r "echo memory_get_usage();"</td>
+                    <td className="px-2 py-1">Affiche la mémoire utilisée par PHP</td>
+                    <td className="px-2 py-1">Nombre en octets (ex: 12582912)</td>
+                    <td className="px-2 py-1">Debug des problèmes de mémoire</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">find . -name "*.php" -type f -mmin -10</td>
+                    <td className="px-2 py-1">Trouve les fichiers PHP modifiés dans les 10 dernières minutes</td>
+                    <td className="px-2 py-1">Liste des fichiers récemment modifiés</td>
+                    <td className="px-2 py-1">Identifier la cause récente d'une erreur</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-gray-500 text-xs mt-2">
+              <strong className="text-cyan-300">Astuce :</strong> <code>php -r</code> exécute du code PHP directement en ligne de commande
+            </p>
+          </div>
+
+          {/* 7.4 Commandes de création de test */}
+          <div className="mb-4">
+            <h4 className="text-cyan-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
+              📝 7.4. CRÉATION DE TEST - Script de diagnostic
+            </h4>
+            <div className="overflow-x-auto">
+              <table className="text-xs">
+                <thead>
+                  <tr className="border-b border-gray-700">
+                    <th className="text-left text-cyan-300 px-2 py-1">Commande</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">À quoi ça sert ?</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">Résultat</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">Contexte</th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-300">
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">echo "ini_set('display_errors', 1);" > /tmp/test.php</td>
+                    <td className="px-2 py-1">Crée fichier test.php</td>
+                    <td className="px-2 py-1">Fichier avec ini_set('display_errors', 1);</td>
+                    <td className="px-2 py-1">Préparer un script de test</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">echo "error_reporting(E_ALL);" >> /tmp/test.php</td>
+                    <td className="px-2 py-1">Ajoute error_reporting(E_ALL) au fichier</td>
+                    <td className="px-2 py-1">test.php contient maintenant 2 lignes</td>
+                    <td className="px-2 py-1">Activer le reporting complet</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">echo "echo \"Test\";" >> /tmp/test.php</td>
+                    <td className="px-2 py-1">Ajoute echo "Test"; au fichier</td>
+                    <td className="px-2 py-1">test.php a maintenant 3 lignes</td>
+                    <td className="px-2 py-1">Test que PHP fonctionne</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">php /tmp/test.php</td>
+                    <td className="px-2 py-1">Exécute le script de test</td>
+                    <td className="px-2 py-1">Affiche "Test" si pas d'erreur, sinon affiche l'erreur</td>
+                    <td className="px-2 py-1">Vérifier que PHP fonctionne et affiche les erreurs</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-gray-500 text-xs mt-2">
+              <strong className="text-cyan-300">Astuce :</strong> <code>>></code> ajoute à la fin du fichier, <code>></code> écrase le fichier
+            </p>
+          </div>
+
+          {/* 7.5 Commandes système */}
+          <div className="mb-4">
+            <h4 className="text-cyan-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
+              🔧 7.5. SYSTÈME - Permissions et services
+            </h4>
+            <div className="overflow-x-auto">
+              <table className="text-xs">
+                <thead>
+                  <tr className="border-b border-gray-700">
+                    <th className="text-left text-cyan-300 px-2 py-1">Commande</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">À quoi ça sert ?</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">Résultat</th>
+                    <th className="text-left text-cyan-300 px-2 py-1">Contexte</th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-300">
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">sudo systemctl restart php-fpm</td>
+                    <td className="px-2 py-1">Redémarre PHP-FPM</td>
+                    <td className="px-2 py-1">Recharge la configuration, vide l'OPcache</td>
+                    <td className="px-2 py-1">Après modification de php.ini ou du code</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">sudo systemctl restart nginx</td>
+                    <td className="px-2 py-1">Redémarre Nginx</td>
+                    <td className="px-2 py-1">Recharge la configuration du serveur web</td>
+                    <td className="px-2 py-1">Après modification de nginx.conf</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">sudo systemctl restart apache2</td>
+                    <td className="px-2 py-1">Redémarre Apache</td>
+                    <td className="px-2 py-1">Recharge la configuration du serveur web</td>
+                    <td className="px-2 py-1">Après modification de apache2.conf</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">ls -la var/log/ var/cache/</td>
+                    <td className="px-2 py-1">Liste les fichiers/dossiers avec leurs permissions</td>
+                    <td className="px-2 py-1">Ex: drwxr-xr-x 2 www-data www-data 4096 Jul 5 10:00 logs</td>
+                    <td className="px-2 py-1">Vérifier les droits actuels</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">chmod -R 775 var/log/ var/cache/</td>
+                    <td className="px-2 py-1">Change les permissions en 775 récursivement</td>
+                    <td className="px-2 py-1">Propriétaire et groupe: rwx, Autres: rx</td>
+                    <td className="px-2 py-1">Corriger les erreurs de permissions</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="px-2 py-1 font-mono">whoami</td>
+                    <td className="px-2 py-1">Affiche l'utilisateur courant</td>
+                    <td className="px-2 py-1">Ex: www-data ou jules</td>
+                    <td className="px-2 py-1">Vérifier sous quel utilisateur PHP s'exécute</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-gray-500 text-xs mt-2">
+              <strong className="text-cyan-300">Astuce :</strong> <code>sudo</code> requis pour les commandes systemctl
+            </p>
+          </div>
+
+          <div className="mt-4 text-blue-300 text-xs bg-blue-900/20 border border-blue-800/50 rounded px-3 py-2">
+            💡 <strong>Astuce générale :</strong> <code>php -i | grep -i error</code> affiche TOUTES les directives liées aux erreurs avec leurs valeurs actuelles.
+          </div>
         </div>
 
         {/* Section 8: Liens officiels */}
