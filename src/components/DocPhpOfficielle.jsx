@@ -23,6 +23,22 @@ export default function DocPhpOffizielle() {
           </p>
         </div>
 
+        {/* Notice importante - Principe fondamental */}
+        <div className="border border-red-900/30 bg-red-950/10 rounded-lg px-4 py-3">
+          <h3 className="text-red-300 text-sm font-semibold mb-2">
+            ⚠️ Principe fondamental pour l'erreur 500 (White Screen of Death)
+          </h3>
+          <p className="text-gray-300 text-xs leading-5">
+            <span className="font-bold text-white">"La clé est toujours les logs - l'erreur 500 est un symptôme, pas la cause."</span>
+          </p>
+          <p className="text-gray-400 text-xs leading-5 mt-2">
+            <strong className="text-cyan-300">Action :</strong> Identifiez l'erreur racine dans les logs et corrigez-la !
+          </p>
+          <p className="text-gray-500 text-xs leading-5 mt-1">
+            <strong className="text-cyan-300">Source :</strong> Bonnes pratiques PHP.net + expérience terrain
+          </p>
+        </div>
+
         {/* Section 1: Types d'erreurs */}
         <div className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-4 py-3">
           <h3 className="text-cyan-400 text-sm font-semibold mb-3">
