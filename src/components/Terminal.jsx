@@ -243,7 +243,7 @@ export default function Terminal({ output, history, command, setCommand, history
         <div
           onMouseDown={(e) => e.stopPropagation()}
           style={{ position: 'fixed', top: defPopup.y + 12, left: defPopup.x, zIndex: 50, maxWidth: 340 }}
-          className="bg-gray-900 border border-cyan-700/60 rounded-lg shadow-2xl p-3 text-xs"
+          className="bg-gray-900 border border-gray-700 rounded-lg shadow-2xl p-3 text-xs"
         >
           <div className="flex items-start justify-between gap-3 mb-1">
             <code className="text-cyan-300 font-mono font-semibold">{defPopup.row.cmd}</code>
@@ -251,7 +251,7 @@ export default function Terminal({ output, history, command, setCommand, history
           </div>
           <p className="text-gray-200 mb-1">{defPopup.row.desc}</p>
           {defPopup.row.example && (
-            <div className="text-gray-500 font-mono bg-gray-950/60 rounded px-2 py-1 mt-1">
+            <div className="text-gray-500 font-mono bg-gray-900 rounded px-2 py-1 mt-1">
               <span className="text-green-400">ex:</span> {defPopup.row.example}
             </div>
           )}
@@ -262,7 +262,7 @@ export default function Terminal({ output, history, command, setCommand, history
       )}
 
       {/* Sortie */}
-      <div onMouseUp={handleOutputMouseUp} className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-950/60 border-b border-cyan-900/20">
+      <div onMouseUp={handleOutputMouseUp} className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-900 border-b border-gray-700">
         {output ? (
           <div className="space-y-2">
             <div className="text-gray-600 text-xs">
@@ -272,7 +272,7 @@ export default function Terminal({ output, history, command, setCommand, history
               <span className="text-gray-500">$</span>{' '}
               <span className="text-green-300">{lastCmd}</span>
             </div>
-            <div className="text-gray-300 bg-gray-900/30 p-3 rounded border border-gray-800/50 text-xs whitespace-pre-wrap break-words font-mono">
+            <div className="text-gray-300 bg-gray-900 p-3 rounded border border-gray-700 text-xs whitespace-pre-wrap break-words font-mono">
               {output}
             </div>
           </div>
@@ -283,7 +283,7 @@ export default function Terminal({ output, history, command, setCommand, history
 
       {/* Feedback */}
       {feedback && (
-        <div className={`${feedbackClass} px-6 py-2 border-b border-cyan-900/20 flex items-center gap-2 text-xs`}>
+        <div className={`${feedbackClass} px-6 py-2 border-b border-gray-700 flex items-center gap-2 text-xs`}>
           {feedback}
         </div>
       )}
@@ -404,7 +404,7 @@ export default function Terminal({ output, history, command, setCommand, history
       )}
 
       {/* Zone de saisie */}
-      <div className="relative px-6 py-4 bg-gray-950/40 border-t border-cyan-900/20">
+      <div className="relative px-6 py-4 bg-gray-950/40 border-t border-gray-700">
         {/* Wizard guidé */}
         {activeWizard && (
           <CommandWizard
@@ -416,7 +416,7 @@ export default function Terminal({ output, history, command, setCommand, history
         )}
         {/* Popup suggestions */}
         {!activeWizard && suggestions.length > 0 && (
-          <div className="absolute bottom-full left-6 right-6 mb-1 bg-gray-900 border border-cyan-900/50 rounded shadow-xl z-10 overflow-hidden">
+          <div className="absolute bottom-full left-6 right-6 mb-1 bg-gray-900 border border-gray-700 rounded shadow-xl z-10 overflow-hidden">
             <div className="px-3 py-1 text-xs text-gray-500 border-b border-gray-800 flex justify-between">
               <span>Suggestions <kbd className="bg-gray-800 px-1 rounded">↑↓</kbd> naviguer · <kbd className="bg-gray-800 px-1 rounded">Tab</kbd> compléter · <kbd className="bg-gray-800 px-1 rounded">Échap</kbd> fermer</span>
               <span>{suggestions.length} résultat{suggestions.length > 1 ? 's' : ''}</span>
@@ -426,7 +426,7 @@ export default function Terminal({ output, history, command, setCommand, history
                 <li
                   key={i}
                   onMouseDown={(e) => { e.preventDefault(); applySuggestion(s); }}
-                  className={`flex items-center justify-between px-3 py-2 cursor-pointer text-xs ${i === selectedIdx ? 'bg-cyan-900/40 text-cyan-300' : 'hover:bg-gray-800/60 text-gray-300'}`}
+                  className={`flex items-center justify-between px-3 py-2 cursor-pointer text-xs ${i === selectedIdx ? 'bg-gray-800 text-cyan-300' : 'hover:bg-gray-800 text-gray-300'}`}
                 >
                   <span className="font-mono">
                     {s.label.endsWith('/') || s.desc === 'dossier'

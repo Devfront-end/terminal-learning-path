@@ -32,7 +32,7 @@ const getTabClass = (tab, activeTab) => {
   if (activeTab === tab) {
     return base + ' border-cyan-400 text-cyan-400';
   }
-  return base + ' border-transparent text-gray-500 hover:text-cyan-300 cursor-pointer';
+  return base + ' border-transparent text-gray-400 hover:text-cyan-300 cursor-pointer';
 };
 
 export default function App() {
@@ -52,9 +52,9 @@ export default function App() {
   } = useTerminal();
 
   return (
-    <div className="w-full h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex flex-col overflow-hidden">
+    <div className="w-full h-screen bg-gray-900 flex flex-col overflow-hidden">
       {/* Header - Responsive */}
-      <div className="border-b border-cyan-900/30 bg-gray-950/50 px-4 md:px-6 py-3">
+      <div className="border-b border-gray-700 bg-gray-900 px-4 md:px-6 py-3">
         <div className="flex items-center gap-2 md:gap-3 mb-1">
           <div className="w-2.5 h-2.5 md:w-3 md:h-3 bg-cyan-400 rounded-full animate-pulse"></div>
           <h1 className="text-lg md:text-xl font-bold text-cyan-400 cursor-default select-none truncate">TERMINAL LEARNING PATH</h1>
@@ -63,7 +63,7 @@ export default function App() {
       </div>
 
       {/* Tabs - Responsive with horizontal scroll on mobile */}
-      <div className="flex border-b border-cyan-900/30 bg-gray-950/30 px-4 md:px-6 overflow-x-auto">
+      <div className="flex border-b border-gray-700 bg-gray-900 px-4 md:px-6 overflow-x-auto">
         <div className="flex space-x-1 md:space-x-0 min-w-max">
           {tabs.map(tab => (
             <button
