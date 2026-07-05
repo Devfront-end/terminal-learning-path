@@ -10,6 +10,7 @@ import Snippets from './components/Snippets.jsx';
 import CodeEditor from './components/CodeEditor.jsx';
 import IPConfig from './components/IPConfig.jsx';
 import PHPErrors from './components/PHPErrors.jsx';
+import PHPFundamentals from './components/PHPFundamentals.jsx';
 // import PHPConfig from './components/PHPConfig.jsx';
 import { useTerminal } from './hooks/useTerminal.js';
 
@@ -20,6 +21,7 @@ const tabs = [
   { id: 'snippets', label: '🗂️ Snippets' },
   { id: 'editor', label: '✏️ Éditeur' },
   { id: 'php-errors', label: '🐘 Erreurs PHP' },
+  { id: 'php-fundamentals', label: '📘 Fondamentaux PHP' },
   { id: 'tree', label: '🌲 Arborescence' },
   { id: 'cli', label: '🖥️ Bash Essentials' },
   { id: 'ipconfig', label: '🌐 Réseau' },
@@ -105,6 +107,9 @@ export default function App() {
         )}
         {activeTab === 'php-errors' && (
           <PHPErrors />
+        )}
+        {activeTab === 'php-fundamentals' && (
+          <PHPFundamentals />
         )}
         {activeTab === 'tree' && (
           <Tree />
