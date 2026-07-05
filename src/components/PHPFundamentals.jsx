@@ -3,7 +3,7 @@ import { useState } from 'react';
 export default function PHPFundamentals() {
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
-      <div className="border-b border-gray-800/60 bg-gray-950/40 px-4 py-3 shrink-0">
+      <div className="border-b border-gray-800/60 bg-gray-950/40 px-3 py-2 md:px-4 md:py-3 shrink-0">
         <div className="flex items-center gap-3">
           <span className="text-purple-300 text-xs font-bold uppercase tracking-wider">
             Fondamentaux PHP
@@ -12,9 +12,9 @@ export default function PHPFundamentals() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-3 md:p-4 lg:p-6 space-y-4 md:space-y-6">
         {/* Introduction */}
-        <section className="bg-cyan-950/10 border border-cyan-900/30 rounded-lg px-6 py-4">
+        <section className="bg-cyan-950/10 border border-cyan-900/30 rounded-lg px-3 py-3 md:px-6 md:py-4">
           <h2 className="text-cyan-400 text-lg font-semibold mb-3">📚 Fondamentaux PHP</h2>
           <p className="text-gray-300 text-sm leading-6">
             Dans n'importe quel projet PHP, on retrouve systématiquement ces éléments de base, 
@@ -23,7 +23,7 @@ export default function PHPFundamentals() {
         </section>
 
         {/* Structure de fichiers */}
-        <section className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-6 py-4">
+        <section className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-3 py-3 md:px-6 md:py-4">
           <h2 className="text-yellow-400 text-lg font-semibold mb-4 flex items-center gap-2">
             📁 Structure de fichiers minimales
           </h2>
@@ -68,7 +68,7 @@ export default function PHPFundamentals() {
         </section>
 
         {/* Éléments techniques constants */}
-        <section className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-6 py-4">
+        <section className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-3 py-3 md:px-6 md:py-4">
           <h2 className="text-yellow-400 text-lg font-semibold mb-4 flex items-center gap-2">
             🔧 Éléments techniques constants
           </h2>
@@ -78,8 +78,8 @@ export default function PHPFundamentals() {
             <div>
               <h3 className="text-cyan-300 text-sm font-semibold mb-2">1. Balises PHP</h3>
               <p className="text-gray-300 text-sm mb-3">Obligatoire pour délimiter le code PHP dans les fichiers.</p>
-              <div className="bg-black/40 border border-gray-700 rounded px-4 py-3">
-                <code className="text-green-300 text-sm">
+              <div className="bg-black/40 border border-gray-700 rounded px-2 py-2 md:px-4 md:py-3 overflow-x-auto">
+                <code className="text-green-300 text-sm whitespace-nowrap">
                   {`<?php
 // Code PHP ici
 ?>`}
@@ -190,8 +190,8 @@ export default function PHPFundamentals() {
             <div>
               <h3 className="text-cyan-300 text-sm font-semibold mb-2">6. Connexion à une base de données</h3>
               <p className="text-gray-300 text-sm mb-3">Utilisation de PDO ou mysqli pour interagir avec MySQL/MariaDB.</p>
-              <div className="bg-black/40 border border-gray-700 rounded px-4 py-3">
-                <code className="text-green-300 text-sm">
+              <div className="bg-black/40 border border-gray-700 rounded px-2 py-2 md:px-4 md:py-3 overflow-x-auto">
+                <code className="text-green-300 text-sm whitespace-nowrap">
                   {`$pdo = new PDO('mysql:host=localhost;dbname=test', 'user', 'password');`}
                 </code>
               </div>
@@ -200,7 +200,7 @@ export default function PHPFundamentals() {
         </section>
 
         {/* Outils et bonnes pratiques */}
-        <section className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-6 py-4">
+        <section className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-3 py-3 md:px-6 md:py-4">
           <h2 className="text-yellow-400 text-lg font-semibold mb-4 flex items-center gap-2">
             🛠 Outils et bonnes pratiques universelles
           </h2>
@@ -242,7 +242,7 @@ export default function PHPFundamentals() {
         </section>
 
         {/* Interaction HTTP */}
-        <section className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-6 py-4">
+        <section className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-3 py-3 md:px-6 md:py-4">
           <h2 className="text-yellow-400 text-lg font-semibold mb-4 flex items-center gap-2">
             🌐 Interaction HTTP
           </h2>
@@ -270,15 +270,15 @@ export default function PHPFundamentals() {
         </section>
 
         {/* Exemple minimal */}
-        <section className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-6 py-4">
+        <section className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-3 py-3 md:px-6 md:py-4">
           <h2 className="text-yellow-400 text-lg font-semibold mb-4 flex items-center gap-2">
             📦 Exemple minimal d'un projet PHP
           </h2>
           
           <p className="text-gray-300 text-sm mb-4">Structure type :</p>
           
-          <div className="bg-black/30 border border-gray-700 rounded px-4 py-3">
-            <code className="text-green-300 text-sm font-mono">
+          <div className="bg-black/30 border border-gray-700 rounded px-2 py-2 md:px-4 md:py-3 overflow-x-auto">
+            <code className="text-green-300 text-sm font-mono whitespace-nowrap">
 {`mon-projet/
 ├── public/
 │   └── index.php       # Point d'entrée
@@ -295,7 +295,7 @@ export default function PHPFundamentals() {
         </section>
 
         {/* Ce qui change */}
-        <section className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-6 py-4">
+        <section className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-3 py-3 md:px-6 md:py-4">
           <h2 className="text-yellow-400 text-lg font-semibold mb-4 flex items-center gap-2">
             ⚡ Ce qui change selon les projets
           </h2>
@@ -335,7 +335,7 @@ export default function PHPFundamentals() {
         </section>
 
         {/* Résumé */}
-        <section className="bg-cyan-950/10 border border-cyan-900/30 rounded-lg px-6 py-4">
+        <section className="bg-cyan-950/10 border border-cyan-900/30 rounded-lg px-3 py-3 md:px-6 md:py-4">
           <h2 className="text-cyan-400 text-lg font-semibold mb-4">En résumé :</h2>
           
           <div className="space-y-3">
