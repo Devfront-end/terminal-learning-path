@@ -11,6 +11,8 @@ import CodeEditor from './components/CodeEditor.jsx';
 import IPConfig from './components/IPConfig.jsx';
 import PHPErrors from './components/PHPErrors.jsx';
 import PHPFundamentals from './components/PHPFundamentals.jsx';
+import Glossary from './components/Glossary.jsx';
+import Links from './components/Links.jsx';
 // import PHPConfig from './components/PHPConfig.jsx';
 import { useTerminal } from './hooks/useTerminal.js';
 
@@ -25,6 +27,8 @@ const tabs = [
   { id: 'tree', label: '🌲 Arborescence' },
   { id: 'cli', label: '🖥️ Bash Essentials' },
   { id: 'ipconfig', label: '🌐 Réseau' },
+  { id: 'glossary', label: '📖 Glossaire' },
+  { id: 'links', label: '🔗 Liens' },
 ];
 
 const getTabClass = (tab, activeTab) => {
@@ -122,10 +126,16 @@ export default function App() {
         {activeTab === 'ipconfig' && (
           <IPConfig />
         )}
+        {activeTab === 'glossary' && (
+          <Glossary />
+        )}
+        {activeTab === 'links' && (
+          <Links />
+        )}
       </div>
 
       {/* Footer */}
-      <div className="border-t border-cyan-900/30 bg-gray-950/50 px-6 py-2 flex items-center justify-between text-xs text-gray-500">
+      <div className="border-t border-gray-700 bg-gray-900 px-4 md:px-6 py-2 flex items-center justify-between text-xs text-gray-500">
         <span>Répertoire: <span className="text-cyan-400">{currentDir}</span></span>
         <button onClick={resetTerminal} className="text-gray-500 hover:text-gray-300 cursor-pointer">
           ↻ Réinitialiser
