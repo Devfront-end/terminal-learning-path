@@ -343,7 +343,7 @@ export default function PHPFundamentals() {
               <span className="text-green-400 text-xl mt-0.5">✓</span>
               <div>
                 <span className="font-semibold text-gray-200">Toujours présents : </span>
-                <span className="text-gray-300">Fichiers .php, balises <?php ?>, superglobales, fonctions natives, gestion des erreurs.</span>
+                <span className="text-gray-300">Fichiers .php, balises &lt;?php ?&gt;, superglobales, fonctions natives, gestion des erreurs.</span>
               </div>
             </div>
             <div className="flex items-start gap-3">
