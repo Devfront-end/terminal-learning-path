@@ -4,6 +4,11 @@ export default function Links() {
   const categories = {
     PHP: [
       {
+        name: "PHP.net (Site officiel)",
+        url: "https://www.php.net/",
+        description: "Site officiel de PHP - Téléchargements, documentation, actualités"
+      },
+      {
         name: "Documentation PHP officielle",
         url: "https://www.php.net/docs.php",
         description: "La documentation complète et officielle du langage PHP"
@@ -22,6 +27,11 @@ export default function Links() {
         name: "PHP FIG",
         url: "https://www.php-fig.org/",
         description: "Framework Interop Group - Standards PSR pour PHP"
+      },
+      {
+        name: "W3Schools PHP",
+        url: "https://www.w3schools.com/php/default.asp",
+        description: "Tutoriels PHP interactifs avec exemples pratiques"
       },
       {
         name: "Packagist",
