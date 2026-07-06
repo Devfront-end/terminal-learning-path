@@ -231,20 +231,20 @@ export const exercises = {
     explanation: "git status montre : les fichiers modifiés non stagés (rouge), les fichiers stagés prêts à commiter (vert), et les fichiers non suivis. À utiliser constamment pour savoir où on en est avant de commiter."
   },
   git_add_file: {
-    category: 'git', title: 'git add — stager un fichier',
-    challenge: 'Ajoutez le fichier index.php à la zone de staging (préparation au commit)',
+    category: 'git', title: 'git add — ajouter un fichier',
+    challenge: 'Ajoutez le fichier index.php à la zone de préparation (préparation au commit)',
     hint: 'git add index.php',
     expectedPatterns: ['git', 'add', 'index.php'],
-    successMessage: '✓ Fichier stagé !',
-    explanation: "git add place un fichier dans la zone de staging (index). C'est une étape intermédiaire entre la modification et le commit. Cela vous permet de choisir précisément quels changements inclure dans le prochain commit."
+    successMessage: '✓ Fichier ajouté !',
+    explanation: "git add place un fichier dans la zone de préparation (index). C'est une étape intermédiaire entre la modification et le commit. Cela vous permet de choisir précisément quels changements inclure dans le prochain commit."
   },
   git_add_all: {
-    category: 'git', title: 'git add . — stager tous les fichiers',
-    challenge: 'Ajoutez TOUS les fichiers modifiés au staging d\'un seul coup',
+    category: 'git', title: 'git add . — ajouter tous les fichiers',
+    challenge: 'Ajoutez TOUS les fichiers modifiés à la préparation d\'un seul coup',
     hint: 'git add .',
     expectedPatterns: ['git', 'add', '.'],
-    successMessage: '✓ Tout stagé !',
-    explanation: "git add . stage tous les fichiers modifiés et nouveaux du dossier courant. Le . désigne le répertoire courant. Pratique pour commiter tout d'un coup, mais attention à ne pas inclure des fichiers sensibles (.env, secrets)."
+    successMessage: '✓ Tout ajouté !',
+    explanation: "git add . ajoute tous les fichiers modifiés et nouveaux du dossier courant. Le . désigne le répertoire courant. Pratique pour commiter tout d'un coup, mais attention à ne pas inclure des fichiers sensibles (.env, secrets)."
   },
   git_commit: {
     category: 'git', title: 'git commit — créer un commit',
@@ -276,7 +276,7 @@ export const exercises = {
     hint: 'git diff',
     expectedPatterns: ['git', 'diff'],
     successMessage: '✓ Diff affiché !',
-    explanation: "git diff montre les lignes ajoutées (+, en vert) et supprimées (-, en rouge) depuis le dernier commit. Ne montre que les fichiers NON stagés. Pour voir les fichiers stagés : git diff --staged. Pour comparer deux branches : git diff main..feature."
+    explanation: "git diff montre les lignes ajoutées (+, en vert) et supprimées (-, en rouge) depuis le dernier commit. Ne montre que les fichiers NON ajoutés. Pour voir les fichiers ajoutés : git diff --cached. Pour comparer deux branches : git diff main..feature."
   },
   git_branch: {
     category: 'git', title: 'git branch — créer une branche',
