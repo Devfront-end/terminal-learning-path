@@ -128,11 +128,11 @@ export default function Tree() {
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
       {/* Toolbar */}
-      <div className="px-6 py-3 border-b border-cyan-900/20 bg-gray-950/30 flex items-center gap-3">
+      <div className="px-6 py-3 border-b border-encre-900/20 bg-gray-950/30 flex items-center gap-3">
         <button
           onClick={openDir}
           disabled={loading}
-          className="px-3 py-1 bg-cyan-900/40 border border-cyan-700/40 text-cyan-300 rounded text-xs hover:bg-cyan-900/60 cursor-pointer disabled:opacity-40"
+          className="px-3 py-1 bg-encre-900/40 border border-encre-700/40 text-encre-300 rounded text-xs hover:bg-encre-900/60 cursor-pointer disabled:opacity-40"
         >
           {loading ? '…' : '📂 Ouvrir un dossier'}
         </button>
@@ -146,7 +146,7 @@ export default function Tree() {
         {editing && (
           <button
             onClick={apply}
-            className="px-3 py-1 bg-cyan-700/30 border border-cyan-600/40 text-cyan-300 rounded text-xs hover:bg-cyan-700/50 cursor-pointer"
+            className="px-3 py-1 bg-encre-700/30 border border-encre-600/40 text-encre-300 rounded text-xs hover:bg-encre-700/50 cursor-pointer"
           >
             ✓ Appliquer
           </button>
@@ -157,19 +157,19 @@ export default function Tree() {
         <textarea
           value={input}
           onChange={e => setInput(e.target.value)}
-          className="flex-1 bg-gray-950/80 text-green-300 text-xs font-mono p-4 outline-none resize-none border-b border-cyan-900/20"
+          className="flex-1 bg-gray-950/80 text-green-300 text-xs font-mono p-4 outline-none resize-none border-b border-encre-900/20"
           placeholder="Colle ici le résultat de `tree` ou n'importe quelle arborescence..."
           spellCheck={false}
         />
       ) : (
         <div className="flex-1 overflow-hidden flex">
           {/* Tree */}
-          <div className="flex-1 overflow-y-auto p-4 font-mono border-r border-cyan-900/20">
+          <div className="flex-1 overflow-y-auto p-4 font-mono border-r border-encre-900/20">
             {nodes.map((node, i) => (
               <div
                 key={i}
                 onClick={() => setSelected(node)}
-                className={`flex items-center gap-1 py-0.5 px-1 rounded cursor-pointer hover:bg-gray-800/40 ${selected?.path === node.path ? 'bg-cyan-900/30 border border-cyan-700/40' : ''}`}
+                className={`flex items-center gap-1 py-0.5 px-1 rounded cursor-pointer hover:bg-gray-800/40 ${selected?.path === node.path ? 'bg-encre-900/30 border border-encre-700/40' : ''}`}
                 style={{ paddingLeft: `${node.depth * 16 + 4}px` }}
               >
                 <span className="text-xs">{node.isDir ? '📁' : '📄'}</span>
@@ -186,7 +186,7 @@ export default function Tree() {
               <>
                 <div>
                   <div className="text-xs text-gray-500 mb-1">Chemin complet</div>
-                  <div className="bg-gray-900/60 border border-cyan-900/30 rounded px-3 py-2 font-mono text-green-300 text-xs break-all">
+                  <div className="bg-gray-900/60 border border-encre-900/30 rounded px-3 py-2 font-mono text-green-300 text-xs break-all">
                     {selected.path}
                   </div>
                 </div>
@@ -223,9 +223,9 @@ function CmdLine({ label, cmd, onCopy }) {
   return (
     <div
       onClick={() => onCopy(cmd)}
-      className="flex items-center gap-2 bg-gray-900/40 border border-gray-800/40 rounded px-3 py-2 cursor-pointer hover:border-cyan-700/40 group"
+      className="flex items-center gap-2 bg-gray-900/40 border border-gray-800/40 rounded px-3 py-2 cursor-pointer hover:border-encre-700/40 group"
     >
-      <span className="text-cyan-500 text-xs font-semibold w-8 shrink-0">{label}</span>
+      <span className="text-encre-500 text-xs font-semibold w-8 shrink-0">{label}</span>
       <span className="font-mono text-green-300 text-xs flex-1 break-all">{cmd}</span>
       <span className="text-gray-600 text-xs group-hover:text-gray-400">📋</span>
     </div>

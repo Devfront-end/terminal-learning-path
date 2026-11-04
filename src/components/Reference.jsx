@@ -8,12 +8,12 @@ function SyntaxTable({ rows, hasNote }) {
     <div className="overflow-x-auto">
       <table className="w-full text-xs border-collapse">
         <thead>
-          <tr className="border-b border-cyan-900/30">
-            <th className="text-left text-cyan-400 py-2 pr-4 font-semibold">Option/Syntaxe</th>
-            <th className="text-left text-cyan-400 py-2 pr-4 font-semibold">Description</th>
-            <th className="text-left text-cyan-400 py-2 pr-4 font-semibold">Exemple</th>
-            <th className="text-left text-cyan-400 py-2 pr-4 font-semibold">Résultat</th>
-            {hasNote && <th className="text-left text-cyan-400 py-2 font-semibold">Notes</th>}
+          <tr className="border-b border-encre-900/30">
+            <th className="text-left text-encre-400 py-2 pr-4 font-semibold">Option/Syntaxe</th>
+            <th className="text-left text-encre-400 py-2 pr-4 font-semibold">Description</th>
+            <th className="text-left text-encre-400 py-2 pr-4 font-semibold">Exemple</th>
+            <th className="text-left text-encre-400 py-2 pr-4 font-semibold">Résultat</th>
+            {hasNote && <th className="text-left text-encre-400 py-2 font-semibold">Notes</th>}
           </tr>
         </thead>
         <tbody>
@@ -37,9 +37,9 @@ function UsageTable({ rows, columns }) {
     <div className="overflow-x-auto">
       <table className="w-full text-xs border-collapse">
         <thead>
-          <tr className="border-b border-cyan-900/30">
+          <tr className="border-b border-encre-900/30">
             {columns.map((col, i) => (
-              <th key={i} className="text-left text-cyan-400 py-2 pr-4 font-semibold">{col.label}</th>
+              <th key={i} className="text-left text-encre-400 py-2 pr-4 font-semibold">{col.label}</th>
             ))}
           </tr>
         </thead>
@@ -60,7 +60,7 @@ function UsageTable({ rows, columns }) {
 }
 
 const usageCols = [
-  { key: 'usage', label: "Cas d'usage", className: 'text-cyan-300 font-medium' },
+  { key: 'usage', label: "Cas d'usage", className: 'text-encre-300 font-medium' },
   { key: 'cmd', label: 'Commande', className: 'font-mono text-green-300 whitespace-nowrap' },
   { key: 'example', label: 'Exemple concret', className: 'font-mono text-yellow-300' },
   { key: 'explain', label: 'Explication', className: 'text-gray-300' },
@@ -72,7 +72,7 @@ const TABS = [
   { id: 'find', label: 'find',        color: 'text-orange-400' },
   { id: 'grep', label: 'grep',        color: 'text-purple-400' },
   { id: 'git',  label: 'git',         color: 'text-green-400' },
-  { id: 'sys',  label: 'Système',     color: 'text-cyan-400' },
+  { id: 'sys',  label: 'Système',     color: 'text-encre-400' },
   { id: 'js',   label: 'JavaScript',  color: 'text-yellow-400' },
   { id: 'php',  label: 'PHP',         color: 'text-indigo-400' },
 ];
@@ -145,16 +145,16 @@ export default function Reference() {
               <div className="overflow-x-auto">
                 <table className="w-full text-xs border-collapse">
                   <thead>
-                    <tr className="border-b border-cyan-900/30">
-                      <th className="text-left text-cyan-400 py-2 pr-4 font-semibold">Opération</th>
-                      <th className="text-left text-cyan-400 py-2 pr-4 font-semibold">Commandes</th>
-                      <th className="text-left text-cyan-400 py-2 font-semibold">Résultat</th>
+                    <tr className="border-b border-encre-900/30">
+                      <th className="text-left text-encre-400 py-2 pr-4 font-semibold">Opération</th>
+                      <th className="text-left text-encre-400 py-2 pr-4 font-semibold">Commandes</th>
+                      <th className="text-left text-encre-400 py-2 font-semibold">Résultat</th>
                     </tr>
                   </thead>
                   <tbody>
                     {gitWorkflowRows.map((r, i) => (
                       <tr key={i} className={`border-b border-gray-800/40 ${i % 2 === 0 ? 'bg-gray-900/20' : ''}`}>
-                        <td className="py-2 pr-4 text-cyan-300 font-medium align-top">{r.desc}</td>
+                        <td className="py-2 pr-4 text-encre-300 font-medium align-top">{r.desc}</td>
                         <td className="py-2 pr-4 align-top">
                           {r.cmds.map((cmd, j) => (
                             <div key={j} className="font-mono text-green-300 whitespace-nowrap">{cmd}</div>
@@ -211,15 +211,15 @@ export default function Reference() {
         {active === 'sys' && (
           <>
             <div>
-              <h2 className="text-cyan-400 font-semibold text-sm mb-3">Lecture de fichiers — cat, head, tail, less</h2>
+              <h2 className="text-encre-400 font-semibold text-sm mb-3">Lecture de fichiers — cat, head, tail, less</h2>
               <SyntaxTable rows={fileRows} hasNote={true} />
             </div>
             <div>
-              <h2 className="text-cyan-400 font-semibold text-sm mb-3">Informations système — whoami, df, du, ps</h2>
+              <h2 className="text-encre-400 font-semibold text-sm mb-3">Informations système — whoami, df, du, ps</h2>
               <SyntaxTable rows={sysRows} hasNote={true} />
             </div>
             <div>
-              <h2 className="text-cyan-400 font-semibold text-sm mb-3">Permissions — ls -la, chmod, chown</h2>
+              <h2 className="text-encre-400 font-semibold text-sm mb-3">Permissions — ls -la, chmod, chown</h2>
               <SyntaxTable rows={permRows} hasNote={true} />
             </div>
           </>

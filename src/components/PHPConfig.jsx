@@ -388,16 +388,16 @@ export default function PHPConfig() {
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="border-b border-cyan-900/30 bg-gray-950/50 px-6 py-4">
+      <div className="border-b border-encre-900/30 bg-gray-950/50 px-6 py-4">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></div>
-          <h1 className="text-xl font-bold text-cyan-400">Configuration PHP</h1>
+          <div className="w-3 h-3 bg-encre-400 rounded-full animate-pulse"></div>
+          <h1 className="text-xl font-bold text-encre-400">Configuration PHP</h1>
         </div>
         <p className="text-xs text-gray-400">Gestion des erreurs, logging et exceptions</p>
       </div>
 
       {/* Sélecteur d'environnement */}
-      <div className="border-b border-cyan-900/20 bg-gray-950/30 px-6 py-3">
+      <div className="border-b border-encre-900/20 bg-gray-950/30 px-6 py-3">
         <div className="flex items-center gap-4 flex-wrap">
           <span className="text-sm text-gray-400">Environnement :</span>
           {Object.keys(phpConfigs).map((envKey) => (
@@ -418,7 +418,7 @@ export default function PHPConfig() {
       </div>
 
       {/* Sous-onglets */}
-      <div className="border-b border-cyan-900/20 bg-gray-950/20 px-6">
+      <div className="border-b border-encre-900/20 bg-gray-950/20 px-6">
         <div className="flex gap-1 overflow-x-auto pb-1">
           {subTabs.map(tab => (
             <button
@@ -426,8 +426,8 @@ export default function PHPConfig() {
               onClick={() => setActiveTab(tab.id)}
               className={`px-3 py-2 text-xs font-semibold rounded-t border-b-2 transition-all whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'border-cyan-400 text-cyan-400 bg-gray-950/40'
-                  : 'border-transparent text-gray-500 hover:text-cyan-300'
+                  ? 'border-encre-400 text-encre-400 bg-gray-950/40'
+                  : 'border-transparent text-gray-500 hover:text-encre-300'
               }`}
             >
               {tab.icon} {tab.label}
@@ -440,14 +440,14 @@ export default function PHPConfig() {
       <div className="flex-1 overflow-y-auto p-6">
         {activeTab === 'php-ini' && (
           <div className="space-y-4">
-            <div className="border-b border-cyan-900/30 pb-3 mb-4">
-              <h2 className="text-lg font-semibold text-cyan-400">php.ini - Configuration des erreurs</h2>
+            <div className="border-b border-encre-900/30 pb-3 mb-4">
+              <h2 className="text-lg font-semibold text-encre-400">php.ini - Configuration des erreurs</h2>
             </div>
             <div className="grid grid-cols-1 gap-3">
               {config.settings.map((setting) => (
-                <div key={`${activeEnv}-${setting.directive}`} className="bg-gray-900/40 border border-gray-800/40 rounded-lg p-4 hover:border-cyan-800/50 transition-all">
+                <div key={`${activeEnv}-${setting.directive}`} className="bg-gray-900/40 border border-gray-800/40 rounded-lg p-4 hover:border-encre-800/50 transition-all">
                   <div className="flex items-start gap-3">
-                    <code className="text-cyan-300 text-sm font-semibold">{setting.directive}</code>
+                    <code className="text-encre-300 text-sm font-semibold">{setting.directive}</code>
                     <span className="text-gray-600 mx-2">=</span>
                     <code className="text-green-300 text-sm font-semibold">{setting.value}</code>
                   </div>
@@ -456,9 +456,9 @@ export default function PHPConfig() {
                 </div>
               ))}
             </div>
-            <div className="mt-6 border-t border-cyan-900/30 pt-6">
-              <h3 className="text-sm font-semibold text-cyan-400 mb-3">📋 Configuration php.ini pour {config.name}</h3>
-              <div className="bg-black/60 border border-cyan-900/40 rounded-lg p-4">
+            <div className="mt-6 border-t border-encre-900/30 pt-6">
+              <h3 className="text-sm font-semibold text-encre-400 mb-3">📋 Configuration php.ini pour {config.name}</h3>
+              <div className="bg-black/60 border border-encre-900/40 rounded-lg p-4">
                 <pre className="text-xs text-green-300 overflow-x-auto">
 {config.settings.map(s => `; ${s.description}`).join('\n')}
 
@@ -471,8 +471,8 @@ export default function PHPConfig() {
 
         {activeTab === 'htaccess' && (
           <div className="space-y-4">
-            <div className="border-b border-cyan-900/30 pb-3 mb-4">
-              <h2 className="text-lg font-semibold text-cyan-400">Configuration Apache via .htaccess</h2>
+            <div className="border-b border-encre-900/30 pb-3 mb-4">
+              <h2 className="text-lg font-semibold text-encre-400">Configuration Apache via .htaccess</h2>
               <p className="text-xs text-gray-500 mt-1">Utilisez php_flag pour les booléens, php_value pour les valeurs</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -491,16 +491,16 @@ export default function PHPConfig() {
 
         {activeTab === 'monolog' && (
           <div className="space-y-4">
-            <div className="border-b border-cyan-900/30 pb-3 mb-4">
-              <h2 className="text-lg font-semibold text-cyan-400">Logging avec Monolog</h2>
+            <div className="border-b border-encre-900/30 pb-3 mb-4">
+              <h2 className="text-lg font-semibold text-encre-400">Logging avec Monolog</h2>
               <p className="text-xs text-gray-500 mt-1">Monolog est la bibliothèque de logging la plus populaire pour PHP</p>
             </div>
             <div className="space-y-4">
               {monologSnippets.map((snippet) => (
                 <div key={snippet.id} className="bg-gray-900/40 border border-gray-800/40 rounded-lg p-4">
-                  <h3 className="text-sm font-semibold text-cyan-400 mb-2">{snippet.title}</h3>
+                  <h3 className="text-sm font-semibold text-encre-400 mb-2">{snippet.title}</h3>
                   <p className="text-xs text-gray-500 mb-3">{snippet.description}</p>
-                  <div className="bg-black/60 border border-cyan-900/40 rounded p-3">
+                  <div className="bg-black/60 border border-encre-900/40 rounded p-3">
                     <pre className="text-xs text-green-300 overflow-x-auto whitespace-pre-wrap">{snippet.code}</pre>
                   </div>
                   <p className="text-xs text-gray-500 mt-2 italic">{snippet.recommendation}</p>
@@ -512,25 +512,25 @@ export default function PHPConfig() {
 
         {activeTab === 'exceptions' && (
           <div className="space-y-4">
-            <div className="border-b border-cyan-900/30 pb-3 mb-4">
-              <h2 className="text-lg font-semibold text-cyan-400">Gestion des exceptions PHP</h2>
+            <div className="border-b border-encre-900/30 pb-3 mb-4">
+              <h2 className="text-lg font-semibold text-encre-400">Gestion des exceptions PHP</h2>
               <p className="text-xs text-gray-500 mt-1">Capturez et loggez les exceptions pour éviter les erreurs silencieuses</p>
             </div>
             <div className="space-y-4">
               {exceptionHandlers.map((handler) => (
                 <div key={handler.id} className="bg-gray-900/40 border border-gray-800/40 rounded-lg p-4">
-                  <h3 className="text-sm font-semibold text-cyan-400 mb-2">{handler.title}</h3>
+                  <h3 className="text-sm font-semibold text-encre-400 mb-2">{handler.title}</h3>
                   <p className="text-xs text-gray-500 mb-3">{handler.description}</p>
-                  <div className="bg-black/60 border border-cyan-900/40 rounded p-3">
+                  <div className="bg-black/60 border border-encre-900/40 rounded p-3">
                     <pre className="text-xs text-green-300 overflow-x-auto whitespace-pre-wrap">{handler.code}</pre>
                   </div>
                   <p className="text-xs text-gray-500 mt-2 italic">{handler.recommendation}</p>
                 </div>
               ))}
             </div>
-            <div className="mt-6 border-t border-cyan-900/30 pt-6">
-              <h3 className="text-sm font-semibold text-cyan-400 mb-3">📋 Exemple complet combiné</h3>
-              <div className="bg-black/60 border border-cyan-900/40 rounded-lg p-4">
+            <div className="mt-6 border-t border-encre-900/30 pt-6">
+              <h3 className="text-sm font-semibold text-encre-400 mb-3">📋 Exemple complet combiné</h3>
+              <div className="bg-black/60 border border-encre-900/40 rounded-lg p-4">
                 <pre className="text-xs text-green-300 overflow-x-auto whitespace-pre-wrap">{`require 'vendor/autoload.php';
 use Monolog\\Logger;
 use Monolog\\Handler\\StreamHandler;
@@ -580,12 +580,12 @@ register_shutdown_function(function() use ($log) {
         )}
 
         {/* Conseils généraux */}
-        <div className="mt-8 border-t border-cyan-900/30 pt-6">
-          <h3 className="text-sm font-semibold text-cyan-400 mb-4">💡 Conseils et bonnes pratiques</h3>
+        <div className="mt-8 border-t border-encre-900/30 pt-6">
+          <h3 className="text-sm font-semibold text-encre-400 mb-4">💡 Conseils et bonnes pratiques</h3>
           <div className="space-y-4">
             {generalTips.map((tip, index) => (
               <div key={index} className="bg-gray-900/30 border border-gray-800/30 rounded-lg p-4">
-                <h4 className="text-cyan-300 text-sm font-semibold mb-2">{tip.title}</h4>
+                <h4 className="text-encre-300 text-sm font-semibold mb-2">{tip.title}</h4>
                 <p className="text-gray-400 text-xs mb-2">{tip.content}</p>
                 <ul className="list-disc list-inside space-y-1">
                   {tip.items.map((item, itemIndex) => (
@@ -599,7 +599,7 @@ register_shutdown_function(function() use ($log) {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-cyan-900/30 bg-gray-950/50 px-6 py-3">
+      <div className="border-t border-encre-900/30 bg-gray-950/50 px-6 py-3">
         <p className="text-xs text-gray-500">
           ⚠️ Après modification de php.ini ou .htaccess, redémarrez votre serveur web (Apache/Nginx/PHP-FPM)
         </p>

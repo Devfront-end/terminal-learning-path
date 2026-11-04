@@ -160,7 +160,7 @@ const FR_STOP = new Set([
 function isNaturalLanguage(input) {
   const firstWord = input.trim().split(/\s+/)[0].toLowerCase();
   const knownCmds = ['cat','cd','chmod','chown','clear','df','du','find','grep','head',
-    'less','ls','man','ps','pwd','tail','tree','whoami','git'];
+    'help','less','ls','man','ps','pwd','tail','tree','whoami','git'];
   if (knownCmds.includes(firstWord)) return false;
   return INTENT_TRIGGERS.some(p => p.test(input.trim()));
 }
@@ -237,6 +237,30 @@ export function useTerminal() {
         success = true;
         newFeedbackType = 'success';
         newFeedback = '✓ Commande correcte';
+      }
+      else if (trimmed === 'help') {
+        result = [
+          'Commandes disponibles :',
+          '- ls [chemin]      : lister les fichiers et dossiers',
+          '- cd [dossier]     : changer de dossier',
+          '- pwd              : afficher le dossier courant',
+          '- cat [fichier]    : afficher le contenu d\'un fichier',
+          '- less [fichier]   : afficher le contenu d\'un fichier pas à pas',
+          '- head/tail [fich] : afficher le début/fin d\'un fichier',
+          '- grep [pat] [fich]: chercher du texte dans un fichier',
+          '- find [chemin]    : chercher des fichiers',
+          '- tree             : afficher l\'arborescence',
+          '- whoami           : afficher l\'utilisateur courant',
+          '- df               : afficher l\'espace disque',
+          '- du [chemin]      : afficher la taille d\'un dossier/fichier',
+          '- ps               : lister les processus',
+          '- chmod/chown      : modifier les permissions/propriétaires',
+          '- man [commande]   : manuel d\'une commande',
+          '- clear            : effacer le terminal'
+        ].join('\n');
+        success = true;
+        newFeedbackType = 'success';
+        newFeedback = '✓ Liste des commandes affichée';
       }
       else if (trimmed.startsWith('ls')) {
         const parts = trimmed.split(/\s+/);
@@ -565,7 +589,7 @@ export function useTerminal() {
         newFeedbackType = 'error';
         newFeedback = '❌ Commande non reconnue';
         // Détecte les préfixes parasites fréquents (: ou $ copiés depuis un terminal)
-        const knownCmds = ['cat','cd','chmod','chown','clear','df','du','find','grep','head','less','ls','man','ps','pwd','tail','tree','whoami','git'];
+        const knownCmds = ['cat','cd','chmod','chown','clear','df','du','find','grep','head','help','less','ls','man','ps','pwd','tail','tree','whoami','git'];
         const stripped = trimmed.replace(/^[:$]\s*/, '');
         const strippedCmd = stripped.split(' ')[0];
         if ((trimmed.startsWith(':') || trimmed.startsWith('$')) && knownCmds.includes(strippedCmd)) {

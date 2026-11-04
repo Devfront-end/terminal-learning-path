@@ -44,8 +44,8 @@ const SECTIONS = [
   },
   {
     title: 'Diagnostics réseau',
-    color: 'text-cyan-400',
-    border: 'border-cyan-900/40',
+    color: 'text-encre-400',
+    border: 'border-encre-900/40',
     commands: [
       { cmd: 'ping 8.8.8.8', desc: 'Test de connectivité (fonctionne sur Windows et Linux)' },
       { cmd: 'ping -c 4 google.com', desc: 'Linux : 4 paquets seulement (Ctrl+C sinon)' },
@@ -79,7 +79,7 @@ export default function IPConfig() {
     <div className="h-full overflow-y-auto bg-gray-950 px-6 py-5">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <h2 className="text-lg font-bold text-cyan-400 mb-1">Réseau — ipconfig & ip</h2>
+          <h2 className="text-lg font-bold text-encre-400 mb-1">Réseau — ipconfig & ip</h2>
           <p className="text-xs text-gray-500">Commandes de configuration et diagnostic réseau sous Windows et Linux.</p>
         </div>
 

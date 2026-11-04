@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { snippets } from '../data/snippets.js';
 
 const LANGS = [
-  { id: 'all',    label: 'Tous',       color: 'text-cyan-400' },
+  { id: 'all',    label: 'Tous',       color: 'text-encre-400' },
   { id: 'js',     label: 'JavaScript', color: 'text-yellow-400' },
   { id: 'php',    label: 'PHP',        color: 'text-indigo-400' },
   { id: 'python', label: 'Python',     color: 'text-green-400' },
@@ -52,7 +52,7 @@ export default function Snippets() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Rechercher…"
-          className="ml-auto bg-gray-900/60 border border-gray-700 rounded px-3 py-1.5 text-xs text-gray-300 outline-none focus:border-cyan-600 placeholder-gray-600 w-48"
+          className="ml-auto bg-gray-900/60 border border-gray-700 rounded px-3 py-1.5 text-xs text-gray-300 outline-none focus:border-encre-600 placeholder-gray-600 w-48"
         />
       </div>
 
@@ -73,7 +73,7 @@ export default function Snippets() {
               </div>
               <button
                 onClick={() => copy(s.id, s.code)}
-                className="shrink-0 ml-3 px-3 py-1 text-xs bg-gray-800 border border-gray-700 text-gray-400 rounded hover:text-cyan-300 hover:border-cyan-700 transition-all"
+                className="shrink-0 ml-3 px-3 py-1 text-xs bg-gray-800 border border-gray-700 text-gray-400 rounded hover:text-encre-300 hover:border-encre-700 transition-all"
               >
                 {copied === s.id ? '✓ Copié' : '📋'}
               </button>

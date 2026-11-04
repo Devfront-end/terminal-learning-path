@@ -280,7 +280,7 @@ export default function Glossary() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Rechercher un terme..."
-              className="flex-1 min-w-40 bg-gray-900 border border-gray-600 rounded px-3 py-2 text-sm text-gray-300 outline-none focus:border-cyan-400 placeholder-gray-500"
+              className="flex-1 min-w-40 bg-gray-900 border border-gray-600 rounded px-3 py-2 text-sm text-gray-300 outline-none focus:border-encre-400 placeholder-gray-500"
             />
           </div>
           <div className="flex flex-wrap gap-1.5 mt-3">
@@ -290,7 +290,7 @@ export default function Glossary() {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-3 py-1 text-xs font-semibold rounded transition-all ${
                   selectedCategory === cat
-                    ? 'bg-cyan-900 text-cyan-300 border border-cyan-700'
+                    ? 'bg-encre-900 text-encre-300 border border-encre-700'
                     : 'bg-gray-900 text-gray-400 border border-gray-700 hover:border-gray-600'
                 }`}
               >
@@ -306,13 +306,13 @@ export default function Glossary() {
             filteredTerms.map((term, index) => (
               <div
                 key={index}
-                className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 hover:border-cyan-700 transition-all"
+                className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 hover:border-encre-700 transition-all"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
-                    <h3 className="text-cyan-400 text-base font-semibold mb-1">
+                    <h3 className="text-encre-400 text-base font-semibold mb-1">
                       {term.term}
-                      <span className="text-cyan-500 text-xs ml-2 font-normal">[{term.category}]</span>
+                      <span className="text-encre-500 text-xs ml-2 font-normal">[{term.category}]</span>
                     </h3>
                     <p className="text-gray-300 text-sm leading-5">{term.definition}</p>
                   </div>
