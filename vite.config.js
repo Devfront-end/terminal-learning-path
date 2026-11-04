@@ -4,5 +4,5 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/carnet-de-dev/',
+  base: '/Carnet-de-dev/',
 })
