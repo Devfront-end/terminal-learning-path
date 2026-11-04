@@ -246,7 +246,7 @@ export default function Terminal({ output, history, command, setCommand, history
           className="bg-gray-900 border border-gray-700 rounded-lg shadow-2xl p-3 text-xs"
         >
           <div className="flex items-start justify-between gap-3 mb-1">
-            <code className="text-cyan-300 font-mono font-semibold">{defPopup.row.cmd}</code>
+            <code className="text-encre-300 font-mono font-semibold">{defPopup.row.cmd}</code>
             <button onClick={() => setDefPopup(null)} className="text-gray-500 hover:text-gray-300 leading-none">✕</button>
           </div>
           <p className="text-gray-200 mb-1">{defPopup.row.desc}</p>
@@ -262,11 +262,11 @@ export default function Terminal({ output, history, command, setCommand, history
       )}
 
       {/* Sortie */}
-      <div onMouseUp={handleOutputMouseUp} className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-900 border-b border-gray-700">
+      <div onMouseUp={handleOutputMouseUp} className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-900 border-b border-gray-700 font-mono">
         {output ? (
           <div className="space-y-2">
             <div className="text-gray-600 text-xs">
-              <span className="text-cyan-400">john_doe@path</span>
+              <span className="text-encre-400">john_doe@path</span>
               <span className="text-gray-500">:</span>
               <span className="text-blue-400">{promptDisplay}</span>
               <span className="text-gray-500">$</span>{' '}
@@ -303,7 +303,7 @@ export default function Terminal({ output, history, command, setCommand, history
                     <span className="text-gray-500 font-mono truncate flex-1">{d}</span>
                     <button
                       onMouseDown={(e) => { e.preventDefault(); setCommand('cd ' + d); inputRef.current?.focus(); }}
-                      className="text-cyan-300 font-mono bg-gray-900/60 border border-cyan-900/40 px-2 py-0.5 rounded hover:bg-cyan-900/30 cursor-pointer whitespace-nowrap"
+                      className="text-encre-300 font-mono bg-gray-900/60 border border-encre-900/40 px-2 py-0.5 rounded hover:bg-encre-900/30 cursor-pointer whitespace-nowrap"
                     >
                       cd
                     </button>
@@ -356,7 +356,7 @@ export default function Terminal({ output, history, command, setCommand, history
             Vouliez-vous dire{' '}
             <button
               onMouseDown={(e) => { e.preventDefault(); setCommand(hint.corrected); inputRef.current?.focus(); }}
-              className="text-cyan-300 font-mono underline underline-offset-2 cursor-pointer hover:text-cyan-200"
+              className="text-encre-300 font-mono underline underline-offset-2 cursor-pointer hover:text-encre-200"
             >
               {hint.corrected}
             </button>{' '}?
@@ -367,14 +367,14 @@ export default function Terminal({ output, history, command, setCommand, history
       {hint?.type === 'cd_not_found' && (
         <div className="px-6 py-3 bg-yellow-950/30 border-b border-yellow-800/30 text-xs space-y-2">
           <p className="text-yellow-400 font-semibold">
-            Guide : le dossier <code className="bg-gray-900 px-1 rounded">{ hint.attempted }</code> n'existe pas dans <span className="text-cyan-400">{ hint.currentDir }</span>
+            Guide : le dossier <code className="bg-gray-900 px-1 rounded">{ hint.attempted }</code> n'existe pas dans <span className="text-encre-400">{ hint.currentDir }</span>
           </p>
           {hint.closest && (
             <p className="text-gray-300">
               Vouliez-vous dire{' '}
               <button
                 onMouseDown={(e) => { e.preventDefault(); setCommand('cd ' + hint.closest); inputRef.current?.focus(); }}
-                className="text-cyan-300 font-mono underline underline-offset-2 cursor-pointer hover:text-cyan-200"
+                className="text-encre-300 font-mono underline underline-offset-2 cursor-pointer hover:text-encre-200"
               >
                 cd {hint.closest}
               </button>{' '}?
@@ -426,7 +426,7 @@ export default function Terminal({ output, history, command, setCommand, history
                 <li
                   key={i}
                   onMouseDown={(e) => { e.preventDefault(); applySuggestion(s); }}
-                  className={`flex items-center justify-between px-3 py-2 cursor-pointer text-xs ${i === selectedIdx ? 'bg-gray-800 text-cyan-300' : 'hover:bg-gray-800 text-gray-300'}`}
+                  className={`flex items-center justify-between px-3 py-2 cursor-pointer text-xs ${i === selectedIdx ? 'bg-gray-800 text-encre-300' : 'hover:bg-gray-800 text-gray-300'}`}
                 >
                   <span className="font-mono">
                     {s.label.endsWith('/') || s.desc === 'dossier'
@@ -444,7 +444,7 @@ export default function Terminal({ output, history, command, setCommand, history
         {/* Input */}
         <div className="flex items-center gap-3">
           <span className="text-xs text-gray-500 font-mono whitespace-nowrap">
-            <span className="text-cyan-400">john_doe</span>
+            <span className="text-encre-400">john_doe</span>
             <span className="text-gray-600">:</span>
             <span className="text-blue-400">{promptDisplay}</span>
             <span className="text-gray-400"> $</span>
@@ -461,7 +461,7 @@ export default function Terminal({ output, history, command, setCommand, history
           />
           <button
             onMouseDown={(e) => { e.preventDefault(); closeSuggestions(); if (command.trim()) { onExecute(command); setCommand(''); setHistoryIndex(-1); } }}
-            className="p-2 text-cyan-400 hover:text-cyan-300 cursor-pointer"
+            className="p-2 text-encre-400 hover:text-encre-300 cursor-pointer"
           >▶</button>
         </div>
       </div>

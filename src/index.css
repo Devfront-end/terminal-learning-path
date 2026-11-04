@@ -1,14 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Source+Sans+3:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
-* {
-  font-family: 'JetBrains Mono', 'Courier New', monospace;
+/* Identité « Carnet de dev » : encre bleue sur fond bleu nuit */
+@theme {
+  --font-sans: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, 'Courier New', monospace;
+
+  --color-nuit: #0f1626;
+
+  --color-encre-50: #eef3fe;
+  --color-encre-100: #dce6fd;
+  --color-encre-200: #bccffb;
+  --color-encre-300: #9dbaf9;
+  --color-encre-400: #7aa2f7;
+  --color-encre-500: #5b86e8;
+  --color-encre-600: #4669cc;
+  --color-encre-700: #3a55a6;
+  --color-encre-800: #304680;
+  --color-encre-900: #263862;
+  --color-encre-950: #182340;
 }
 
 body {
-  background: linear-gradient(to bottom right, #0f172a, #111827, #000000);
+  font-family: var(--font-sans);
+  background: linear-gradient(to bottom right, #0f1626, #121a2e, #070b14);
   margin: 0;
   padding: 0;
+}
+
+code, pre, kbd, samp, input, textarea, select {
+  font-family: var(--font-mono);
 }
 
 @keyframes fadeIn {
@@ -35,16 +56,16 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: #0f1626;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e3a5f;
+  background: #304680;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2d5a8f;
+  background: #3a55a6;
 }
 
 .terminal-input {
-  caret-color: #06b6d4;
+  caret-color: var(--color-encre-400);
 }

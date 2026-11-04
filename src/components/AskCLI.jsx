@@ -42,7 +42,7 @@ const predefinedQA = [
   },
   {
     question: 'Comment changer de répertoire ?',
-    answer: 'Utilisez `cd` (change directory) :\n\nNavigation de base:\n- `cd nom_du_dossier` : aller dans un sous-dossier\n- `cd ..` : remonter d\'un niveau\n- `cd /` : aller à la racine\n- `cd ~` : retourner dans votre home\n- `cd -` : retourner au répertoire précédent\n\nChemins:\n- Chemin relatif: `cd projets/my_app` (depuis votre position actuelle)\n- Chemin absolu: `cd /home/user/projects` (depuis n\'importe où)',
+    answer: 'Utilisez `cd` (change directory) :\n\nNavigation de base:\n- `cd nom_du_dossier` : aller dans un sous-dossier\n- `cd ..` : remonter d\'un niveau\n- `cd /` : aller à la racine\n- `cd ~` : retourner dans votre home\n- `cd -` : retourner au répertoire précédent\n\nChemins:\n- Chemin relatif: `cd projets/my_project` (depuis votre position actuelle)\n- Chemin absolu: `cd /home/john_doe/projets` (depuis n\'importe où)',
     category: 'cd',
     type: 'predefined',
   },
@@ -207,17 +207,17 @@ export default function AskCLI() {
 
   return (
     <div className="flex h-full min-h-0 bg-gray-950 text-gray-200 flex-col">
-      <div className="border-b border-cyan-900/30 p-4 bg-gray-950/50">
+      <div className="border-b border-encre-900/30 p-4 bg-gray-950/50">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
-          <h2 className="text-sm font-semibold text-cyan-400">Assistant CLI Local</h2>
+          <div className="w-2 h-2 bg-encre-400 rounded-full"></div>
+          <h2 className="text-sm font-semibold text-encre-400">Assistant CLI Local</h2>
         </div>
         <p className="text-xs text-gray-500">
           🔍 Recherche dans la base de connaissances locale - 100% transparent, sans appel externe
         </p>
       </div>
 
-      <div className="p-4 border-b border-cyan-900/30 bg-gray-950/30">
+      <div className="p-4 border-b border-encre-900/30 bg-gray-950/30">
         <div className="flex gap-2">
           <input
             type="text"
@@ -229,14 +229,14 @@ export default function AskCLI() {
             onKeyDown={handleKeyDown}
             placeholder={showExamples ? "Tapez votre question ou choisissez un exemple..." : "Poser une question sur CLI, Linux ou Git..."}
             disabled={loading}
-            className="flex-1 bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-gray-100 outline-none focus:border-cyan-600 font-mono"
+            className="flex-1 bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-gray-100 outline-none focus:border-encre-600 font-mono"
             autoFocus
             autoComplete="off"
           />
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="px-4 py-2 rounded bg-cyan-700/30 border border-cyan-600/60 text-cyan-100 text-sm font-semibold hover:bg-cyan-700/40 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded bg-encre-700/30 border border-encre-600/60 text-encre-100 text-sm font-semibold hover:bg-encre-700/40 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {loading ? '...' : '🔍'}
           </button>
@@ -247,7 +247,7 @@ export default function AskCLI() {
               setShowExamples(true);
               setSelectedExample(exampleQuestions[0]);
             }}
-            className="mt-2 text-xs text-cyan-500 hover:text-cyan-300 cursor-pointer text-left"
+            className="mt-2 text-xs text-encre-500 hover:text-encre-300 cursor-pointer text-left"
           >
             Afficher des exemples de questions
           </button>
@@ -265,8 +265,8 @@ export default function AskCLI() {
                 <button
                   key={example}
                   onClick={() => handleExampleClick(example)}
-                  className={`w-full text-left px-3 py-2 rounded text-sm text-gray-300 hover:bg-cyan-900/30 border border-transparent hover:border-cyan-800/50 transition-all ${
-                    selectedExample === example ? 'bg-cyan-900/40 border-cyan-700/60 text-cyan-100' : ''
+                  className={`w-full text-left px-3 py-2 rounded text-sm text-gray-300 hover:bg-encre-900/30 border border-transparent hover:border-encre-800/50 transition-all ${
+                    selectedExample === example ? 'bg-encre-900/40 border-encre-700/60 text-encre-100' : ''
                   }`}
                   style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}
                 >
@@ -281,10 +281,10 @@ export default function AskCLI() {
             {answers.map((answer, index) => (
               <div
                 key={`${answer.question}-${index}`}
-                className="bg-gray-900/50 border border-cyan-900/30 rounded-lg p-4"
+                className="bg-gray-900/50 border border-encre-900/30 rounded-lg p-4"
               >
                 <div className="mb-2">
-                  <span className="text-cyan-400 text-sm font-semibold">Q:</span>
+                  <span className="text-encre-400 text-sm font-semibold">Q:</span>
                   <span className="ml-2 text-gray-300">{answer.question}</span>
                 </div>
                 <div className="pl-6">
@@ -317,7 +317,7 @@ export default function AskCLI() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t border-cyan-900/30 p-3 bg-gray-950/50">
+      <div className="border-t border-encre-900/30 p-3 bg-gray-950/50">
         <p className="text-xs text-gray-500 text-center">
           Recherche locale uniquement - Aucune donnée n'est envoyée à des serveurs externes
         </p>

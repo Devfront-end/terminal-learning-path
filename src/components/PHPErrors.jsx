@@ -11,11 +11,11 @@ const CATEGORY_COLORS = {
 function BulletList({ title, items, tone = 'text-gray-300' }) {
   return (
     <div>
-      <h3 className="text-cyan-400 text-xs font-semibold mb-2">{title}</h3>
+      <h3 className="text-encre-400 text-xs font-semibold mb-2">{title}</h3>
       <ul className="space-y-1.5">
         {items.map((item, index) => (
           <li key={index} className={`text-xs leading-5 ${tone}`}>
-            <span className="text-cyan-700 mr-2">›</span>
+            <span className="text-encre-700 mr-2">›</span>
             {item}
           </li>
         ))}
@@ -110,7 +110,7 @@ export default function PHPErrors() {
 
             {error.commands.length > 0 && (
               <div className="border-t border-gray-800/50 px-4 py-3">
-                <h3 className="text-cyan-400 text-xs font-semibold mb-2">Commandes utiles</h3>
+                <h3 className="text-encre-400 text-xs font-semibold mb-2">Commandes utiles</h3>
                 <div className="flex flex-col gap-2">
                   {error.commands.map((command, index) => (
                     <code

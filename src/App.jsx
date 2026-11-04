@@ -36,9 +36,9 @@ const tabs = [
 const getTabClass = (tab, activeTab) => {
   const base = 'px-4 py-3 text-xs font-semibold border-b-2 transition-all';
   if (activeTab === tab) {
-    return base + ' border-cyan-400 text-cyan-400';
+    return base + ' border-encre-400 text-encre-400';
   }
-  return base + ' border-transparent text-gray-400 hover:text-cyan-300 cursor-pointer';
+  return base + ' border-transparent text-gray-400 hover:text-encre-300 cursor-pointer';
 };
 
 export default function App() {
@@ -58,18 +58,18 @@ export default function App() {
   } = useTerminal();
 
   return (
-    <div className="w-full h-screen bg-gray-900 flex flex-col overflow-hidden">
+    <div className="w-full h-screen bg-nuit flex flex-col overflow-hidden">
       {/* Header - Responsive */}
-      <div className="border-b border-gray-700 bg-gray-900 px-4 md:px-6 py-3">
+      <div className="border-b border-gray-700 bg-nuit px-4 md:px-6 py-3">
         <div className="flex items-center gap-2 md:gap-3 mb-1">
-          <div className="w-2.5 h-2.5 md:w-3 md:h-3 bg-cyan-400 rounded-full animate-pulse"></div>
-          <h1 className="text-lg md:text-xl font-bold text-cyan-400 cursor-default select-none truncate">TERMINAL LEARNING PATH</h1>
+          <div className="w-2.5 h-2.5 md:w-3 md:h-3 bg-encre-400 rounded-full animate-pulse"></div>
+          <h1 className="text-lg md:text-xl font-bold text-encre-400 cursor-default select-none truncate">CARNET DE DEV</h1>
         </div>
-        <p className="text-xs text-gray-400 hidden md:block">CLI Linux, Git et PHP</p>
+        <p className="text-xs text-gray-400 hidden md:block">PHP · CLI · Git</p>
       </div>
 
       {/* Tabs - Responsive with horizontal scroll on mobile */}
-      <div className="flex border-b border-gray-700 bg-gray-900 px-4 md:px-6 overflow-x-auto">
+      <div className="flex border-b border-gray-700 bg-nuit px-4 md:px-6 overflow-x-auto">
         <div className="flex space-x-1 md:space-x-0 min-w-max">
           {tabs.map(tab => (
             <button
@@ -140,8 +140,8 @@ export default function App() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-gray-700 bg-gray-900 px-4 md:px-6 py-2 flex items-center justify-between text-xs text-gray-500">
-        <span>Répertoire: <span className="text-cyan-400">{currentDir}</span></span>
+      <div className="border-t border-gray-700 bg-nuit px-4 md:px-6 py-2 flex items-center justify-between text-xs text-gray-500">
+        <span>Répertoire: <span className="text-encre-400">{currentDir}</span></span>
         <button onClick={resetTerminal} className="text-gray-500 hover:text-gray-300 cursor-pointer">
           ↻ Réinitialiser
         </button>

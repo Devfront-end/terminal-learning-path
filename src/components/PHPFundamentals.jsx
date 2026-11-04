@@ -15,7 +15,7 @@ export default function PHPFundamentals() {
       <div className="flex-1 overflow-y-auto p-3 md:p-4 lg:p-6 space-y-4 md:space-y-6">
         {/* Introduction */}
         <section className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-3 md:px-6 md:py-4">
-          <h2 className="text-cyan-400 text-lg font-semibold mb-3">📚 Fondamentaux PHP</h2>
+          <h2 className="text-encre-400 text-lg font-semibold mb-3">📚 Fondamentaux PHP</h2>
           <p className="text-gray-300 text-sm leading-6">
             Dans n'importe quel projet PHP, on retrouve systématiquement ces éléments de base, 
             quels que soient la taille, le framework ou l'objectif du projet.
@@ -30,36 +30,36 @@ export default function PHPFundamentals() {
           
           <div className="space-y-4">
             <div>
-              <h3 className="text-cyan-300 text-sm font-semibold mb-2">Fichiers obligatoires :</h3>
+              <h3 className="text-encre-300 text-sm font-semibold mb-2">Fichiers obligatoires :</h3>
               <ul className="space-y-2">
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span><code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">index.php</code> : Point d'entrée principal (même vide ou redirigeant).</span>
                 </li>
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span>Fichiers <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">.php</code> : Contiennent du code PHP (même un seul fichier pour les micro-projets).</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-cyan-300 text-sm font-semibold mb-2">Dossiers classiques (selon la complexité) :</h3>
+              <h3 className="text-encre-300 text-sm font-semibold mb-2">Dossiers classiques (selon la complexité) :</h3>
               <ul className="space-y-2">
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span><code className="bg-gray-800 px-2 py-0.5 rounded text-orange-300">/src/</code> ou <code className="bg-gray-800 px-2 py-0.5 rounded text-orange-300">/app/</code> : Logique métier.</span>
                 </li>
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span><code className="bg-gray-800 px-2 py-0.5 rounded text-orange-300">/vendor/</code> : Dépendances (si Composer est utilisé).</span>
                 </li>
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span><code className="bg-gray-800 px-2 py-0.5 rounded text-orange-300">/public/</code> : Fichiers accessibles via le navigateur (CSS, JS, images, index.php).</span>
                 </li>
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span><code className="bg-gray-800 px-2 py-0.5 rounded text-orange-300">/config/</code> : Fichiers de configuration (base de données, routes, etc.).</span>
                 </li>
               </ul>
@@ -76,7 +76,7 @@ export default function PHPFundamentals() {
           <div className="space-y-6">
             {/* Balises PHP */}
             <div>
-              <h3 className="text-cyan-300 text-sm font-semibold mb-2">1. Balises PHP</h3>
+              <h3 className="text-encre-300 text-sm font-semibold mb-2">1. Balises PHP</h3>
               <p className="text-gray-300 text-sm mb-3">Obligatoire pour délimiter le code PHP dans les fichiers.</p>
               <div className="bg-gray-800 border border-gray-700 rounded px-2 py-2 md:px-4 md:py-3 overflow-x-auto">
                 <code className="text-green-300 text-sm whitespace-nowrap">
@@ -89,14 +89,14 @@ export default function PHPFundamentals() {
 
             {/* Variables et types */}
             <div>
-              <h3 className="text-cyan-300 text-sm font-semibold mb-2">2. Variables et types</h3>
+              <h3 className="text-encre-300 text-sm font-semibold mb-2">2. Variables et types</h3>
               <ul className="space-y-2">
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span>Variables préfixées par <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">$</code> (ex: <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">$variable</code>).</span>
                 </li>
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span>Types de base : <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">string</code>, <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">int</code>, <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">float</code>, <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">bool</code>, <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">array</code>, <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">object</code>, <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">null</code>.</span>
                 </li>
               </ul>
@@ -104,29 +104,29 @@ export default function PHPFundamentals() {
 
             {/* Superglobales */}
             <div>
-              <h3 className="text-cyan-300 text-sm font-semibold mb-2">3. Superglobales (toujours disponibles)</h3>
+              <h3 className="text-encre-300 text-sm font-semibold mb-2">3. Superglobales (toujours disponibles)</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <ul className="space-y-2">
                   <li className="text-gray-300 text-sm flex items-start gap-2">
-                    <span className="text-cyan-500 mt-0.5">→</span>
+                    <span className="text-encre-500 mt-0.5">→</span>
                     <span><code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">$_GET</code>, <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">$_POST</code>, <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">$_REQUEST</code> : Données HTTP.</span>
                   </li>
                   <li className="text-gray-300 text-sm flex items-start gap-2">
-                    <span className="text-cyan-500 mt-0.5">→</span>
+                    <span className="text-encre-500 mt-0.5">→</span>
                     <span><code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">$_SERVER</code> : Informations sur le serveur (ex: <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">$_SERVER['REQUEST_METHOD']</code>).</span>
                   </li>
                   <li className="text-gray-300 text-sm flex items-start gap-2">
-                    <span className="text-cyan-500 mt-0.5">→</span>
+                    <span className="text-encre-500 mt-0.5">→</span>
                     <span><code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">$_SESSION</code> : Gestion des sessions.</span>
                   </li>
                 </ul>
                 <ul className="space-y-2">
                   <li className="text-gray-300 text-sm flex items-start gap-2">
-                    <span className="text-cyan-500 mt-0.5">→</span>
+                    <span className="text-encre-500 mt-0.5">→</span>
                     <span><code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">$_COOKIE</code> : Cookies.</span>
                   </li>
                   <li className="text-gray-300 text-sm flex items-start gap-2">
-                    <span className="text-cyan-500 mt-0.5">→</span>
+                    <span className="text-encre-500 mt-0.5">→</span>
                     <span><code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">$_FILES</code> : Uploads de fichiers.</span>
                   </li>
                 </ul>
@@ -135,7 +135,7 @@ export default function PHPFundamentals() {
 
             {/* Fonctions natives */}
             <div>
-              <h3 className="text-cyan-300 text-sm font-semibold mb-2">4. Fonctions natives</h3>
+              <h3 className="text-encre-300 text-sm font-semibold mb-2">4. Fonctions natives</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <h4 className="text-yellow-300 text-xs font-semibold mb-1.5">Manipulation de chaînes :</h4>
@@ -173,14 +173,14 @@ export default function PHPFundamentals() {
 
             {/* Gestion des erreurs */}
             <div>
-              <h3 className="text-cyan-300 text-sm font-semibold mb-2">5. Gestion des erreurs</h3>
+              <h3 className="text-encre-300 text-sm font-semibold mb-2">5. Gestion des erreurs</h3>
               <ul className="space-y-2">
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span><code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">error_reporting()</code> et <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">ini_set('display_errors', 1)</code> en développement.</span>
                 </li>
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span><code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">try/catch</code> pour les exceptions.</span>
                 </li>
               </ul>
@@ -188,7 +188,7 @@ export default function PHPFundamentals() {
 
             {/* Connexion BD */}
             <div>
-              <h3 className="text-cyan-300 text-sm font-semibold mb-2">6. Connexion à une base de données</h3>
+              <h3 className="text-encre-300 text-sm font-semibold mb-2">6. Connexion à une base de données</h3>
               <p className="text-gray-300 text-sm mb-3">Utilisation de PDO ou mysqli pour interagir avec MySQL/MariaDB.</p>
               <div className="bg-gray-800 border border-gray-700 rounded px-2 py-2 md:px-4 md:py-3 overflow-x-auto">
                 <code className="text-green-300 text-sm whitespace-nowrap">
@@ -207,35 +207,35 @@ export default function PHPFundamentals() {
           
           <div className="space-y-4">
             <div>
-              <h3 className="text-cyan-300 text-sm font-semibold mb-2">Composer :</h3>
+              <h3 className="text-encre-300 text-sm font-semibold mb-2">Composer :</h3>
               <ul className="space-y-2">
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span>Gestion des dépendances (même pour les petits projets).</span>
                 </li>
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span>Fichier <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">composer.json</code> pour déclarer les bibliothèques (ex: monolog, phpunit).</span>
                 </li>
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span>Autoloading des classes via <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">autoload.php</code> dans <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">/vendor/</code>.</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-cyan-300 text-sm font-semibold mb-2">PSR-4 :</h3>
+              <h3 className="text-encre-300 text-sm font-semibold mb-2">PSR-4 :</h3>
               <p className="text-gray-300 text-sm">Standard d'autoloading pour les classes (ex: <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">namespace App\Controller;</code>).</p>
             </div>
 
             <div>
-              <h3 className="text-cyan-300 text-sm font-semibold mb-2">Fichier .htaccess (si Apache) :</h3>
+              <h3 className="text-encre-300 text-sm font-semibold mb-2">Fichier .htaccess (si Apache) :</h3>
               <p className="text-gray-300 text-sm">Pour réécrire les URLs ou activer des modules PHP.</p>
             </div>
 
             <div>
-              <h3 className="text-cyan-300 text-sm font-semibold mb-2">Fichier .env :</h3>
+              <h3 className="text-encre-300 text-sm font-semibold mb-2">Fichier .env :</h3>
               <p className="text-gray-300 text-sm">Stocke les variables d'environnement (clés API, identifiants DB, etc.).</p>
             </div>
           </div>
@@ -249,21 +249,21 @@ export default function PHPFundamentals() {
           
           <div className="space-y-4">
             <div>
-              <h3 className="text-cyan-300 text-sm font-semibold mb-2">Requêtes/réponses :</h3>
+              <h3 className="text-encre-300 text-sm font-semibold mb-2">Requêtes/réponses :</h3>
               <ul className="space-y-2">
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span>Récupération des paramètres via <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">$_GET</code>/<code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">$_POST</code>.</span>
                 </li>
                 <li className="text-gray-300 text-sm flex items-start gap-2">
-                  <span className="text-cyan-500 mt-0.5">→</span>
+                  <span className="text-encre-500 mt-0.5">→</span>
                   <span>Envoi de réponses avec <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">echo</code>, <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">json_encode()</code>, ou des headers (<code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">header('Content-Type: application/json')</code>).</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-cyan-300 text-sm font-semibold mb-2">Formulaires :</h3>
+              <h3 className="text-encre-300 text-sm font-semibold mb-2">Formulaires :</h3>
               <p className="text-gray-300 text-sm">Traitement des données soumises (ex: <code className="bg-gray-800 px-2 py-0.5 rounded text-purple-300">if ($_SERVER['REQUEST_METHOD'] === 'POST')</code>).</p>
             </div>
           </div>
@@ -304,8 +304,8 @@ export default function PHPFundamentals() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-700">
-                  <th className="text-left py-2 text-cyan-300">Éléments variables</th>
-                  <th className="text-left py-2 text-cyan-300">Exemples</th>
+                  <th className="text-left py-2 text-encre-300">Éléments variables</th>
+                  <th className="text-left py-2 text-encre-300">Exemples</th>
                 </tr>
               </thead>
               <tbody className="text-gray-300">
@@ -336,7 +336,7 @@ export default function PHPFundamentals() {
 
         {/* Résumé */}
         <section className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-3 md:px-6 md:py-4">
-          <h2 className="text-cyan-400 text-lg font-semibold mb-4">En résumé :</h2>
+          <h2 className="text-encre-400 text-lg font-semibold mb-4">En résumé :</h2>
           
           <div className="space-y-3">
             <div className="flex items-start gap-3">

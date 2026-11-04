@@ -207,7 +207,7 @@ export default function Links() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Rechercher un lien..."
-              className="flex-1 min-w-40 bg-gray-900 border border-gray-600 rounded px-3 py-2 text-sm text-gray-300 outline-none focus:border-cyan-400 placeholder-gray-500"
+              className="flex-1 min-w-40 bg-gray-900 border border-gray-600 rounded px-3 py-2 text-sm text-gray-300 outline-none focus:border-encre-400 placeholder-gray-500"
             />
           </div>
           <div className="flex flex-wrap gap-1.5 mt-3">
@@ -217,7 +217,7 @@ export default function Links() {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-3 py-1 text-xs font-semibold rounded transition-all ${
                   selectedCategory === cat
-                    ? 'bg-cyan-900 text-cyan-300 border border-cyan-700'
+                    ? 'bg-encre-900 text-encre-300 border border-encre-700'
                     : 'bg-gray-900 text-gray-400 border border-gray-700 hover:border-gray-600'
                 }`}
               >
@@ -236,18 +236,18 @@ export default function Links() {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 hover:border-cyan-700 hover:bg-gray-700/50 transition-all group"
+                className="block bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 hover:border-encre-700 hover:bg-gray-700/50 transition-all group"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
-                    <h3 className="text-cyan-400 text-base font-semibold mb-1 group-hover:text-cyan-300">
+                    <h3 className="text-encre-400 text-base font-semibold mb-1 group-hover:text-encre-300">
                       {link.name}
-                      <span className="text-cyan-500 text-xs ml-2 font-normal">[{link.category}]</span>
+                      <span className="text-encre-500 text-xs ml-2 font-normal">[{link.category}]</span>
                     </h3>
                     <p className="text-gray-400 text-sm leading-5">{link.description}</p>
                     <p className="text-gray-500 text-xs mt-1 truncate">{link.url}</p>
                   </div>
-                  <span className="text-gray-600 text-xl group-hover:text-cyan-400 transition-all">↗</span>
+                  <span className="text-gray-600 text-xl group-hover:text-encre-400 transition-all">↗</span>
                 </div>
               </a>
             ))

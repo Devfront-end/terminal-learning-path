@@ -32,16 +32,16 @@ export default function DocPhpOffizielle() {
             <span className="font-bold text-white">"La clé est toujours les logs - l'erreur 500 est un symptôme, pas la cause."</span>
           </p>
           <p className="text-gray-400 text-xs leading-5 mt-2">
-            <strong className="text-cyan-300">Action :</strong> Identifiez l'erreur racine dans les logs et corrigez-la !
+            <strong className="text-encre-300">Action :</strong> Identifiez l'erreur racine dans les logs et corrigez-la !
           </p>
           <p className="text-gray-500 text-xs leading-5 mt-1">
-            <strong className="text-cyan-300">Source :</strong> Bonnes pratiques PHP.net + expérience terrain
+            <strong className="text-encre-300">Source :</strong> Bonnes pratiques PHP.net + expérience terrain
           </p>
         </div>
 
         {/* Section 1: Types d'erreurs */}
         <div className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-4 py-3">
-          <h3 className="text-cyan-400 text-sm font-semibold mb-3">
+          <h3 className="text-encre-400 text-sm font-semibold mb-3">
             🔹 1. Types d'erreurs PHP (Constantes prédéfinies)
           </h3>
           <p className="text-gray-400 text-xs mb-3">
@@ -52,10 +52,10 @@ export default function DocPhpOffizielle() {
             <table className="text-xs">
               <thead>
                 <tr className="border-b border-gray-700">
-                  <th className="text-left text-cyan-300 px-2 py-1">Constante</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Valeur</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Description</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Gérable ?</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Constante</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Valeur</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Description</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Gérable ?</th>
                 </tr>
               </thead>
               <tbody className="text-gray-300">
@@ -74,7 +74,7 @@ export default function DocPhpOffizielle() {
                 <tr className="border-b border-gray-800/50"><td className="px-2 py-1">E_RECOVERABLE_ERROR</td><td className="px-2 py-1">4096</td><td className="px-2 py-1">Erreur récupérable (depuis PHP 5.2)</td><td className="px-2 py-1 text-green-300">✅ Oui</td></tr>
                 <tr className="border-b border-gray-800/50"><td className="px-2 py-1">E_DEPRECATED</td><td className="px-2 py-1">8192</td><td className="px-2 py-1">Fonctionnalités dépréciées</td><td className="px-2 py-1 text-green-300">✅ Oui</td></tr>
                 <tr className="border-b border-gray-800/50"><td className="px-2 py-1">E_USER_DEPRECATED</td><td className="px-2 py-1">16384</td><td className="px-2 py-1">Dépréciations utilisateur</td><td className="px-2 py-1 text-green-300">✅ Oui</td></tr>
-                <tr><td className="px-2 py-1 font-semibold text-cyan-300">E_ALL</td><td className="px-2 py-1 font-semibold text-cyan-300">32767</td><td className="px-2 py-1 font-semibold text-cyan-300">Toutes les erreurs</td><td className="px-2 py-1 text-green-300">✅ Oui</td></tr>
+                <tr><td className="px-2 py-1 font-semibold text-encre-300">E_ALL</td><td className="px-2 py-1 font-semibold text-encre-300">32767</td><td className="px-2 py-1 font-semibold text-encre-300">Toutes les erreurs</td><td className="px-2 py-1 text-green-300">✅ Oui</td></tr>
               </tbody>
             </table>
           </div>
@@ -89,7 +89,7 @@ export default function DocPhpOffizielle() {
 
         {/* Section 2: Directives de reporting */}
         <div className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-4 py-3">
-          <h3 className="text-cyan-400 text-sm font-semibold mb-3">
+          <h3 className="text-encre-400 text-sm font-semibold mb-3">
             🔹 2. Directives de Reporting (error_reporting)
           </h3>
           
@@ -97,11 +97,11 @@ export default function DocPhpOffizielle() {
             <table className="text-xs">
               <thead>
                 <tr className="border-b border-gray-700">
-                  <th className="text-left text-cyan-300 px-2 py-1">Directive</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Description</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Valeurs</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Défaut</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Runtime</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Directive</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Description</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Valeurs</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Défaut</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Runtime</th>
                 </tr>
               </thead>
               <tbody className="text-gray-300">
@@ -117,7 +117,7 @@ export default function DocPhpOffizielle() {
           </div>
           
           <p className="text-gray-400 text-xs mt-2">
-            <strong className="text-cyan-300">Exemple de configuration :</strong>
+            <strong className="text-encre-300">Exemple de configuration :</strong>
           </p>
           <div className="mt-1 bg-black/40 border border-gray-800 rounded px-3 py-2">
             <code className="text-green-300 text-xs">
@@ -130,7 +130,7 @@ export default function DocPhpOffizielle() {
 
         {/* Section 3: Directives d'affichage */}
         <div className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-4 py-3">
-          <h3 className="text-cyan-400 text-sm font-semibold mb-3">
+          <h3 className="text-encre-400 text-sm font-semibold mb-3">
             🔹 3. Directives d'Affichage
           </h3>
           
@@ -138,11 +138,11 @@ export default function DocPhpOffizielle() {
             <table className="text-xs">
               <thead>
                 <tr className="border-b border-gray-700">
-                  <th className="text-left text-cyan-300 px-2 py-1">Directive</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Description</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Valeurs</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Défaut</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Runtime</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Directive</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Description</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Valeurs</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Défaut</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Runtime</th>
                 </tr>
               </thead>
               <tbody className="text-gray-300">
@@ -192,7 +192,7 @@ export default function DocPhpOffizielle() {
 
         {/* Section 4: Directives de logging */}
         <div className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-4 py-3">
-          <h3 className="text-cyan-400 text-sm font-semibold mb-3">
+          <h3 className="text-encre-400 text-sm font-semibold mb-3">
             🔹 4. Directives de Journalisation
           </h3>
           
@@ -200,11 +200,11 @@ export default function DocPhpOffizielle() {
             <table className="text-xs">
               <thead>
                 <tr className="border-b border-gray-700">
-                  <th className="text-left text-cyan-300 px-2 py-1">Directive</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Description</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Valeurs</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Défaut</th>
-                  <th className="text-left text-cyan-300 px-2 py-1">Runtime</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Directive</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Description</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Valeurs</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Défaut</th>
+                  <th className="text-left text-encre-300 px-2 py-1">Runtime</th>
                 </tr>
               </thead>
               <tbody className="text-gray-300">
@@ -268,7 +268,7 @@ export default function DocPhpOffizielle() {
           <div className="space-y-3">
             <div>
               <p className="text-gray-400 text-xs mb-1">
-                <strong className="text-cyan-300">set_error_handler() - Gestionnaire d'erreurs personnalisé :</strong>
+                <strong className="text-encre-300">set_error_handler() - Gestionnaire d'erreurs personnalisé :</strong>
               </p>
               <div className="bg-black/40 border border-purple-800 rounded px-3 py-2">
                 <code className="text-purple-300 text-xs">
@@ -298,7 +298,7 @@ export default function DocPhpOffizielle() {
             
             <div>
               <p className="text-gray-400 text-xs mb-1">
-                <strong className="text-cyan-300">set_exception_handler() - Gestionnaire d'exceptions :</strong>
+                <strong className="text-encre-300">set_exception_handler() - Gestionnaire d'exceptions :</strong>
               </p>
               <div className="bg-black/40 border border-purple-800 rounded px-3 py-2">
                 <code className="text-purple-300 text-xs">
@@ -317,7 +317,7 @@ export default function DocPhpOffizielle() {
             
             <div>
               <p className="text-gray-400 text-xs mb-1">
-                <strong className="text-cyan-300">register_shutdown_function() - Capturer les erreurs fatales :</strong>
+                <strong className="text-encre-300">register_shutdown_function() - Capturer les erreurs fatales :</strong>
               </p>
               <div className="bg-black/40 border border-purple-800 rounded px-3 py-2">
                 <code className="text-purple-300 text-xs">
@@ -388,17 +388,17 @@ error_log = /var/log/php_errors.log`}
           
           {/* 7.1 Commandes de LOGS */}
           <div className="mb-4">
-            <h4 className="text-cyan-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
+            <h4 className="text-encre-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
               📁 7.1. LOGS - Afficher les erreurs
             </h4>
             <div className="overflow-x-auto">
               <table className="text-xs">
                 <thead>
                   <tr className="border-b border-gray-700">
-                    <th className="text-left text-cyan-300 px-2 py-1">Commande</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">À quoi ça sert ?</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">Résultat</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">Contexte</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Commande</th>
+                    <th className="text-left text-encre-300 px-2 py-1">À quoi ça sert ?</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Résultat</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Contexte</th>
                   </tr>
                 </thead>
                 <tbody className="text-gray-300">
@@ -448,23 +448,23 @@ error_log = /var/log/php_errors.log`}
               </table>
             </div>
             <p className="text-gray-500 text-xs mt-2">
-              <strong className="text-cyan-300">Astuce :</strong> <code>--no-pager</code> empêche l'utilisation d'un paginateur
+              <strong className="text-encre-300">Astuce :</strong> <code>--no-pager</code> empêche l'utilisation d'un paginateur
             </p>
           </div>
 
           {/* 7.2 Commandes DOCKER */}
           <div className="mb-4">
-            <h4 className="text-cyan-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
+            <h4 className="text-encre-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
               🐳 7.2. DOCKER - Debug des conteneurs
             </h4>
             <div className="overflow-x-auto">
               <table className="text-xs">
                 <thead>
                   <tr className="border-b border-gray-700">
-                    <th className="text-left text-cyan-300 px-2 py-1">Commande</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">À quoi ça sert ?</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">Résultat</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">Contexte</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Commande</th>
+                    <th className="text-left text-encre-300 px-2 py-1">À quoi ça sert ?</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Résultat</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Contexte</th>
                   </tr>
                 </thead>
                 <tbody className="text-gray-300">
@@ -490,23 +490,23 @@ error_log = /var/log/php_errors.log`}
               </table>
             </div>
             <p className="text-gray-500 text-xs mt-2">
-              <strong className="text-cyan-300">Astuce :</strong> <code>exec -it</code> = execute + interactive + TTY
+              <strong className="text-encre-300">Astuce :</strong> <code>exec -it</code> = execute + interactive + TTY
             </p>
           </div>
 
           {/* 7.3 Commandes PHP */}
           <div className="mb-4">
-            <h4 className="text-cyan-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
+            <h4 className="text-encre-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
               🔍 7.3. PHP - Diagnostic du code
             </h4>
             <div className="overflow-x-auto">
               <table className="text-xs">
                 <thead>
                   <tr className="border-b border-gray-700">
-                    <th className="text-left text-cyan-300 px-2 py-1">Commande</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">À quoi ça sert ?</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">Résultat</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">Contexte</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Commande</th>
+                    <th className="text-left text-encre-300 px-2 py-1">À quoi ça sert ?</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Résultat</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Contexte</th>
                   </tr>
                 </thead>
                 <tbody className="text-gray-300">
@@ -544,23 +544,23 @@ error_log = /var/log/php_errors.log`}
               </table>
             </div>
             <p className="text-gray-500 text-xs mt-2">
-              <strong className="text-cyan-300">Astuce :</strong> <code>php -r</code> exécute du code PHP directement en ligne de commande
+              <strong className="text-encre-300">Astuce :</strong> <code>php -r</code> exécute du code PHP directement en ligne de commande
             </p>
           </div>
 
           {/* 7.4 Commandes de création de test */}
           <div className="mb-4">
-            <h4 className="text-cyan-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
+            <h4 className="text-encre-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
               📝 7.4. CRÉATION DE TEST - Script de diagnostic
             </h4>
             <div className="overflow-x-auto">
               <table className="text-xs">
                 <thead>
                   <tr className="border-b border-gray-700">
-                    <th className="text-left text-cyan-300 px-2 py-1">Commande</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">À quoi ça sert ?</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">Résultat</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">Contexte</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Commande</th>
+                    <th className="text-left text-encre-300 px-2 py-1">À quoi ça sert ?</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Résultat</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Contexte</th>
                   </tr>
                 </thead>
                 <tbody className="text-gray-300">
@@ -592,23 +592,23 @@ error_log = /var/log/php_errors.log`}
               </table>
             </div>
             <p className="text-gray-500 text-xs mt-2">
-              <strong className="text-cyan-300">Astuce :</strong> <code>>></code> ajoute à la fin du fichier, <code>></code> écrase le fichier
+              <strong className="text-encre-300">Astuce :</strong> <code>>></code> ajoute à la fin du fichier, <code>></code> écrase le fichier
             </p>
           </div>
 
           {/* 7.5 Commandes système */}
           <div className="mb-4">
-            <h4 className="text-cyan-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
+            <h4 className="text-encre-300 text-xs font-semibold mb-2 border-b border-gray-700 pb-1">
               🔧 7.5. SYSTÈME - Permissions et services
             </h4>
             <div className="overflow-x-auto">
               <table className="text-xs">
                 <thead>
                   <tr className="border-b border-gray-700">
-                    <th className="text-left text-cyan-300 px-2 py-1">Commande</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">À quoi ça sert ?</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">Résultat</th>
-                    <th className="text-left text-cyan-300 px-2 py-1">Contexte</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Commande</th>
+                    <th className="text-left text-encre-300 px-2 py-1">À quoi ça sert ?</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Résultat</th>
+                    <th className="text-left text-encre-300 px-2 py-1">Contexte</th>
                   </tr>
                 </thead>
                 <tbody className="text-gray-300">
@@ -652,7 +652,7 @@ error_log = /var/log/php_errors.log`}
               </table>
             </div>
             <p className="text-gray-500 text-xs mt-2">
-              <strong className="text-cyan-300">Astuce :</strong> <code>sudo</code> requis pour les commandes systemctl
+              <strong className="text-encre-300">Astuce :</strong> <code>sudo</code> requis pour les commandes systemctl
             </p>
           </div>
 
@@ -663,14 +663,14 @@ error_log = /var/log/php_errors.log`}
 
         {/* Section 8: Liens officiels */}
         <div className="bg-gray-900/40 border border-gray-800/50 rounded-lg px-4 py-3">
-          <h3 className="text-cyan-400 text-sm font-semibold mb-3">
+          <h3 className="text-encre-400 text-sm font-semibold mb-3">
             🔹 8. Documentation Officielle PHP.net
           </h3>
           
           <div className="space-y-2">
             <a 
               href="https://www.php.net/manual/en/errorfunc.configuration.php"
-              className="block text-cyan-300 text-xs hover:text-cyan-200 underline"
+              className="block text-encre-300 text-xs hover:text-encre-200 underline"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -678,7 +678,7 @@ error_log = /var/log/php_errors.log`}
             </a>
             <a 
               href="https://www.php.net/manual/en/errorfunc.constants.php"
-              className="block text-cyan-300 text-xs hover:text-cyan-200 underline"
+              className="block text-encre-300 text-xs hover:text-encre-200 underline"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -686,7 +686,7 @@ error_log = /var/log/php_errors.log`}
             </a>
             <a 
               href="https://www.php.net/manual/en/function.set-error-handler.php"
-              className="block text-cyan-300 text-xs hover:text-cyan-200 underline"
+              className="block text-encre-300 text-xs hover:text-encre-200 underline"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -694,7 +694,7 @@ error_log = /var/log/php_errors.log`}
             </a>
             <a 
               href="https://www.php.net/manual/en/function.set-exception-handler.php"
-              className="block text-cyan-300 text-xs hover:text-cyan-200 underline"
+              className="block text-encre-300 text-xs hover:text-encre-200 underline"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -702,7 +702,7 @@ error_log = /var/log/php_errors.log`}
             </a>
             <a 
               href="https://www.php.net/manual/en/function.register-shutdown-function.php"
-              className="block text-cyan-300 text-xs hover:text-cyan-200 underline"
+              className="block text-encre-300 text-xs hover:text-encre-200 underline"
               target="_blank"
               rel="noopener noreferrer"
             >

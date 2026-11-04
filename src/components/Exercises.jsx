@@ -79,7 +79,7 @@ export default function Exercises({ onValidate }) {
       if (!grouped[ex.category]) grouped[ex.category] = [];
       grouped[ex.category].push([key, ex]);
     });
-    const color = categoryColors[activeCat] || { text: 'text-cyan-400', border: 'border-cyan-900/40' };
+    const color = categoryColors[activeCat] || { text: 'text-encre-400', border: 'border-encre-900/40' };
     const items = grouped[activeCat] || [];
 
     return (
@@ -87,7 +87,7 @@ export default function Exercises({ onValidate }) {
         {/* Onglets catégories */}
         <div className="flex border-b border-gray-800/60 bg-gray-950/40 px-4 overflow-x-auto shrink-0">
           {categories.map(cat => {
-            const c = categoryColors[cat] || { text: 'text-cyan-400', border: 'border-cyan-900/40' };
+            const c = categoryColors[cat] || { text: 'text-encre-400', border: 'border-encre-900/40' };
             const active = cat === activeCat;
             return (
               <button
@@ -105,14 +105,14 @@ export default function Exercises({ onValidate }) {
         {/* Liste des exercices de la catégorie active */}
         <div className="flex-1 overflow-y-auto p-6 space-y-3">
           {items.map(([key, ex]) => (
-            <div key={key} className="bg-gray-900/40 border border-gray-800/40 rounded p-4 flex items-start justify-between gap-4 hover:border-cyan-600/30 transition-all">
+            <div key={key} className="bg-gray-900/40 border border-gray-800/40 rounded p-4 flex items-start justify-between gap-4 hover:border-encre-600/30 transition-all">
               <div className="flex-1 min-w-0">
                 <h3 className={`font-semibold text-xs mb-1 ${color.text}`}>{ex.title}</h3>
                 <p className="text-gray-400 text-xs">{ex.challenge}</p>
               </div>
               <button
                 onClick={() => handleStartExercise(key)}
-                className="shrink-0 px-3 py-1.5 bg-cyan-600/20 border border-cyan-600/40 text-cyan-300 rounded text-xs font-semibold hover:bg-cyan-600/30 cursor-pointer"
+                className="shrink-0 px-3 py-1.5 bg-encre-600/20 border border-encre-600/40 text-encre-300 rounded text-xs font-semibold hover:bg-encre-600/30 cursor-pointer"
               >
                 Commencer
               </button>
@@ -124,12 +124,12 @@ export default function Exercises({ onValidate }) {
   }
 
   const ex = exercises[exerciseMode];
-  const color = categoryColors[ex.category] || { text: 'text-cyan-400', border: 'border-cyan-900/40' };
+  const color = categoryColors[ex.category] || { text: 'text-encre-400', border: 'border-encre-900/40' };
 
   return (
     <div className="flex-1 overflow-y-auto p-6 space-y-4">
       <div className="flex items-center justify-between mb-2">
-        <button onClick={handleBack} className="text-cyan-400 text-xs hover:text-cyan-300 flex items-center gap-2 cursor-pointer">
+        <button onClick={handleBack} className="text-encre-400 text-xs hover:text-encre-300 flex items-center gap-2 cursor-pointer">
           ← Retour aux exercices
         </button>
         <div className="flex items-center gap-2">
@@ -150,12 +150,12 @@ export default function Exercises({ onValidate }) {
           </button>
         </div>
       </div>
-      <div className="bg-gray-900/40 border border-cyan-600/30 rounded p-5 space-y-4">
+      <div className="bg-gray-900/40 border border-encre-600/30 rounded p-5 space-y-4">
         <div>
           <span className={`text-xs font-semibold ${color.text} uppercase tracking-wider`}>
             {categoryLabels[ex.category] || ex.category}
           </span>
-          <h3 className="text-cyan-400 font-bold text-sm mt-1">{ex.title}</h3>
+          <h3 className="text-encre-400 font-bold text-sm mt-1">{ex.title}</h3>
         </div>
         <div className="bg-yellow-950/20 border border-yellow-900/30 p-3 rounded">
           <p className="text-yellow-200 text-xs font-semibold mb-1">Défi</p>
@@ -169,7 +169,7 @@ export default function Exercises({ onValidate }) {
             onChange={e => setExCommand(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleValidate(); } }}
             placeholder="Entrez votre commande..."
-            className="flex-1 bg-gray-950/50 border border-cyan-900/20 rounded px-3 py-2 text-green-300 text-xs outline-none focus:border-cyan-600/50"
+            className="flex-1 bg-gray-950/50 border border-encre-900/20 rounded px-3 py-2 text-green-300 text-xs outline-none focus:border-encre-600/50"
           />
           <button
             onClick={handleShowSolution}
